@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="50dp"
+        android:layout_marginBottom="30dp">
+
+        <TextView
+            android:id="@+id/game"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            android:layout_marginBottom="15dp"
+            android:text="Spielname:"
+            android:textSize="20dp"/>
+
+        <EditText
+            android:id="@+id/gameName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/game"
+            android:text="Dateiname"
+            android:background="@drawable/textview_story_border"
+            android:paddingHorizontal="10dp"/>
+
+        <TextView
+            android:id="@+id/playerCountOptions"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/game"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            android:layout_marginBottom="15dp"
+            android:text="Spielerzahl:"
+            android:textSize="20dp"/>
+
+        <EditText
+            android:id="@+id/playerCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/game"
+            android:layout_toRightOf="@+id/playerCountOptions"
+            android:layout_marginBottom="15dp"
+            android:text="3"
+            android:background="@drawable/textview_story_border"
+            android:paddingHorizontal="10dp"
+            android:inputType="numberDecimal"/>
+
+        <TextView
+            android:id="@+id/playModeOptionns"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/playerCountOptions"
+            android:layout_marginLeft="30dp"
+            android:layout_marginBottom="15dp"
+            android:layout_marginRight="30dp"
+            android:text="Lokal oder online:"
+            android:textSize="20dp"/>
+
+        <Switch
+            android:id="@+id/playMode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/playerCountOptions"
+            android:layout_toRightOf="@+id/playModeOptionns"
+            android:layout_marginBottom="15dp"/>
+
+        <TextView
+            android:id="@+id/storyMinCountOption"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/playModeOptionns"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            android:layout_marginBottom="15dp"
+            android:text="Mindest-Storyzahl pro Person:"
+            android:textSize="20dp"/>
+
+        <EditText
+            android:id="@+id/storyMinCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/playModeOptionns"
+            android:layout_toRightOf="@+id/storyMinCountOption"
+            android:layout_marginBottom="15dp"
+            android:text="2"
+            android:background="@drawable/textview_story_border"
+            android:paddingHorizontal="10dp"
+            android:inputType="numberDecimal"/>
+
+        <TextView
+            android:id="@+id/storyMaxCountOption"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/storyMinCountOption"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            android:layout_marginBottom="15dp"
+            android:text="Maximale Storyzahl pro Person:"
+            android:textSize="20dp"/>
+
+        <EditText
+            android:id="@+id/storyMaxCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/storyMinCountOption"
+            android:layout_toRightOf="@+id/storyMaxCountOption"
+            android:layout_marginBottom="15dp"
+            android:text="4"
+            android:background="@drawable/textview_story_border"
+            android:paddingHorizontal="10dp"
+            android:inputType="numberDecimal"/>
+
+        <Button
+            android:id="@+id/nextMenu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/storyMaxCountOption"
+            android:layout_marginTop="20dp"
+            android:layout_centerHorizontal="true"
+            android:text="Weiter"
+            android:backgroundTint="@color/orange_one"/>
+
+    </RelativeLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

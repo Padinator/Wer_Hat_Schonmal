@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/player"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="50dp"
+                android:layout_marginLeft="20dp"
+                android:textSize="23dp"
+                android:text="Spieler 1: Name ist an der Reihe"/>
+
+            <TextView
+                android:id="@+id/story"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/player"
+                android:layout_marginTop="20dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginBottom="80dp"
+                android:textSize="23dp"
+                android:text="Hier sollte eine Story drin stehen.
+                              Hier sollte eine Story drin stehen.
+                              Hier sollte eine Story drin stehen.
+                              Hier sollte eine Story drin stehen.
+                              Hier sollte eine Story drin stehen.
+                              Hier sollte eine Story drin stehen."/>
+
+            <Button
+                android:id="@+id/solution"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/story"
+                android:layout_marginBottom="30dp"
+                android:layout_centerHorizontal="true"
+                android:text="Auflösung"/>
+
+            <Button
+                android:id="@+id/nextRound"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/solution"
+                android:layout_centerHorizontal="true"
+                android:text="Nächste Runde"/>
+
+            <TextView
+                android:id="@+id/popupText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20dp"
+                android:text="Bestätige, dass die Auflösung gezeigt werden soll"/>
+
+        </RelativeLayout>
+
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
