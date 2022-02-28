@@ -13,6 +13,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        //Stinker
 
         Button newGame = findViewById(R.id.newGame);
         Button loadGame = findViewById(R.id.loadGame);      // muss eine loeschfunktion haben
