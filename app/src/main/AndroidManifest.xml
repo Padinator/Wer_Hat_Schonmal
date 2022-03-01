@@ -19,12 +19,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".NewGameOptions"/>
-        <activity android:name=".NewGameOneDevice"/>
-        <activity android:name=".PlayLocalGame"/>
+        <activity android:name=".NewGame"/>
+        <activity android:name=".CreatePlayers"/>
+        <activity android:name=".PlayGame"/>
         <activity android:name=".LoadGame"/>
         <activity android:name=".Rules"/>
-        <activity android:name=".NewGameMultipleDevices"/>
     </application>
 
 </manifest>

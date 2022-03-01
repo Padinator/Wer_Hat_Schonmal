@@ -14,7 +14,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-public class NewGameOneDevice extends AppCompatActivity {
+public class CreatePlayers extends AppCompatActivity {
 
     private Player[] players = new Player[] {new Player(1)};       // List of all players
     private int actualPlayer = 0;       // Player zero is the first player
@@ -25,7 +25,7 @@ public class NewGameOneDevice extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.new_game_one_device);
+        setContentView(R.layout.create_players);
 
         Button saveAndNextStory, nextPerson, rules, start, viewYourStory;
         EditText writeStories, playerName;
@@ -68,17 +68,17 @@ public class NewGameOneDevice extends AppCompatActivity {
 
                 // Add a players story
                 if (players[actualPlayer].getCountOfStories() == maxStoryNumber) {      // Stories per player == maxStoryNumber?
-                    Toast.makeText(NewGameOneDevice.this, "Spieler hat bereits genug Stories aufgeschrieben!",
+                    Toast.makeText(CreatePlayers.this, "Spieler hat bereits genug Stories aufgeschrieben!",
                             Toast.LENGTH_LONG).show();
                 } else if (writeStories.getText().toString().isEmpty()) {       // Text field for stories is empty
-                    Toast.makeText(NewGameOneDevice.this, "Kein Text zum speichern!",
+                    Toast.makeText(CreatePlayers.this, "Kein Text zum speichern!",
                             Toast.LENGTH_LONG).show();
                 } else {            // Text field is okay
                     players[actualPlayer].addStory(writeStories.getText().toString());
                     writeStories.setText("Schreibe in dieses Feld deine n\u00e4chste Story rein.");
                     storyNumber.setText("Story " + (players[actualPlayer].getCountOfStories() + 1) + ":");
 
-                    Toast.makeText(NewGameOneDevice.this, "Story " + players[actualPlayer].getCountOfStories() + " gespeichert",
+                    Toast.makeText(CreatePlayers.this, "Story " + players[actualPlayer].getCountOfStories() + " gespeichert",
                             Toast.LENGTH_LONG).show();
                 }
             }
@@ -90,13 +90,13 @@ public class NewGameOneDevice extends AppCompatActivity {
 
                 // Check inserting a new player
                 if (players.length == playerNumber)
-                    Toast.makeText(NewGameOneDevice.this, "Es k\u00f6nnen nicht weitere Spieler teilnehmen!",
+                    Toast.makeText(CreatePlayers.this, "Es k\u00f6nnen nicht weitere Spieler teilnehmen!",
                             Toast.LENGTH_LONG).show();
                 else if (players[actualPlayer].getCountOfStories() < minStoryNumber)
-                    Toast.makeText(NewGameOneDevice.this, "Spieler muss mindestens " + minStoryNumber + " Stories besitzen!",
+                    Toast.makeText(CreatePlayers.this, "Spieler muss mindestens " + minStoryNumber + " Stories besitzen!",
                             Toast.LENGTH_LONG).show();
                 else if (players.length > playerNumber){
-                    Toast.makeText(NewGameOneDevice.this, "Zu viele eingeloggte Spieler!",
+                    Toast.makeText(CreatePlayers.this, "Zu viele eingeloggte Spieler!",
                             Toast.LENGTH_LONG).show();
                     // Exception has to be added hereeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
                 } else {
@@ -114,7 +114,7 @@ public class NewGameOneDevice extends AppCompatActivity {
                     tmpPlayerNumbers[players.length] = new Player(actualPlayer + 1);         // New player with no stories inserted
                     players = tmpPlayerNumbers;
 
-                    Toast.makeText(NewGameOneDevice.this, "Spieler " + players[actualPlayer - 1].getNumber() + " erfolgreich gespeichert",
+                    Toast.makeText(CreatePlayers.this, "Spieler " + players[actualPlayer - 1].getNumber() + " erfolgreich gespeichert",
                             Toast.LENGTH_LONG).show();
 
                     // Reset Text fields in new_game.xml
@@ -142,17 +142,18 @@ public class NewGameOneDevice extends AppCompatActivity {
                 // Check, if all players meet all conditions
                 //Auch durch Exceptions bzw. Assertions austauschennnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
                 if (players.length < playerNumber)
-                    Toast.makeText(NewGameOneDevice.this, "Zu wenig eingeloggte Spieler", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(CreatePlayers.this, "Zu wenig eingeloggte Spieler", Toast.LENGTH_SHORT).show();
                 else if (players.length > playerNumber)
-                    Toast.makeText(NewGameOneDevice.this, "Zu viele eingeloggte Spieler", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(CreatePlayers.this, "Zu viele eingeloggte Spieler", Toast.LENGTH_SHORT).show();
                 else if (players[players.length - 1].getCountOfStories() < minStoryNumber)
-                    Toast.makeText(NewGameOneDevice.this, "Spieler " + players.length + " besitzt zu wenig Storys!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(CreatePlayers.this, "Spieler " + players.length + " besitzt zu wenig Storys!", Toast.LENGTH_SHORT).show();
                 else if (maxStoryNumber < players[players.length - 1].getCountOfStories())
-                    Toast.makeText(NewGameOneDevice.this, "Spieler " + players.length + " besitzt zu viele Storys!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(CreatePlayers.this, "Spieler " + players.length + " besitzt zu viele Storys!", Toast.LENGTH_SHORT).show();
                 else {
 
                     // directory = game name directory
                     File directory = (File) getIntent().getExtras().get("directory");
+                    Toast.makeText(CreatePlayers.this, directory.toString(), Toast.LENGTH_SHORT).show();
 
                     if (directory.mkdirs()) {
 
@@ -179,7 +180,7 @@ public class NewGameOneDevice extends AppCompatActivity {
                                 }
 
                                 // Go to class PlayLocalGame
-                                Intent startLocalGameIntent = new Intent(getApplicationContext(), PlayLocalGame.class);
+                                Intent startLocalGameIntent = new Intent(getApplicationContext(), PlayGame.class);
 
                                 // Give players and their stories, do not change content of files
                                 startLocalGameIntent.putExtra("countOfPlayers", players.length);
@@ -190,14 +191,14 @@ public class NewGameOneDevice extends AppCompatActivity {
                                 startActivity(startLocalGameIntent);
 
                             } else {
-                                Toast.makeText(NewGameOneDevice.this, "Spielerverzeichnis " +
+                                Toast.makeText(CreatePlayers.this, "Spielerverzeichnis " +
                                         "konnte nicht erstellt werden", Toast.LENGTH_SHORT).show();
                                 correctInput = false;
                             }
                         }
 
                     } else {
-                        Toast.makeText(NewGameOneDevice.this, "Spielverzeichnis konnte nicht " +
+                        Toast.makeText(CreatePlayers.this, "Spielverzeichnis konnte nicht " +
                                 "erstellt werden", Toast.LENGTH_SHORT).show();
                         correctInput = false;
                     }
