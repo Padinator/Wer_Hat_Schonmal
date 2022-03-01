@@ -23,9 +23,9 @@
                 android:layout_marginTop="10dp"
                 android:background="#00000000"
                 android:gravity="center_horizontal"
-                android:text="Regeln"
+                android:text="Regeln!"
                 android:textAlignment="center"
-                android:textColor="@color/normalBlue"
+                android:textColor="#f45431"
                 android:textSize="20dp"
                 />
 
@@ -41,9 +41,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
-                android:text="Weiter"
-                android:layout_marginTop="40dp"
+                android:text="SPIELSTART"
+                android:layout_marginTop="20dp"
                 android:layout_below="@id/listView"
+                android:backgroundTint="@color/orange_one"
+                android:textColor="@color/black"
                 />
 
 

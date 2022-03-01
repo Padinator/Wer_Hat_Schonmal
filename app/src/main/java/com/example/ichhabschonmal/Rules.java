@@ -9,6 +9,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ComponentActivity;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,21 +23,20 @@ public class Rules extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // make ListView visible
+        // make Content visible
         setContentView(R.layout.rules);
 
         Button weiter;
 
         weiter = findViewById(R.id.btn);
 
-
         listView = (ListView)findViewById(R.id.listView);
 
         // ArrayList for all Game Rules
         ArrayList <String> rules = new ArrayList<>();
-        rules.add("1:");
-        rules.add("2:");
-        rules.add("3:");
+        rules.add("1: bla bla bla");
+        rules.add("2: blub blub blub");
+        rules.add("3: bli bli bli");
         rules.add("4:");
         rules.add("5:");
         rules.add("6:");
@@ -59,7 +59,11 @@ public class Rules extends AppCompatActivity {
                 Intent startGame = new Intent(Rules.this, PlayGame.class);
                 startActivity(startGame);
             }
+
+            // Code from CreatePlayers.java for Game start is missing here ...
+
         });
+
 
 
 
