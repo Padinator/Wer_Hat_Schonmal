@@ -3,7 +3,6 @@ package com.example.ichhabschonmal;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,7 +12,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-public class PlayLocalGame extends AppCompatActivity {
+public class PlayGame extends AppCompatActivity {
 
     private Player[] players;
     private File directory;
@@ -21,7 +20,7 @@ public class PlayLocalGame extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.play_local_game);
+        setContentView(R.layout.play_game);
 
         Button solution, nextRound;
         TextView popupText, player, story;
@@ -80,7 +79,7 @@ public class PlayLocalGame extends AppCompatActivity {
     }
 
     private void createPlayer(int number) {     // Find a player's number, name and stories
-        File directory = new File(this.directory.toString() + "Spieler" + number);
+        File directory = new File(this.directory.toString() + "/Spieler" + number);
         File[] listOfStories = directory.listFiles();
         String name;
 

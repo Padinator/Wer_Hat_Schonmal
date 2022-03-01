@@ -14,24 +14,24 @@
             android:id="@+id/newGame"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Neues Spiel"
-            android:gravity="center"
+            android:layout_centerInParent="true"
             android:backgroundTint="@color/orange_one"
-            android:textColor="@color/black"
-            android:layout_centerInParent="true" />
+            android:gravity="center"
+            android:text="Neues Spiel"
+            android:textColor="@color/black" />
 
         <Button
             android:id="@+id/loadGame"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Lade alten Spielstand"
-            android:gravity="center"
-            android:backgroundTint="@color/orange_one"
-            android:textColor="@color/black"
             android:layout_below="@+id/newGame"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="10dp"
-            android:layout_marginBottom="50dp"/>
+            android:layout_marginBottom="50dp"
+            android:backgroundTint="@color/orange_one"
+            android:gravity="center"
+            android:text="Lade alten Spielstand"
+            android:textColor="@color/black" />
 
     </RelativeLayout>
 
