@@ -51,14 +51,14 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/solution"
                 android:layout_centerHorizontal="true"
-                android:text="Nächste Runde"/>
+                android:text="Nächste Runde" />
 
             <TextView
                 android:id="@+id/popupText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="20dp"
-                android:text="Bestätige, dass die Auflösung gezeigt werden soll"/>
+                android:text="Bestätige, dass die Auflösung gezeigt werden soll"
+                android:textSize="20dp" />
 
         </RelativeLayout>
 

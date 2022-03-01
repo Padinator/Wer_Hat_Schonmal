@@ -129,7 +129,7 @@ public class CreatePlayers extends AppCompatActivity {
         rules.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent rulesIntent = new Intent(getApplicationContext(), Rules.class);
+                Intent rulesIntent = new Intent(CreatePlayers.this, Rules.class);
                 startActivity(rulesIntent);
             }
         });

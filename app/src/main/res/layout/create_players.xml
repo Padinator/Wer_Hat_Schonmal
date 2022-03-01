@@ -129,13 +129,13 @@
                     android:id="@+id/rules"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Regeln"
-                    android:textColor="@color/black"
                     android:layout_below="@id/nextPerson"
-                    android:layout_toLeftOf="@+id/orientationTwo"
                     android:layout_marginLeft="20dp"
                     android:layout_marginRight="10dp"
-                    android:backgroundTint="@color/white"/>
+                    android:layout_toLeftOf="@+id/orientationTwo"
+                    android:backgroundTint="@color/white"
+                    android:text="Regeln"
+                    android:textColor="@color/black" />
 
                 <TextView
                     android:id="@+id/orientationTwo"
@@ -150,12 +150,12 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/nextPerson"
-                    android:layout_toRightOf="@+id/orientationTwo"
                     android:layout_marginLeft="10dp"
                     android:layout_marginRight="20dp"
-                    android:text="Start"
+                    android:layout_toRightOf="@+id/orientationTwo"
                     android:backgroundTint="@color/orange_one"
-                    android:textColor="@color/black"/>
+                    android:text="Start"
+                    android:textColor="@color/black" />
 
             </RelativeLayout>
 
