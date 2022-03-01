@@ -32,9 +32,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_toRightOf="@+id/playerID"
-                    android:text="Dein Name"
                     android:background="@drawable/textview_story_border"
-                    android:paddingHorizontal="10dp"/>
+                    android:paddingHorizontal="10dp"
+                    android:text="Dein Name" />
 
             </RelativeLayout>
 
@@ -103,7 +103,7 @@
                 <!--RecyclerView-->
 
                 <Button
-                    android:id="@+id/viewYourStory"
+                    android:id="@+id/viewYourStories"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="15dp"
@@ -125,18 +125,6 @@
                     android:text="Nächste Person ist dran"
                     android:textColor="@color/white" />
 
-                <Button
-                    android:id="@+id/rules"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/nextPerson"
-                    android:layout_marginLeft="20dp"
-                    android:layout_marginRight="10dp"
-                    android:layout_toLeftOf="@+id/orientationTwo"
-                    android:backgroundTint="@color/white"
-                    android:text="Regeln"
-                    android:textColor="@color/black" />
-
                 <TextView
                     android:id="@+id/orientationTwo"
                     android:layout_width="wrap_content"
@@ -146,16 +134,14 @@
                     android:visibility="invisible"/>
 
                 <Button
-                    android:id="@+id/start"
+                    android:id="@+id/next"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/nextPerson"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginRight="20dp"
-                    android:layout_toRightOf="@+id/orientationTwo"
+                    android:layout_below="@id/nextPerson"
+                    android:layout_centerHorizontal="true"
+                    android:text="Weiter"
                     android:backgroundTint="@color/orange_one"
-                    android:text="Start"
-                    android:textColor="@color/black" />
+                    />
 
             </RelativeLayout>
 

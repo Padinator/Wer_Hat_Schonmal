@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/player"
+        android:layout_width="160dp"
+        android:layout_height="30dp"
+        android:background="@drawable/textview_story_border"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="20dp">
+    </TextView>
+
+    <TextView
+        android:id="@+id/points"
+        android:layout_width="100dp"
+        android:layout_height="30dp"
+        android:background="@drawable/textview_story_border"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="250dp">
+    </TextView>
+
+
+</RelativeLayout>

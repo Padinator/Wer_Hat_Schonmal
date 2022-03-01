@@ -26,9 +26,9 @@ public class Rules extends AppCompatActivity {
         // make Content visible
         setContentView(R.layout.rules);
 
-        Button weiter;
+        Button start;
 
-        weiter = findViewById(R.id.btn);
+        start = findViewById(R.id.btn);
 
         listView = (ListView)findViewById(R.id.listView);
 
@@ -53,7 +53,7 @@ public class Rules extends AppCompatActivity {
 
 
         // if press on button "weiter" then the game will start
-        weiter.setOnClickListener(new View.OnClickListener() {
+        start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent startGame = new Intent(Rules.this, PlayGame.class);

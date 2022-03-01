@@ -27,16 +27,15 @@ public class CreatePlayers extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.create_players);
 
-        Button saveAndNextStory, nextPerson, rules, start, viewYourStory;
+        Button saveAndNextStory, nextPerson, rules, start, viewYourStories, next;
         EditText writeStories, playerName;
         TextView playerID, storyNumber;
 
         // Buttons:
         saveAndNextStory = findViewById(R.id.saveAndNextStory);
         nextPerson = findViewById(R.id.nextPerson);
-        rules = findViewById(R.id.rules);
-        start = findViewById(R.id.start);
-        viewYourStory = findViewById(R.id.viewYourStory);//nachbearbeitennnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
+        next = findViewById(R.id.next);
+        viewYourStories = findViewById(R.id.viewYourStories);//nachbearbeitennnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
 
         // EditTexts:
         writeStories = findViewById(R.id.writeStories);
@@ -126,14 +125,7 @@ public class CreatePlayers extends AppCompatActivity {
             }
         });
 
-        rules.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent rulesIntent = new Intent(CreatePlayers.this, Rules.class);
-                startActivity(rulesIntent);
-            }
-        });
-
+        /*
         start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -166,7 +158,7 @@ public class CreatePlayers extends AppCompatActivity {
                             if (playersDir.mkdir()) {
                                 for (int j = 0; j < players[i].getCountOfStories(); j++) {
                                     try {       // Create file and write data
-                                        File playersFileDir = new File(playersDir /*+ "/" +*/, players[i].getName() + "_" + "story" + j);
+                                        File playersFileDir = new File(playersDir  players[i].getName() + "_" + "story" + j);
 
                                         //playersFileDir.createNewFile();         // playersFileDir = location to save files in playersDir
 
@@ -205,8 +197,17 @@ public class CreatePlayers extends AppCompatActivity {
                 }
             }
         });
+        */
 
-        viewYourStory.setOnClickListener(new View.OnClickListener() {//nachbearbeitennnnnnnnnnnnnnnnnnnnnnnnnnnnn
+        next.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent rules = new Intent(CreatePlayers.this, Rules.class);
+                startActivity(rules);
+            }
+        });
+
+        viewYourStories.setOnClickListener(new View.OnClickListener() {//nachbearbeitennnnnnnnnnnnnnnnnnnnnnnnnnnnn
             @Override
             public void onClick(View view) {
                 // Use RecyclerView
