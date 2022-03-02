@@ -16,6 +16,10 @@ public class StoryAdapter extends RecyclerView.Adapter<StoryAdapter.StoryViewHol
     private Cursor mCursor;
 
 
+    public StoryAdapter() {
+
+    }
+
     public StoryAdapter(Context context, Cursor cursor) {
         mContext = context;
         mCursor = cursor;
