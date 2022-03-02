@@ -32,7 +32,7 @@ public class CreatePlayers extends AppCompatActivity {
         saveAndNextStory = findViewById(R.id.saveAndNextStory);
         nextPerson = findViewById(R.id.nextPerson);
         next = findViewById(R.id.next);
-        viewYourStories = findViewById(R.id.viewYourStories);//nachbearbeitennnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
+        viewYourStories = findViewById(R.id.viewYourStories);
 
         // EditTexts:
         writeStories = findViewById(R.id.writeStories);
@@ -62,6 +62,16 @@ public class CreatePlayers extends AppCompatActivity {
         AppDatabase db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
 
         //muss uebergeben werdennnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
+
+        viewYourStories.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent viewStories = new Intent(getApplicationContext(), ViewAllStories.class);
+                Toast.makeText(getApplicationContext(), "Stories", Toast.LENGTH_LONG).show();
+                startActivity(viewStories);
+            }
+        });
+
 
         saveAndNextStory.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -193,11 +203,5 @@ public class CreatePlayers extends AppCompatActivity {
             }
         });
 
-        viewYourStories.setOnClickListener(new View.OnClickListener() {//nachbearbeitennnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
-            @Override
-            public void onClick(View view) {
-                // Use RecyclerView
-            }
-        });
     }
 }
