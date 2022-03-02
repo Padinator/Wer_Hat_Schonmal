@@ -50,11 +50,11 @@ public class PlayGame extends AppCompatActivity {
         int chosenPlayer = chooseNumber(players.length, 0);        // Choose a player to guess the writer of the story
 
         // Write name and number of first player in the TextView player
-        player.setText("Spieler " + chosenPlayer + ": " + players[chosenPlayer].getName() + " ist an der Reihe");
+        //player.setText("Spieler " + chosenPlayer + ": " + players[chosenPlayer].getName() + " ist an der Reihe");
 
         // Write a story in the TextView story
         int chosenStory = chooseNumber(players.length, chosenPlayer);
-        story.setText(players[chosenPlayer].getStory(chosenStory));
+        //story.setText(players[chosenPlayer].getStory(chosenStory));
 
 
         solution.setOnClickListener(new View.OnClickListener() {
@@ -79,6 +79,7 @@ public class PlayGame extends AppCompatActivity {
     }
 
     private void createPlayer(int number) {     // Find a player's number, name and stories
+        /*
         File directory = new File(this.directory.toString() + "/Spieler" + number);
         File[] listOfStories = directory.listFiles();
         String name;
@@ -112,7 +113,7 @@ public class PlayGame extends AppCompatActivity {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }
+        }*/
     }
 
     private void playRound() {

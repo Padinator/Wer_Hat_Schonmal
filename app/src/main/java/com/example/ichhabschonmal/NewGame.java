@@ -80,12 +80,13 @@ public class NewGame extends AppCompatActivity {
                     Toast.makeText(NewGame.this, "Minimum-Storyzahl muss kleiner oder gleich der Maximum-Storyzahl sein!", Toast.LENGTH_SHORT).show();
                 else {
                      if (!playMode.isChecked()) {       // One phone for all player, only one counter:
-                         Intent newGameOneDeviceIntent = new Intent(getApplicationContext(), CreatePlayers.class);
-                         newGameOneDeviceIntent.putExtra("MinStoryNumber", Integer.parseInt(storyMinNumber));     // Give storyMinNumber
-                         newGameOneDeviceIntent.putExtra("MaxStoryNumber", Integer.parseInt(storyMaxNumber));     // Give storyMaxNumber
-                         newGameOneDeviceIntent.putExtra("playerNumber", Integer.parseInt(playerNumber));     // Give number of players
-                         newGameOneDeviceIntent.putExtra("directory", directory);       // Give directory
-                         startActivity(newGameOneDeviceIntent);
+                         Intent newGameIntent = new Intent(getApplicationContext(), CreatePlayers.class);
+                         newGameIntent.putExtra("MinStoryNumber", Integer.parseInt(storyMinNumber));     // Give storyMinNumber
+                         newGameIntent.putExtra("MaxStoryNumber", Integer.parseInt(storyMaxNumber));     // Give storyMaxNumber
+                         newGameIntent.putExtra("playerNumber", Integer.parseInt(playerNumber));     // Give number of players
+                         //newGame.putExtra("directory", directory);       // Give directory
+                         newGameIntent.putExtra("GameName", gameName.getText().toString());     // Give the name of the game
+                         startActivity(newGameIntent);
                      } /*else {
                         Intent newGameMultipleDevicesIntent = new Intent(getApplicationContext(), NewGameMultipleDevices.class);
                         startActivity(newGameMultipleDevicesIntent);
