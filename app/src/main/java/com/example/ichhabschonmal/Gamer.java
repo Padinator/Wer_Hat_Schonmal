@@ -2,7 +2,7 @@ package com.example.ichhabschonmal;
 
 public class Gamer {        // Data entity is already named Player
     private String[] listOfStories = new String[0];     // Stories are saved temporary in listOfStories
-    public final int number;
+    private final int number;
     private String name;
 
     Gamer(int number) {       // No default-Ctor: a player/gamer always has name and a number
