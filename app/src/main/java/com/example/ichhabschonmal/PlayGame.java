@@ -4,23 +4,31 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.room.Room;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.List;
 
 public class PlayGame extends AppCompatActivity {
 
-    private Player[] players;
-    private File directory;
+    //private Gamer[] players;
+    //private File directory;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.play_game);
+
+        AppDatabase db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
+        List<Game> listOfGames = db.gamesDao().getAll();
+        List<Player> listOfPlayers = db.userDao().getAll();
+        List<Story> listOfStories = db.storyDao().getAll();
 
         Button solution, nextRound;
         TextView popupText, player, story;
@@ -38,22 +46,17 @@ public class PlayGame extends AppCompatActivity {
         //PopupMenus:
         //popupMenu = new PopupMenu(getApplicationContext(), popupText);
 
-        // Use given values:
-        players = new Player[getIntent().getExtras().getInt("countOfPlayers")];
-        directory = (File) getIntent().getExtras().get("directory");
-
         // Collect all players in one Array in this intent
         findAllPlayers();
 
-
         // Find first player to play
-        int chosenPlayer = chooseNumber(players.length, 0);        // Choose a player to guess the writer of the story
+        //int chosenPlayer = chooseNumber(players.length, 0);        // Choose a player to guess the writer of the story
 
         // Write name and number of first player in the TextView player
         //player.setText("Spieler " + chosenPlayer + ": " + players[chosenPlayer].getName() + " ist an der Reihe");
 
         // Write a story in the TextView story
-        int chosenStory = chooseNumber(players.length, chosenPlayer);
+        //int chosenStory = chooseNumber(players.length, chosenPlayer);
         //story.setText(players[chosenPlayer].getStory(chosenStory));
 
 
@@ -72,10 +75,11 @@ public class PlayGame extends AppCompatActivity {
         });
     }
 
+
     private void findAllPlayers() {
-        for (int i = 0; i < players.length; i++) {
+        /*for (int i = 0; i < players.length; i++) {
             createPlayer(i);
-        }
+        }*/
     }
 
     private void createPlayer(int number) {     // Find a player's number, name and stories

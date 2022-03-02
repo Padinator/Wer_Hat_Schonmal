@@ -2,9 +2,11 @@ package com.example.ichhabschonmal;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.room.Room;
+import androidx.room.RoomDatabase;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -14,6 +16,7 @@ import android.widget.Toast;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class CreatePlayers extends AppCompatActivity {
@@ -64,7 +67,8 @@ public class CreatePlayers extends AppCompatActivity {
             playerNumber = 5;
 
         // Database connection:
-        AppDatabase db = Room.databaseBuilder(this, AppDatabase.class, "database").build();
+        AppDatabase db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
+
         //muss uebergeben werdennnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
 
         saveAndNextStory.setOnClickListener(new View.OnClickListener() {
@@ -150,7 +154,7 @@ public class CreatePlayers extends AppCompatActivity {
                 else {
                     // Database connection
                     GameDao gamesDao = db.gamesDao();
-                    PlayerDao userDao = db.userDao();
+                    PlayerDao playerDao = db.userDao();
                     StoryDao storyDao = db.storyDao();
 
                     // Insert name of the game  -> next-Button of the previous intent
@@ -159,23 +163,34 @@ public class CreatePlayers extends AppCompatActivity {
                     newGame.gameName = getIntent().getStringExtra("GameName");
                     gamesDao.insertAll(newGame);
 
-                    // Check inserting a new player     -> nextPlayer-Button
-                    for (int i = 0; i < listOfPlayers.length; i++) {
-                        Player newPlayer = new Player();
-                        //newPlayer.playerId = newPlayer.playerId;      // Player id is set with autoincrement
-                        newPlayer.name = listOfPlayers[i].getName();
-                        newPlayer.gameId = newGame.gameId;
-                        newPlayer.score = 0;
+                    // Create an Array to insert in playerDao
+                    Player[] listOfNewPlayers = new Player[listOfPlayers.length];
 
-                        // Add a players story      -> safeStory-Button
+                    // Insert all players     -> nextPlayer-Button
+                    for (int i = 0; i < listOfPlayers.length; i++) {
+                        //listOfNewPlayers[i].playerId = listOfNewPlayers[i].playerId;      // Player id is set with autoincrement
+
+                        listOfNewPlayers[i] = new Player();
+                        listOfNewPlayers[i].name = listOfPlayers[i].getName();
+                        listOfNewPlayers[i].gameId = newGame.gameId;
+                        listOfNewPlayers[i].score = 0;
+
+                        // Create an Array to insert in storyDao
+                        Story[] listOfStories = new Story[listOfPlayers[i].getCountOfStories()];
+
+                        // Insert a player's stories
                         for (int j = 0; j < listOfPlayers[i].getCountOfStories(); j++) {
-                            Story newStory = new Story();
-                            //newStory.storyId = newStory.storyId;        // Story id is set with autoincrement
-                            newStory.content = listOfPlayers[i].getStory(j);
-                            newStory.status = false;
-                            newStory.playerId = newPlayer.playerId;
+                            listOfStories[j] = new Story();
+                            //listOfStories[i].storyId = listOfStories[i].storyId;        // Story id is set with autoincrement
+                            listOfStories[j].content = listOfPlayers[i].getStory(j);
+                            listOfStories[j].status = false;
+                            listOfStories[j].playerId = listOfNewPlayers[i].playerId;
                         }
+
+                        storyDao.insertAll(listOfStories);
                     }
+
+                    playerDao.insertAll(listOfNewPlayers);
 
                     //Ist das so/auf diese Weise sinnvollllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
                     if (correctInput) {         // If database is correctly created

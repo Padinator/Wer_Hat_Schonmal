@@ -70,7 +70,7 @@ public class NewGame extends AppCompatActivity {
                         && storyMaxNumber.indexOf("7") != -1 && storyMaxNumber.indexOf("8") != -1
                         && storyMaxNumber.indexOf("9") != -1)
                     Toast.makeText(NewGame.this, "Spielerzahl darf nur aus Zahlen bestehen!", Toast.LENGTH_SHORT).show();
-                else if (Integer.parseInt(playerNumber) < 2)
+                else if (Integer.parseInt(playerNumber) < 3)
                     Toast.makeText(NewGame.this, "Spielerzahl muss gr\u00f6\u00dfer als 2 sein!", Toast.LENGTH_SHORT).show();
                 else if (Integer.parseInt(storyMinNumber) <= 0)          // Cast is valid, because of if-cases before
                     Toast.makeText(NewGame.this, "Mindest-Storyzahl muss gr\u00f6\u00dfer 0 sein!", Toast.LENGTH_SHORT).show();
