@@ -1,6 +1,5 @@
 package com.example.ichhabschonmal;
 
-
 import android.content.Context;
 import android.database.Cursor;
 import android.view.LayoutInflater;
