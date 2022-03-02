@@ -40,7 +40,7 @@ public class PlayGame extends AppCompatActivity {
 
         // Use given values:
         players = new Player[getIntent().getExtras().getInt("countOfPlayers")];
-        directory = (File) getIntent().getExtras().get("directory");
+        //directory = (File) getIntent().getExtras().get("directory");
 
         // Collect all players in one Array in this intent
         findAllPlayers();

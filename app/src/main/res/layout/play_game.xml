@@ -41,9 +41,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/story"
-                android:layout_marginBottom="30dp"
                 android:layout_centerHorizontal="true"
-                android:text="Auflösung"/>
+                android:layout_marginBottom="30dp"
+                android:text="Auflösung" />
 
             <Button
                 android:id="@+id/nextRound"
