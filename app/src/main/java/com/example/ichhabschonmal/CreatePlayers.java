@@ -32,7 +32,8 @@ public class CreatePlayers extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.create_players);
 
-        Button saveAndNextStory, nextPerson, viewYourStories, next;        EditText writeStories, playerName;
+        Button saveAndNextStory, nextPerson, viewYourStories, next;
+        EditText writeStories, playerName;
         TextView playerID, storyNumber;
 
         // Buttons:
@@ -137,7 +138,7 @@ public class CreatePlayers extends AppCompatActivity {
         next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                /*
+
                 boolean correctInput = true;//spaeter durch Exceptions bzw. Assertions austauschennnnnnnnnnnnn
 
                 // Check, if all players meet all conditions
@@ -192,17 +193,11 @@ public class CreatePlayers extends AppCompatActivity {
                     playerDao.insertAll(listOfNewPlayers);
 
                     //Ist das so/auf diese Weise sinnvollllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
-
                     if (correctInput) {         // If database is correctly created
                         Intent rules = new Intent(CreatePlayers.this, Rules.class);
                         startActivity(rules);
                     }
-
                 }
-
-                 */
-                Intent rules = new Intent(CreatePlayers.this, Rules.class);
-                startActivity(rules);
             }
         });
 
