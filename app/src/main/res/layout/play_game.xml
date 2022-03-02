@@ -15,26 +15,35 @@
                 android:id="@+id/player"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="50dp"
                 android:layout_marginLeft="20dp"
-                android:textSize="23dp"
-                android:text="Spieler 1: Name ist an der Reihe"/>
+                android:layout_marginTop="50dp"
+                android:text="Spieler 1: Name ist an der Reihe"
+                android:textSize="23dp" />
+
+            <Spinner
+                android:id="@+id/dropdown"
+                android:layout_width="260dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/story"
+                android:background="@android:drawable/btn_dropdown"
+                android:spinnerMode="dropdown"
+                android:layout_centerHorizontal="true" />
 
             <TextView
                 android:id="@+id/story"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/player"
-                android:layout_marginTop="20dp"
                 android:layout_marginLeft="20dp"
+                android:layout_marginTop="20dp"
                 android:layout_marginBottom="80dp"
-                android:textSize="23dp"
                 android:text="Hier sollte eine Story drin stehen.
                               Hier sollte eine Story drin stehen.
                               Hier sollte eine Story drin stehen.
                               Hier sollte eine Story drin stehen.
                               Hier sollte eine Story drin stehen.
-                              Hier sollte eine Story drin stehen."/>
+                              Hier sollte eine Story drin stehen."
+                android:textSize="23dp" />
 
             <Button
                 android:id="@+id/solution"
@@ -42,6 +51,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/story"
                 android:layout_centerHorizontal="true"
+                android:layout_marginTop="80dp"
                 android:layout_marginBottom="30dp"
                 android:text="Auflösung" />
 
@@ -54,10 +64,12 @@
                 android:text="Nächste Runde" />
 
             <TextView
-                android:id="@+id/popupText"
+                android:id="@+id/round"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Bestätige, dass die Auflösung gezeigt werden soll"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="10dp"
+                android:textColor="#8ab6de"
                 android:textSize="20dp" />
 
         </RelativeLayout>

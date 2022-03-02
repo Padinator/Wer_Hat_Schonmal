@@ -12,21 +12,30 @@
             android:id="@+id/scoreboard"
             android:layout_width="match_parent"
             android:layout_height="30dp"
-            android:layout_marginTop="10dp"
             android:layout_alignParentTop="true"
             android:layout_centerInParent="true"
+            android:layout_marginTop="10dp"
             android:background="#00000000"
             android:gravity="center_horizontal"
             android:text="PUNKTESTAND"
             android:textAlignment="center"
             android:textColor="#8ab6de"
-            android:textSize="20dp"/>
+            android:textSize="20dp" />
+
+        <Button
+            android:id="@+id/confirm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/recyclerView"
+            android:layout_centerHorizontal="true"
+            android:text="WEITER"/>
 
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="400dp"
+            android:layout_below="@id/scoreboard"/>
 
 
 

@@ -1,8 +1,12 @@
 package com.example.ichhabschonmal;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,6 +23,7 @@ public class PlayGame extends AppCompatActivity {
 
     //private Gamer[] players;
     //private File directory;
+    private static int roundNumber = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,8 +35,9 @@ public class PlayGame extends AppCompatActivity {
         List<Player> listOfPlayers = db.userDao().getAll();
         List<Story> listOfStories = db.storyDao().getAll();
 
+
         Button solution, nextRound;
-        TextView popupText, player, story;
+        TextView popupText, player, story,round;
         //PopupMenu popupMenu;
 
         // Buttons:
@@ -42,9 +48,22 @@ public class PlayGame extends AppCompatActivity {
         //popupText = findViewById(R.id.popupText);
         player = findViewById(R.id.player);
         story = findViewById(R.id.story);
+        round = findViewById(R.id.round);
+
+        round.setText("Runde Nr." + roundNumber);
+
 
         //PopupMenus:
         //popupMenu = new PopupMenu(getApplicationContext(), popupText);
+
+
+        // this array must be replaced by the player array!
+        String[] test = new String[] {"Tom", "Dom", "Patrick"};
+
+        // create drop down menu for choosing a player
+        Spinner spin = findViewById(R.id.dropdown);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, test);
+        spin.setAdapter(adapter);
 
         // Collect all players in one Array in this intent
         findAllPlayers();
@@ -70,7 +89,10 @@ public class PlayGame extends AppCompatActivity {
         nextRound.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                // verweis auf score
+                Intent next = new Intent(PlayGame.this, Score.class);
+                startActivity(next);
+                roundNumber++;
             }
         });
     }
