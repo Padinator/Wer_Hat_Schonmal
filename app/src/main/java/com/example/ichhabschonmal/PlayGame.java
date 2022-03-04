@@ -3,7 +3,6 @@ package com.example.ichhabschonmal;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
@@ -25,6 +24,7 @@ public class PlayGame extends AppCompatActivity {
     //private File directory;
     private static int roundNumber = 1;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,7 +34,6 @@ public class PlayGame extends AppCompatActivity {
         List<Game> listOfGames = db.gamesDao().getAll();
         List<Player> listOfPlayers = db.userDao().getAll();
         List<Story> listOfStories = db.storyDao().getAll();
-
 
         Button solution, nextRound;
         TextView popupText, player, story,round;
@@ -52,10 +51,8 @@ public class PlayGame extends AppCompatActivity {
 
         round.setText("Runde Nr." + roundNumber);
 
-
         //PopupMenus:
         //popupMenu = new PopupMenu(getApplicationContext(), popupText);
-
 
         // this array must be replaced by the player array!
         String[] test = new String[] {"Tom", "Dom", "Patrick"};
@@ -93,6 +90,7 @@ public class PlayGame extends AppCompatActivity {
                 Intent next = new Intent(PlayGame.this, Score.class);
                 startActivity(next);
                 roundNumber++;
+
             }
         });
     }
