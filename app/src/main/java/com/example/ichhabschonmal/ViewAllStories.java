@@ -9,6 +9,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
 
+import java.util.ArrayList;
+
 public class ViewAllStories extends AppCompatActivity {
 
 
@@ -22,9 +24,8 @@ public class ViewAllStories extends AppCompatActivity {
 
         StoryDao storyDao = db.storyDao();
 
-
-
         Story[] stories = new Story[storyDao.getAll().size()];
+
 
 
         for (int i = 0; i < stories.length; i++) {
