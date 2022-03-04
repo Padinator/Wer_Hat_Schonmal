@@ -1,6 +1,7 @@
 package com.example.ichhabschonmal;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
@@ -10,9 +11,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class LoadGame extends AppCompatActivity {
+
+    private LoadGameAdapter loadGameAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,26 +25,20 @@ public class LoadGame extends AppCompatActivity {
 
 
         AppDatabase db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
+        List<Game> games = db.gamesDao().getAll();
 
         RecyclerView recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
 
-        List<Game> games = db.gamesDao().getAll();
 
+        List<String> listGames = new ArrayList<>();
+        for (int i = 0; i < games.size(); i++) {
+            listGames.add(games.get(i).gameName);
+        }
 
-        Toast.makeText(LoadGame.this,  "MIMIMI", Toast.LENGTH_LONG).show();
-
-
-
-        Toast.makeText(getApplicationContext(), games.get(0).gameName + "MIMIMI", Toast.LENGTH_LONG).show();
-        Toast.makeText(getApplicationContext(), games.get(1).gameName, Toast.LENGTH_LONG).show();
-
-
-
-
-
-
+        loadGameAdapter = new LoadGameAdapter(this, listGames);
+        recyclerView.setAdapter(loadGameAdapter);
 
 
 

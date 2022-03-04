@@ -1,80 +1,60 @@
 package com.example.ichhabschonmal;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ListView;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class LoadGameAdapter extends RecyclerView.Adapter<LoadGameAdapter.LoadGameViewHolder> {
+import java.util.List;
 
-    private Context mContext;
-    private Cursor mCursor;
+public class LoadGameAdapter extends RecyclerView.Adapter<LoadGameAdapter.ViewHolder> {
 
+    private List<String> mData;
+    private LayoutInflater mInflater;
 
-    public LoadGameAdapter(Context context, Cursor cursor) {
-        mContext = context;
-        mCursor = cursor;
-    }
-
-    public class LoadGameViewHolder extends RecyclerView.ViewHolder {
-        public TextView name;
-        public Button load;
-        public Button delete;
-
-        public LoadGameViewHolder(View view) {
-            super(view);
-            name = view.findViewById(R.id.name);
-            load = view.findViewById(R.id.load);
-            delete = view.findViewById(R.id.delete);
-        }
+    LoadGameAdapter(Context context, List<String> data) {
+        this.mInflater = LayoutInflater.from(context);
+        this.mData = data;
     }
 
     @Override
-    public LoadGameViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        LayoutInflater inflater = LayoutInflater.from(mContext);
-        View view = inflater.inflate(R.layout.load_game_item, parent, false);
-        return new LoadGameViewHolder(view);
+    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View view = mInflater.inflate(R.layout.load_game_item, parent, false);
+        return new ViewHolder(view);
     }
-
 
     @Override
-    public void onBindViewHolder(LoadGameViewHolder holder, int pos) {
-        if (!mCursor.moveToPosition(pos)) {
-            return;
-        }
-
-     /*
-        String name = mCursor.getString(mCursor.getColumnIndex(DB.GroceryEntry.COLUMN_NAME));
-        int amount = mCursor.getInt(mCursor.getColumnIndex(DB.GroceryEntry.COLUMN_AMOUNT));
-        long id = mCursor.getLong(mCursor.getColumnIndex(DB.GroceryEntry._ID));
-
-        gameView.name.setText(name);
-        gameView.load.setText(String.valueOf(amount));
-        gameView.delete.setTag(id);
-      */
+    public void onBindViewHolder(ViewHolder holder, int position) {
+        String game = mData.get(position);
+        holder.name.setText(game);
     }
-
 
     @Override
     public int getItemCount() {
-        return mCursor.getCount();
+        return mData.size();
     }
 
-    public void swapCursor(Cursor newCursor) {
-        if (mCursor != null) {
-            mCursor.close();
-        }
-        mCursor = newCursor;
 
-        if (newCursor != null) {
-            notifyDataSetChanged();
+    // stores and recycles views as they are scrolled off screen
+    public class ViewHolder extends RecyclerView.ViewHolder {
+        Button load, delete;
+        TextView name;
+
+        ViewHolder(View itemView) {
+            super(itemView);
+            name = itemView.findViewById(R.id.name);
+            load = itemView.findViewById(R.id.load);
+            delete = itemView.findViewById(R.id.delete);
         }
+
     }
+
+    String getItem(int id) {
+        return mData.get(id);
+    }
+
 }
