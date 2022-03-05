@@ -37,7 +37,7 @@ public class CreatePlayers extends AppCompatActivity {
         TextView playerID, storyNumber;
 
         // Buttons:
-        saveAndNextStory = findViewById(R.id.saveAndNextStory);
+        saveAndNextStory  = findViewById(R.id.saveAndNextStory);
         nextPerson = findViewById(R.id.nextPerson);
         next = findViewById(R.id.next);
         viewYourStories = findViewById(R.id.viewYourStories);//nachbearbeitennnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
@@ -69,6 +69,7 @@ public class CreatePlayers extends AppCompatActivity {
         // Database connection:
         AppDatabase db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
 
+        db.gamesDao();
         //muss uebergeben werdennnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
 
         saveAndNextStory.setOnClickListener(new View.OnClickListener() {

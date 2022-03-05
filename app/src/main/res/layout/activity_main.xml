@@ -15,10 +15,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:backgroundTint="@color/orange_one"
+            android:backgroundTint="@color/black"
             android:gravity="center"
             android:text="Neues Spiel"
-            android:textColor="@color/black" />
+            android:textColor="@color/white" />
 
         <Button
             android:id="@+id/loadGame"
@@ -28,10 +28,10 @@
             android:layout_centerHorizontal="true"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="50dp"
-            android:backgroundTint="@color/orange_one"
+            android:backgroundTint="@color/black"
             android:gravity="center"
             android:text="Lade alten Spielstand"
-            android:textColor="@color/black" />
+            android:textColor="@color/white" />
 
     </RelativeLayout>
 

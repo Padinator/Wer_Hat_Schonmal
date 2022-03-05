@@ -28,7 +28,7 @@ public class Rules extends AppCompatActivity {
 
         Button start;
 
-        start = findViewById(R.id.btn);
+        start = findViewById(R.id.start);
 
         listView = (ListView)findViewById(R.id.listView);
 

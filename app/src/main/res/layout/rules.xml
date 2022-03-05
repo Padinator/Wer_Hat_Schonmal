@@ -7,8 +7,9 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
-
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
         <RelativeLayout
             android:id="@+id/rulesTextView"
             android:layout_width="wrap_content"
@@ -26,8 +27,7 @@
                 android:text="Regeln!"
                 android:textAlignment="center"
                 android:textColor="#f45431"
-                android:textSize="20dp"
-                />
+                android:textSize="20dp" />
 
 
             <ListView
@@ -37,21 +37,21 @@
                 android:layout_marginTop="40dp" />
 
             <Button
-                android:id="@+id/btn"
+                android:id="@+id/start"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:text="SPIELSTART"
-                android:layout_marginTop="20dp"
                 android:layout_below="@id/listView"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="20dp"
                 android:backgroundTint="@color/orange_one"
-                android:textColor="@color/black"
-                />
-
+                android:text="SPIELSTART"
+                android:textColor="@color/black" />
 
         </RelativeLayout>
 
-    </RelativeLayout>
+        </ScrollView>
+
+        </RelativeLayout>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
