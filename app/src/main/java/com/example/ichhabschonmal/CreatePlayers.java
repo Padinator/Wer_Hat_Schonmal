@@ -1,27 +1,19 @@
 package com.example.ichhabschonmal;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.room.Room;
-import androidx.room.RoomDatabase;
-
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.room.Room;
 
 public class CreatePlayers extends AppCompatActivity {
 
-    private Gamer[] listOfPlayers = new Gamer[] {new Gamer(1)};       // List of all players
+    private Gamer[] listOfPlayers = new Gamer[]{new Gamer(1)};       // List of all players
     private int actualPlayer = 0;
     private int minStoryNumber;
     private int maxStoryNumber;
@@ -37,10 +29,10 @@ public class CreatePlayers extends AppCompatActivity {
         TextView playerID, storyNumber;
 
         // Buttons:
-        saveAndNextStory  = findViewById(R.id.saveAndNextStory);
+        saveAndNextStory = findViewById(R.id.saveAndNextStory);
         nextPerson = findViewById(R.id.nextPerson);
         next = findViewById(R.id.next);
-        viewYourStories = findViewById(R.id.viewYourStories);//nachbearbeitennnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
+        viewYourStories = findViewById(R.id.viewYourStories);
 
         // EditTexts:
         writeStories = findViewById(R.id.writeStories);
@@ -62,15 +54,24 @@ public class CreatePlayers extends AppCompatActivity {
 
         // Set number of players
         if (getIntent().hasExtra("playerNumber"))
-             playerNumber = getIntent().getExtras().getInt("playerNumber");
+            playerNumber = getIntent().getExtras().getInt("playerNumber");
         else
             playerNumber = 5;
 
         // Database connection:
         AppDatabase db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
 
-        db.gamesDao();
         //muss uebergeben werdennnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
+
+        viewYourStories.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent viewStories = new Intent(getApplicationContext(), ViewAllStories.class);
+                Toast.makeText(getApplicationContext(), "Stories", Toast.LENGTH_LONG).show();
+                startActivity(viewStories);
+            }
+        });
+
 
         saveAndNextStory.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -105,7 +106,7 @@ public class CreatePlayers extends AppCompatActivity {
                 else if (listOfPlayers[actualPlayer].getCountOfStories() < minStoryNumber)
                     Toast.makeText(CreatePlayers.this, "Spieler muss mindestens " + minStoryNumber + " Stories besitzen!",
                             Toast.LENGTH_LONG).show();
-                else if (listOfPlayers.length > playerNumber){
+                else if (listOfPlayers.length > playerNumber) {
                     Toast.makeText(CreatePlayers.this, "Zu viele eingeloggte Spieler!",
                             Toast.LENGTH_LONG).show();
                     // Exception has to be added hereeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
@@ -167,25 +168,14 @@ public class CreatePlayers extends AppCompatActivity {
                     // Create an Array to insert in playerDao
                     Player[] listOfNewPlayers = new Player[listOfPlayers.length];
 
-                    //Darf nicht einfach mit 0 initialisiert werdennnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
-                    //int firstPlayerId = 0;
-                    int firstStoryId = 0;
-                    int numberOfAllStories = 0;
-
                     // Insert all players     -> nextPlayer-Button
                     for (int i = 0; i < listOfPlayers.length; i++) {
-                        listOfNewPlayers[i] = new Player();
                         //listOfNewPlayers[i].playerId = listOfNewPlayers[i].playerId;      // Player id is set with autoincrement
-                        listOfNewPlayers[i].playerNumber = listOfPlayers[i].getNumber();
+
+                        listOfNewPlayers[i] = new Player();
                         listOfNewPlayers[i].name = listOfPlayers[i].getName();
                         listOfNewPlayers[i].gameId = newGame.gameId;
                         listOfNewPlayers[i].score = 0;
-                        //listOfNewPlayers[i].numberOfStories = listOfPlayers[i].getCountOfStories();
-
-                        numberOfAllStories += listOfPlayers[i].getCountOfStories();
-
-                        //if (i == 0)         // Give class play game first player's id
-                        //    firstPlayerId = listOfNewPlayers[i].playerId;
 
                         // Create an Array to insert in storyDao
                         Story[] listOfStories = new Story[listOfPlayers[i].getCountOfStories()];
@@ -197,9 +187,6 @@ public class CreatePlayers extends AppCompatActivity {
                             listOfStories[j].content = listOfPlayers[i].getStory(j);
                             listOfStories[j].status = false;
                             listOfStories[j].playerId = listOfNewPlayers[i].playerId;
-
-                            if (i == 0 && j == 0)
-                                firstStoryId = listOfStories[j].storyId;
                         }
 
                         storyDao.insertAll(listOfStories);
@@ -210,24 +197,11 @@ public class CreatePlayers extends AppCompatActivity {
                     //Ist das so/auf diese Weise sinnvollllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
                     if (correctInput) {         // If database is correctly created
                         Intent rules = new Intent(CreatePlayers.this, Rules.class);
-                        //rules.putExtra("FirstPlayer", firstPlayerId);
-                        //rules.putExtra("NumberOfPlayers", listOfPlayers.length);
-                        rules.putExtra("FirstStory", firstStoryId);
-                        rules.putExtra("NumberOfStories", numberOfAllStories);
                         startActivity(rules);
-                    } else {
-                        Toast.makeText(CreatePlayers.this, "Eingabe ist fehlerhaft!", Toast.LENGTH_SHORT).show();
                     }
                 }
             }
         });
 
-        viewYourStories.setOnClickListener(new View.OnClickListener() {//nachbearbeitennnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
-            @Override
-            public void onClick(View view) {
-                Intent viewAllStories = new Intent(CreatePlayers.this, ViewAllStories.class);
-                startActivity(viewAllStories);
-            }
-        });
     }
 }
