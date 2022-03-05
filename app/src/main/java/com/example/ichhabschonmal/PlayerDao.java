@@ -22,6 +22,7 @@ public interface PlayerDao {
     @Insert
     void insertAll(Player... players);
 
+
     @Delete
     void delete(Player player);
 }

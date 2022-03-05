@@ -3,6 +3,7 @@ package com.example.ichhabschonmal;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -17,22 +18,19 @@ import java.util.List;
 
 public class PlayGame extends AppCompatActivity {
 
-    //private Gamer[] players;
-    //private File directory;
+    //private int firstPlayerId = getIntent().getExtras().getInt("FirstPlayer");
+    //private int numberOfPlayers = getIntent().getExtras().getInt("NumberOfPlayers");
+    private int firstStoryId = getIntent().getExtras().getInt("FirstStory");
+    private int numberOfStories = getIntent().getExtras().getInt("NumberOfStories");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.play_game);
 
-        AppDatabase db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
-        List<Game> listOfGames = db.gamesDao().getAll();
-        List<Player> listOfPlayers = db.userDao().getAll();
-        List<Story> listOfStories = db.storyDao().getAll();
-
         Button solution, nextRound;
         TextView popupText, player, story;
-        //PopupMenu popupMenu;
+        EditText guessPlayer;
 
         // Buttons:
         solution = findViewById(R.id.solution);
@@ -43,27 +41,75 @@ public class PlayGame extends AppCompatActivity {
         player = findViewById(R.id.player);
         story = findViewById(R.id.story);
 
+        // EditTexts:
+        guessPlayer = findViewById(R.id.guessPlayer);
+
         //PopupMenus:
         //popupMenu = new PopupMenu(getApplicationContext(), popupText);
 
-        // Collect all players in one Array in this intent
-        findAllPlayers();
+        /*
+        // Find all players:
+        int[] playerIds = new int[numberOfPlayers];
 
-        // Find first player to play
-        //int chosenPlayer = chooseNumber(players.length, 0);        // Choose a player to guess the writer of the story
+        int tmp = 0;
+        for (int i = firstPlayerId; i < firstPlayerId + numberOfPlayers; i++) {
+            playerIds[tmp] = i;
+            tmp++;
+        }*/
 
-        // Write name and number of first player in the TextView player
-        //player.setText("Spieler " + chosenPlayer + ": " + players[chosenPlayer].getName() + " ist an der Reihe");
+        // Database connection:
+        AppDatabase db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
+        //List<Game> listOfGames = db.gamesDao().getAll();
+        //List<Player> listOfPlayers = db.userDao().loadAllByPlayerIds(playerIds);
+        //List<Story> listOfStories = db.storyDao().getAll();
 
-        // Write a story in the TextView story
-        //int chosenStory = chooseNumber(players.length, chosenPlayer);
-        //story.setText(players[chosenPlayer].getStory(chosenStory));
+        /*// Choose player, who guess:
+        Player playerWhoGuesses = chooseRandomPlayer(listOfPlayers, -1);
 
+        // Choose player, whose story should be guess:
+        Player playerToGuess = chooseRandomPlayer(listOfPlayers, playerWhoGuesses.playerId);
+
+        // Choose one of playerToGuess's stories:
+        Story chosenStory = chooseRandomStory();
+
+        // Set TextViews:
+        player.setText("Spieler " + playerWhoGuesses.playerNumber + ": " + playerWhoGuesses.name);
+        story.setText(playerToGuess.);*/
+
+        // Find all stories
+        int[] storyIds = new int[numberOfStories];
+
+        int tmp = 0;
+        for (int i = firstStoryId; i < firstStoryId + numberOfStories; i++) {
+            storyIds[tmp] = i;
+            tmp++;
+        }
+
+        // List stories
+        List<Story> listOfStories = db.storyDao().loadAllByStoryIds(storyIds);
+
+        // List players
+        List<Player> listOfAllPlayers = db.userDao().getAll();
+
+        // Choose story to guess
+        Story storyToGuess = chooseRandomStory(listOfStories, -1);
+
+        // Choose player, who guess
+        Player playerWhoGuess = searchPlayerToStoryId(chooseRandomStory(listOfStories, storyToGuess.storyId).playerId, listOfAllPlayers);
+
+        // Set TextViews:
+        player.setText("Spieler: " + playerWhoGuess.name);
+        story.setText(storyToGuess.content);
 
         solution.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //popupMenu.getMenu();
+                if (guessPlayer.getText().toString() == searchPlayerToStoryId(storyToGuess.playerId, listOfAllPlayers).name)
+                    Toast.makeText(PlayGame.this, "Richtig geraten, " + searchPlayerToStoryId(storyToGuess.playerId, listOfAllPlayers).name + "!", Toast.LENGTH_SHORT).show();
+                else
+                    Toast.makeText(PlayGame.this, "Falsch geraten, du musst trinken!", Toast.LENGTH_SHORT).show();
+
+                storyToGuess.status = true;
             }
         });
 
@@ -75,69 +121,45 @@ public class PlayGame extends AppCompatActivity {
         });
     }
 
+    // Add commentsssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss
+    /*private Player chooseRandomPlayer(List<Player> listOfPlayers, int notId) {
+        int factorNumberOfPlayers = 1;
+        int chosenPlayer = 0;//Geht so nichttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt
 
-    private void findAllPlayers() {
-        /*for (int i = 0; i < players.length; i++) {
-            createPlayer(i);
-        }*/
-    }
-
-    private void createPlayer(int number) {     // Find a player's number, name and stories
-        /*
-        File directory = new File(this.directory.toString() + "/Spieler" + number);
-        File[] listOfStories = directory.listFiles();
-        String name;
-
-        // Create a player and give him his number
-        players[number] = new Player(number + 1);
-
-        // Set a player's name
-        name = directory.list()[0];         // name contents the filename of the first story of the chosen player
-        name.substring(0, name.indexOf('_'));       // name contains the name of the player
-        players[number].setName(name);
-
-        // Find all of a player's stories
-        for (int i = 1; i <= listOfStories.length; i++) {
-            try {
-                FileInputStream fis = new FileInputStream(listOfStories[i]);
-                byte[] storyAsBytes = new byte[fis.available()];
-                String story = "";
-
-                fis.read(storyAsBytes);         // Save data as bytes in storyAsBytes
-                fis.close();
-
-                for (int j = 0; j < storyAsBytes.length; j++) {         // Convert story from byte to string
-                    story += (char) storyAsBytes[j];
-                }
-
-                players[i].addStory(story);
-
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }*/
-    }
-
-    private void playRound() {
-
-    }
-
-    // Exceptions bzw. Assertions are missingggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg
-    private int chooseNumber(int number, int notNumber) {          // Algorithm to choose a number in a range
-            // notNumber is a number, which should not be chosen (is necessary: chosen player
-            // should not guess his own story)
-        int chosenNumber = 1, factorCalc = 1;
-
-        for (int i = 0; i < String.valueOf(number).length(); i++) {
-            factorCalc *= 10;
+        for (int i = 1; i < String.valueOf(numberOfPlayers).length(); i++) {
+            factorNumberOfPlayers *= 10;
         }
 
         do {
-            chosenNumber = (int) (Math.random() * factorCalc);
-        } while (chosenNumber > number || chosenNumber == 0 || chosenNumber == notNumber);
+            chosenPlayer = (int) (Math.random() * factorNumberOfPlayers);
+        } while (chosenPlayer < 0 || chosenPlayer >= listOfPlayers.size()
+                || listOfPlayers.get(chosenPlayer).playerId == notId);
 
-        return chosenNumber;
+        return listOfPlayers.get(chosenPlayer);
+    }*/
+
+    private Story chooseRandomStory(List<Story> listOfStories, int notId) {
+        int factorNumberOfStories = 1;
+        int chosenStory = 0;//Geht so nichtttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt
+
+        for (int i = 1; i < String.valueOf(numberOfStories).length(); i++) {
+            factorNumberOfStories *= 10;
+        }
+
+        do {
+            chosenStory = (int) (Math.random() * factorNumberOfStories);
+        } while (chosenStory < 0 || chosenStory >= listOfStories.size()
+                || listOfStories.get(chosenStory).playerId == notId
+                || listOfStories.get(chosenStory).status);
+
+        return listOfStories.get(chosenStory);
+    }
+
+    private Player searchPlayerToStoryId(int playerId, List<Player> listOfAllPlayers) {
+        int i = 0;
+
+        for (; playerId != listOfAllPlayers.get(i).playerId; i++) {}
+
+        return listOfAllPlayers.get(i);
     }
 }

@@ -166,14 +166,25 @@ public class CreatePlayers extends AppCompatActivity {
                     // Create an Array to insert in playerDao
                     Player[] listOfNewPlayers = new Player[listOfPlayers.length];
 
+                    //Darf nicht einfach mit 0 initialisiert werdennnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
+                    //int firstPlayerId = 0;
+                    int firstStoryId = 0;
+                    int numberOfAllStories = 0;
+
                     // Insert all players     -> nextPlayer-Button
                     for (int i = 0; i < listOfPlayers.length; i++) {
-                        //listOfNewPlayers[i].playerId = listOfNewPlayers[i].playerId;      // Player id is set with autoincrement
-
                         listOfNewPlayers[i] = new Player();
+                        //listOfNewPlayers[i].playerId = listOfNewPlayers[i].playerId;      // Player id is set with autoincrement
+                        listOfNewPlayers[i].playerNumber = listOfPlayers[i].getNumber();
                         listOfNewPlayers[i].name = listOfPlayers[i].getName();
                         listOfNewPlayers[i].gameId = newGame.gameId;
                         listOfNewPlayers[i].score = 0;
+                        //listOfNewPlayers[i].numberOfStories = listOfPlayers[i].getCountOfStories();
+
+                        numberOfAllStories += listOfPlayers[i].getCountOfStories();
+
+                        //if (i == 0)         // Give class play game first player's id
+                        //    firstPlayerId = listOfNewPlayers[i].playerId;
 
                         // Create an Array to insert in storyDao
                         Story[] listOfStories = new Story[listOfPlayers[i].getCountOfStories()];
@@ -185,6 +196,9 @@ public class CreatePlayers extends AppCompatActivity {
                             listOfStories[j].content = listOfPlayers[i].getStory(j);
                             listOfStories[j].status = false;
                             listOfStories[j].playerId = listOfNewPlayers[i].playerId;
+
+                            if (i == 0 && j == 0)
+                                firstStoryId = listOfStories[j].storyId;
                         }
 
                         storyDao.insertAll(listOfStories);
@@ -195,7 +209,13 @@ public class CreatePlayers extends AppCompatActivity {
                     //Ist das so/auf diese Weise sinnvollllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
                     if (correctInput) {         // If database is correctly created
                         Intent rules = new Intent(CreatePlayers.this, Rules.class);
+                        //rules.putExtra("FirstPlayer", firstPlayerId);
+                        //rules.putExtra("NumberOfPlayers", listOfPlayers.length);
+                        rules.putExtra("FirstStory", firstStoryId);
+                        rules.putExtra("NumberOfStories", numberOfAllStories);
                         startActivity(rules);
+                    } else {
+                        Toast.makeText(CreatePlayers.this, "Eingabe ist fehlerhaft!", Toast.LENGTH_SHORT).show();
                     }
                 }
             }
@@ -204,7 +224,8 @@ public class CreatePlayers extends AppCompatActivity {
         viewYourStories.setOnClickListener(new View.OnClickListener() {//nachbearbeitennnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
             @Override
             public void onClick(View view) {
-                // Use RecyclerView
+                Intent viewAllStories = new Intent(CreatePlayers.this, ViewAllStories.class);
+                startActivity(viewAllStories);
             }
         });
     }

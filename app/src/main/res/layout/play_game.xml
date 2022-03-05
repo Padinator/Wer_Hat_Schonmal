@@ -36,14 +36,25 @@
                               Hier sollte eine Story drin stehen.
                               Hier sollte eine Story drin stehen."/>
 
+            <EditText
+                android:id="@+id/guessPlayer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/story"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="30dp"
+                android:padding="10dp"
+                android:background="@drawable/textview_story_border"
+                android:text="Spielername"/>
+
             <Button
                 android:id="@+id/solution"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/story"
+                android:layout_below="@+id/guessPlayer"
                 android:layout_marginBottom="30dp"
                 android:layout_centerHorizontal="true"
-                android:text="Auflösung"/>
+                android:text="Auflösen"/>
 
             <Button
                 android:id="@+id/nextRound"
@@ -53,12 +64,12 @@
                 android:layout_centerHorizontal="true"
                 android:text="Nächste Runde" />
 
-            <TextView
+            <!--<TextView
                 android:id="@+id/popupText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Bestätige, dass die Auflösung gezeigt werden soll"
-                android:textSize="20dp" />
+                android:textSize="20dp" />-->
 
         </RelativeLayout>
 
