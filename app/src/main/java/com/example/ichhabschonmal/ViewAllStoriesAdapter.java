@@ -2,25 +2,21 @@ package com.example.ichhabschonmal;
 
 
 import android.content.Context;
-import android.database.Cursor;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.ListView;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
-public class ScoreAdapter extends RecyclerView.Adapter<ScoreAdapter.ScoreViewHolder> {
+public class ViewAllStoriesAdapter extends RecyclerView.Adapter<ViewAllStoriesAdapter.ScoreViewHolder> {
 
     private Context mContext;
     private List<Player> mPlayers;
 
-    public ScoreAdapter(Context context, List<Player> players) {
+    public ViewAllStoriesAdapter(Context context, List<Player> players) {
         mContext = context;
         mPlayers = players;
     }
