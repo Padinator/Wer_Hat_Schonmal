@@ -14,7 +14,7 @@ import java.util.List;
 
 public class Score extends AppCompatActivity {
 
-    private ViewAllStoriesAdapter scoreAdapter;
+    private ScoreAdapter scoreAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +32,7 @@ public class Score extends AppCompatActivity {
         RecyclerView recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        scoreAdapter = new ViewAllStoriesAdapter(this, players);
+        scoreAdapter = new ScoreAdapter(this, players);
         recyclerView.setAdapter(scoreAdapter);
 
 
