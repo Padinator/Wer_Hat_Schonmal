@@ -1,13 +1,22 @@
 package com.example.ichhabschonmal;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.room.Room;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Score extends AppCompatActivity {
+
+    private ScoreAdapter scoreAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -17,6 +26,16 @@ public class Score extends AppCompatActivity {
         Button confirm;
 
         confirm = findViewById(R.id.confirm);
+
+        AppDatabase db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
+
+        List<Player> players = db.userDao().getAll();
+
+        RecyclerView recyclerView = findViewById(R.id.recyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        scoreAdapter = new ScoreAdapter(this, players);
+        recyclerView.setAdapter(scoreAdapter);
 
 
         confirm.setOnClickListener(new View.OnClickListener() {

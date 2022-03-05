@@ -28,7 +28,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/recyclerView"
             android:layout_centerHorizontal="true"
-            android:text="WEITER"/>
+            android:text="WEITER" />
 
 
         <androidx.recyclerview.widget.RecyclerView

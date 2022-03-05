@@ -13,15 +13,16 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.List;
+
 public class ScoreAdapter extends RecyclerView.Adapter<ScoreAdapter.ScoreViewHolder> {
 
     private Context mContext;
-    private Cursor mCursor;
+    private List<Player> mPlayers;
 
-
-    public ScoreAdapter(Context context, Cursor cursor) {
+    public ScoreAdapter(Context context, List<Player> players) {
         mContext = context;
-        mCursor = cursor;
+        mPlayers = players;
     }
 
     public class ScoreViewHolder extends RecyclerView.ViewHolder {
@@ -45,34 +46,25 @@ public class ScoreAdapter extends RecyclerView.Adapter<ScoreAdapter.ScoreViewHol
 
     @Override
     public void onBindViewHolder(ScoreViewHolder holder, int pos) {
-        if (!mCursor.moveToPosition(pos)) {
-            return;
-        }
-
-     /*
-        String name = mCursor.getString(mCursor.getColumnIndex(DB.GroceryEntry.COLUMN_NAME));
-        int amount = mCursor.getInt(mCursor.getColumnIndex(DB.GroceryEntry.COLUMN_AMOUNT));
-        long id = mCursor.getLong(mCursor.getColumnIndex(DB.GroceryEntry._ID));
-        gameView.name.setText(name);
-        gameView.load.setText(String.valueOf(amount));
-        gameView.delete.setTag(id);
-      */
+        holder.player.setText(mPlayers.get(pos).name + "");
+        holder.points.setText(mPlayers.get(pos).score + "");
     }
 
 
     @Override
     public int getItemCount() {
-        return mCursor.getCount();
+        return mPlayers.size();
     }
 
-    public void swapCursor(Cursor newCursor) {
-        if (mCursor != null) {
-            mCursor.close();
-        }
-        mCursor = newCursor;
+    // stores and recycles views as they are scrolled off screen
+    public class ViewHolder extends RecyclerView.ViewHolder {
+        TextView player, points;
 
-        if (newCursor != null) {
-            notifyDataSetChanged();
+        ViewHolder(View itemView) {
+            super(itemView);
+            player = itemView.findViewById(R.id.player);
+            points = itemView.findViewById(R.id.points);
         }
+
     }
 }

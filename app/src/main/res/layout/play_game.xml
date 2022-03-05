@@ -25,9 +25,9 @@
                 android:layout_width="260dp"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/story"
-                android:layout_centerHorizontal="true"
                 android:background="@android:drawable/btn_dropdown"
-                android:spinnerMode="dropdown" />
+                android:spinnerMode="dropdown"
+                android:layout_centerHorizontal="true" />
 
             <TextView
                 android:id="@+id/story"

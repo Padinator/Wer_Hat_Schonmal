@@ -3,6 +3,7 @@ package com.example.ichhabschonmal;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
@@ -24,7 +25,6 @@ public class PlayGame extends AppCompatActivity {
     //private File directory;
     private static int roundNumber = 1;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,6 +34,7 @@ public class PlayGame extends AppCompatActivity {
         List<Game> listOfGames = db.gamesDao().getAll();
         List<Player> listOfPlayers = db.userDao().getAll();
         List<Story> listOfStories = db.storyDao().getAll();
+
 
         Button solution, nextRound;
         TextView popupText, player, story,round;
@@ -51,15 +52,20 @@ public class PlayGame extends AppCompatActivity {
 
         round.setText("Runde Nr." + roundNumber);
 
+
         //PopupMenus:
         //popupMenu = new PopupMenu(getApplicationContext(), popupText);
+
+        CreatePlayers cp = new CreatePlayers();
 
         // this array must be replaced by the player array!
         String[] test = new String[] {"Tom", "Dom", "Patrick"};
 
+
+
         // create drop down menu for choosing a player
         Spinner spin = findViewById(R.id.dropdown);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, test);
+        ArrayAdapter<Player> adapter = new ArrayAdapter<Player>(this, android.R.layout.simple_spinner_dropdown_item, listOfPlayers);
         spin.setAdapter(adapter);
 
         // Collect all players in one Array in this intent
@@ -90,16 +96,15 @@ public class PlayGame extends AppCompatActivity {
                 Intent next = new Intent(PlayGame.this, Score.class);
                 startActivity(next);
                 roundNumber++;
-
             }
         });
     }
 
 
     private void findAllPlayers() {
-        /*for (int i = 0; i < players.length; i++) {
-            createPlayer(i);
-        }*/
+        //for (int i = 0; i < listOfPlayers.length; i++) {
+        //    createPlayer(i);
+        //}
     }
 
     private void createPlayer(int number) {     // Find a player's number, name and stories
