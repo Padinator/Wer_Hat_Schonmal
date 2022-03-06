@@ -39,8 +39,7 @@ public class Score extends AppCompatActivity {
         confirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent nextRound = new Intent(Score.this,PlayGame.class);
-                startActivity(nextRound);
+                finish();
             }
         });
 

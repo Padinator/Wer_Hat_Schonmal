@@ -57,6 +57,15 @@ public class Rules extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent startGame = new Intent(Rules.this, PlayGame.class);
+                int idOfFirstPlayer = getIntent().getExtras().getInt("IdOfFirstPlayer");
+                int countOfPlayers = getIntent().getExtras().getInt("CountOfPlayers");
+                int idOfFirstStory = getIntent().getExtras().getInt("IdOfFirstStory");
+                int countOfStories = getIntent().getExtras().getInt("CountOfStories");
+
+                startGame.putExtra("IdOfFirstPlayer", idOfFirstPlayer);
+                startGame.putExtra("CountOfPlayers", countOfPlayers);
+                startGame.putExtra("IdOfFirstStory", idOfFirstStory);
+                startGame.putExtra("CountOfStories", countOfStories);
                 startActivity(startGame);
             }
 
