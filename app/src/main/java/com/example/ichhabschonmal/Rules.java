@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ComponentActivity;
+import androidx.room.Room;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,6 +48,7 @@ public class Rules extends AppCompatActivity {
         rules.add("11:");
         rules.add("12:");
 
+        AppDatabase db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
 
         ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1,rules);
         listView.setAdapter(adapter);

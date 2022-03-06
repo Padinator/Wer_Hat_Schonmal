@@ -1,5 +1,7 @@
 package com.example.ichhabschonmal;
 
+import android.widget.Toast;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,7 +37,9 @@ public class Gamer {        // Data entity is already named Player
     }
 
     public String getStory(int j) {
-        return listOfStories.get(j);
+        if (j >= 0 && j < listOfStories.size())
+            return listOfStories.get(j);
+        return "Keine Story gefunden, falscher Indexwert";//Exceptionnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
     }
 
     public void addStory(String story) {        // Add a story to the story list of a player
