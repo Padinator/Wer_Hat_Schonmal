@@ -1,27 +1,19 @@
 package com.example.ichhabschonmal;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.room.Room;
-import androidx.room.RoomDatabase;
-
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.room.Room;
 
 public class CreatePlayers extends AppCompatActivity {
 
-    private Gamer[] listOfPlayers = new Gamer[] {new Gamer(1)};       // List of all players
+    private Gamer[] listOfPlayers = new Gamer[]{new Gamer(1)};       // List of all players
     private int actualPlayer = 0;
     private int minStoryNumber;
     private int maxStoryNumber;
@@ -37,10 +29,10 @@ public class CreatePlayers extends AppCompatActivity {
         TextView playerID, storyNumber;
 
         // Buttons:
-        saveAndNextStory  = findViewById(R.id.saveAndNextStory);
+        saveAndNextStory = findViewById(R.id.saveAndNextStory);
         nextPerson = findViewById(R.id.nextPerson);
         next = findViewById(R.id.next);
-        viewYourStories = findViewById(R.id.viewYourStories);//nachbearbeitennnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
+        viewYourStories = findViewById(R.id.viewYourStories);
 
         // EditTexts:
         writeStories = findViewById(R.id.writeStories);
@@ -62,15 +54,24 @@ public class CreatePlayers extends AppCompatActivity {
 
         // Set number of players
         if (getIntent().hasExtra("playerNumber"))
-             playerNumber = getIntent().getExtras().getInt("playerNumber");
+            playerNumber = getIntent().getExtras().getInt("playerNumber");
         else
             playerNumber = 5;
 
         // Database connection:
         AppDatabase db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
 
-        db.gamesDao();
         //muss uebergeben werdennnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
+
+        viewYourStories.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent viewStories = new Intent(getApplicationContext(), ViewAllStories.class);
+                Toast.makeText(getApplicationContext(), "Stories", Toast.LENGTH_LONG).show();
+                startActivity(viewStories);
+            }
+        });
+
 
         saveAndNextStory.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -105,7 +106,7 @@ public class CreatePlayers extends AppCompatActivity {
                 else if (listOfPlayers[actualPlayer].getCountOfStories() < minStoryNumber)
                     Toast.makeText(CreatePlayers.this, "Spieler muss mindestens " + minStoryNumber + " Stories besitzen!",
                             Toast.LENGTH_LONG).show();
-                else if (listOfPlayers.length > playerNumber){
+                else if (listOfPlayers.length > playerNumber) {
                     Toast.makeText(CreatePlayers.this, "Zu viele eingeloggte Spieler!",
                             Toast.LENGTH_LONG).show();
                     // Exception has to be added hereeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
@@ -202,11 +203,5 @@ public class CreatePlayers extends AppCompatActivity {
             }
         });
 
-        viewYourStories.setOnClickListener(new View.OnClickListener() {//nachbearbeitennnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
-            @Override
-            public void onClick(View view) {
-                // Use RecyclerView
-            }
-        });
     }
 }

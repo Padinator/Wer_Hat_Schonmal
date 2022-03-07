@@ -15,6 +15,9 @@ public class Player {
     @ColumnInfo(name = "name")
     public String name;
 
+    /*@ColumnInfo(name = "numberOfStories")
+    public int numberOfStories;*/
+
     @ColumnInfo(name = "gameId")
     public int gameId;
 
