@@ -30,6 +30,8 @@ public class PlayGame extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.play_game);
 
+        // test
+
         AppDatabase db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
         List<Game> listOfGames = db.gamesDao().getAll();
         List<Player> listOfPlayers = db.userDao().getAll();
