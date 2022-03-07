@@ -13,12 +13,12 @@ import java.util.List;
 
 public class LoadGameAdapter extends RecyclerView.Adapter<LoadGameAdapter.ViewHolder> {
 
-    private List<String> mData;
+    private List<Game> mGames;
     private LayoutInflater mInflater;
 
-    LoadGameAdapter(Context context, List<String> data) {
-        this.mInflater = LayoutInflater.from(context);
-        this.mData = data;
+    LoadGameAdapter(Context context, List<Game> games) {
+        mInflater = LayoutInflater.from(context);
+        mGames = games;
     }
 
     @Override
@@ -29,13 +29,13 @@ public class LoadGameAdapter extends RecyclerView.Adapter<LoadGameAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        String game = mData.get(position);
-        holder.name.setText(game);
+        //String game = mData.get(position);
+        holder.name.setText(mGames.get(position).gameName);
     }
 
     @Override
     public int getItemCount() {
-        return mData.size();
+        return mGames.size();
     }
 
 
@@ -51,10 +51,6 @@ public class LoadGameAdapter extends RecyclerView.Adapter<LoadGameAdapter.ViewHo
             delete = itemView.findViewById(R.id.delete);
         }
 
-    }
-
-    String getItem(int id) {
-        return mData.get(id);
     }
 
 }
