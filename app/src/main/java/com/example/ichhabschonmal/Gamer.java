@@ -1,12 +1,23 @@
 package com.example.ichhabschonmal;
 
+import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class Gamer {        // Data entity is already named Player
-    private String[] listOfStories = new String[0];     // Stories are saved temporary in listOfStories
+    private List<String> listOfStories = new ArrayList<>();     // Stories are saved temporary in listOfStories
     private final int number;
     private String name;
 
-    Gamer(int number) {       // No default-Ctor: a player/gamer always has name and a number
+    public Gamer(int number) {       // No default-Ctor: a player/gamer always has a name and a number
         this.number = number;
+    }
+
+    private Gamer(int number, String name, List<String> listOfStories) {        // Copy-ctor
+        this.number = number;
+        this.name = name;
+        this.listOfStories.addAll(listOfStories);
     }
 
     public int getNumber() {
@@ -22,22 +33,42 @@ public class Gamer {        // Data entity is already named Player
     }
 
     public int getCountOfStories() {
-        return listOfStories.length;
+        return listOfStories.size();
     }
 
     public String getStory(int j) {
-        return listOfStories[j];
+        if (j >= 0 && j < listOfStories.size())
+            return listOfStories.get(j);
+        return "Keine Story gefunden, falscher Indexwert";//Exceptionnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
     }
 
     public void addStory(String story) {        // Add a story to the story list of a player
-        String[] tmp = new String[listOfStories.length+ 1];
+        listOfStories.add(story);
+    }
 
-        for (int i = 0; i < listOfStories.length; i++) {
-            tmp[i] = listOfStories[i];
+    public void deleteStory(int j) {
+        listOfStories.remove(j);
+    }
+
+    public static boolean isEmpty(Gamer[] listOfPlayers) {        // Returns true, if listOfPlayers is empty
+        boolean check = true;
+
+        // Check all players
+        for (int i = 0; check && i < listOfPlayers.length; i++) {
+            if (listOfPlayers[i] != null)
+                check = false;
         }
 
-        tmp[listOfStories.length] = story;
+        return  check;
+    }
 
-        listOfStories = tmp;
+    public static Gamer[] copyPlayers(Gamer[] listOfPlayers) {
+        Gamer[] newListOfPlayers = new Gamer[listOfPlayers.length];
+
+        for (int i = 0; i < listOfPlayers.length; i++) {
+            newListOfPlayers[i] = new Gamer(listOfPlayers[i].number, listOfPlayers[i].name, listOfPlayers[i].listOfStories);
+        }
+
+        return newListOfPlayers;
     }
 }

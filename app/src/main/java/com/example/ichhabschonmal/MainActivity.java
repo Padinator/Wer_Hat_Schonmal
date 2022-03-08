@@ -15,14 +15,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //Stinker
 
-        Toast.makeText(MainActivity.this,  "MIMIMI", Toast.LENGTH_LONG).show();
+        Button newGame, loadGame;
 
-        Log.e("MIMIMIMIMIMIM", "TESST");
-
-        Button newGame = findViewById(R.id.newGame);
-        Button loadGame = findViewById(R.id.loadGame);      // muss eine loeschfunktion haben
+        // Buttons:
+        newGame = findViewById(R.id.newGame);
+        loadGame = findViewById(R.id.loadGame);
 
         newGame.setOnClickListener(new View.OnClickListener() {
             @Override
