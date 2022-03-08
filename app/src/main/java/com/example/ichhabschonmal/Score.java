@@ -59,7 +59,6 @@ public class Score extends AppCompatActivity {
             public void onClick(View view) {
                 // go back to last intent
                 finish();
-
             }
         });
 
