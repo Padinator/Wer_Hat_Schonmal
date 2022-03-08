@@ -30,14 +30,7 @@ public class LoadGame extends AppCompatActivity {
         RecyclerView recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-
-
-        List<String> listGames = new ArrayList<>();
-        for (int i = 0; i < games.size(); i++) {
-            listGames.add(games.get(i).gameName);
-        }
-
-        loadGameAdapter = new LoadGameAdapter(this, listGames);
+        loadGameAdapter = new LoadGameAdapter(this, games);
         recyclerView.setAdapter(loadGameAdapter);
 
 

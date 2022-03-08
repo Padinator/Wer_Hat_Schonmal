@@ -11,37 +11,27 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
-public class ScoreAdapter extends RecyclerView.Adapter<ScoreAdapter.ScoreViewHolder> {
+public class ScoreAdapter extends RecyclerView.Adapter<ScoreAdapter.ViewHolder> {
 
-    private Context mContext;
+    private LayoutInflater mInflater;
     private List<Player> mPlayers;
 
     public ScoreAdapter(Context context, List<Player> players) {
-        mContext = context;
+        mInflater = LayoutInflater.from(context);
         mPlayers = players;
     }
 
-    public class ScoreViewHolder extends RecyclerView.ViewHolder {
-        public TextView player;
-        public TextView points;
 
-        public ScoreViewHolder(View view) {
-            super(view);
-            player = view.findViewById(R.id.player);
-            points = view.findViewById(R.id.points);
-        }
-    }
 
     @Override
-    public ScoreViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        LayoutInflater inflater = LayoutInflater.from(mContext);
-        View view = inflater.inflate(R.layout.score_item, parent, false);
-        return new ScoreViewHolder(view);
+    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View view = mInflater.inflate(R.layout.score_item, parent, false);
+        return new ViewHolder(view);
     }
 
 
     @Override
-    public void onBindViewHolder(ScoreViewHolder holder, int pos) {
+    public void onBindViewHolder(ViewHolder holder, int pos) {
         holder.player.setText(mPlayers.get(pos).name + "");
         holder.points.setText(mPlayers.get(pos).score + "");
     }
