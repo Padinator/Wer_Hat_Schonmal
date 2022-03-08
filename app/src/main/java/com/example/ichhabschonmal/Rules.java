@@ -68,11 +68,10 @@ public class Rules extends AppCompatActivity {
                 startGame.putExtra("CountOfPlayers", countOfPlayers);
                 startGame.putExtra("IdOfFirstStory", idOfFirstStory);
                 startGame.putExtra("CountOfStories", countOfStories);
+
                 startActivity(startGame);
+                finish();
             }
-
-            // Code from CreatePlayers.java for Game start is missing here ...
-
         });
 
 

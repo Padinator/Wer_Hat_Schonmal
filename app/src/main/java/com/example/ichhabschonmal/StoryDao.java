@@ -4,6 +4,7 @@ import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
+import androidx.room.Update;
 
 import java.util.List;
 
@@ -18,6 +19,9 @@ public interface StoryDao {
     @Query("SELECT * FROM Story WHERE content LIKE :content AND status LIKE :status AND " +
             " playerId LIKE :playerId LIMIT 1")
     Story findByName(String content, boolean status, int playerId);
+
+    @Update
+    public void updateStory(Story story);
 
     @Insert
     void insertAll(Story... stories);

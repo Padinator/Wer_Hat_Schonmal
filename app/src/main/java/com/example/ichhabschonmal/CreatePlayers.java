@@ -82,11 +82,14 @@ public class CreatePlayers extends AppCompatActivity {
 
                 // Add a players story
                 if (listOfPlayers[actualPlayer].getCountOfStories() == maxStoryNumber) {      // Stories per player == maxStoryNumber?
-                    Toast.makeText(CreatePlayers.this, "Spieler hat bereits genug Stories aufgeschrieben!",
-                            Toast.LENGTH_LONG).show();
+                    Toast.makeText(CreatePlayers.this, "Spieler hat bereits genug Stories " +
+                                    "aufgeschrieben!", Toast.LENGTH_LONG).show();
                 } else if (writeStories.getText().toString().isEmpty()) {       // Text field for stories is empty
                     Toast.makeText(CreatePlayers.this, "Kein Text zum speichern!",
                             Toast.LENGTH_LONG).show();
+                } else if (writeStories.getText().toString().length() < 25) {
+                    Toast.makeText(CreatePlayers.this, "Story muss aus mindestens 25 zeichen " +
+                            "bestehen.", Toast.LENGTH_SHORT).show();
                 } else {            // Text field is okay
                     listOfPlayers[actualPlayer].addStory(writeStories.getText().toString());
                     writeStories.setText("Schreibe in dieses Feld deine n\u00e4chste Story rein.");
@@ -113,7 +116,11 @@ public class CreatePlayers extends AppCompatActivity {
                     Toast.makeText(CreatePlayers.this, "Zu viele eingeloggte Spieler!",
                             Toast.LENGTH_LONG).show();
                     // Exception has to be added hereeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
-                } else {
+                } else if (playerName.getText().toString().isEmpty()) {
+                    Toast.makeText(CreatePlayers.this, "Spielername darf nicht leer sein", Toast.LENGTH_SHORT).show();
+                } else if (playerName.getText().toString().length() < 5)
+                    Toast.makeText(CreatePlayers.this, "Spielername muss aus mindestens 5 Zeichen bestehen", Toast.LENGTH_SHORT).show();
+                else {
 
                     // Set name of a player
                     listOfPlayers[actualPlayer].setName(playerName.getText().toString());
@@ -156,20 +163,17 @@ public class CreatePlayers extends AppCompatActivity {
                     Toast.makeText(CreatePlayers.this, "Spieler " + listOfPlayers.length + " besitzt zu wenig Storys!", Toast.LENGTH_SHORT).show();
                 else if (maxStoryNumber < listOfPlayers[listOfPlayers.length - 1].getCountOfStories())
                     Toast.makeText(CreatePlayers.this, "Spieler " + listOfPlayers.length + " besitzt zu viele Storys!", Toast.LENGTH_SHORT).show();
+                else if (playerName.getText().toString().isEmpty())
+                    Toast.makeText(CreatePlayers.this, "Spielername darf nicht leer sein", Toast.LENGTH_SHORT).show();
+                else if (playerName.getText().toString().length() < 5)
+                    Toast.makeText(CreatePlayers.this, "Spielername muss aus mindestens 5 Zeichen bestehen", Toast.LENGTH_SHORT).show();
                 else {
+
                     // Set name of the last player
                     listOfPlayers[actualPlayer].setName(playerName.getText().toString());
 
                     Toast.makeText(CreatePlayers.this, "Spieler " + listOfPlayers[actualPlayer].getNumber() + " erfolgreich gespeichert",
                             Toast.LENGTH_LONG).show();
-
-                    /*  -> Schwierig beim zurueckgehen
-                    // Reset Text fields in new_game.xml, if a player goes accidentally to this intent -> No one can see the last players last storie
-                    playerID.setText("Du bist Spieler " + (actualPlayer + 1) + ":");
-                    playerName.setText("Dein Name");
-                    storyNumber.setText("Story 1:");
-                    writeStories.setText("Schreibe in dieses Feld deine Story rein.");
-                    */
 
                     // Database connection
                     GameDao gamesDao = db.gamesDao();
@@ -218,7 +222,7 @@ public class CreatePlayers extends AppCompatActivity {
 
                     playerDao.insertAll(listOfNewPlayers);
 
-                    //Ist das so/auf diese Weise sinnvollllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
+                    //Ist das so/auf diese Weise sinnvolllllllllllllllllllllllllllllllllllllllllllllllllllllll
                     if (correctInput) {         // If database is correctly created
                         Intent rules = new Intent(CreatePlayers.this, Rules.class);
                         rules.putExtra("IdOfFirstPlayer", idOfFirstPlayer);
@@ -226,6 +230,7 @@ public class CreatePlayers extends AppCompatActivity {
                         rules.putExtra("IdOfFirstStory", idOfFirstStory);
                         rules.putExtra("CountOfStories", countOfStories);
                         startActivity(rules);
+                        finish();
                     }
                 }
             }

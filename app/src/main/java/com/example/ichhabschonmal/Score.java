@@ -27,10 +27,10 @@ public class Score extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.score);
 
-        idOfFirstPlayer = 1/*getIntent().getExtras().getInt("IdOfFirstPlayer")*/;
-        countOfPlayers = 3/*getIntent().getExtras().getInt("CountOfPlayers")*/;
-        idOfFirstStory = 1/*getIntent().getExtras().getInt("IdOfFirstStory")*/;
-        countOfStories = 3/*getIntent().getExtras().getInt("CountOfStories")*/;
+        idOfFirstPlayer = getIntent().getExtras().getInt("IdOfFirstPlayer");
+        countOfPlayers = getIntent().getExtras().getInt("CountOfPlayers");
+        idOfFirstStory = getIntent().getExtras().getInt("IdOfFirstStory");
+        countOfStories = getIntent().getExtras().getInt("CountOfStories");
 
         Button confirm;
 
@@ -49,10 +49,6 @@ public class Score extends AppCompatActivity {
 
         scoreAdapter = new ScoreAdapter(this, players);
         recyclerView.setAdapter(scoreAdapter);
-
-        Toast.makeText(this, players.size() + "", Toast.LENGTH_SHORT).show();
-
-
 
         confirm.setOnClickListener(new View.OnClickListener() {
             @Override
