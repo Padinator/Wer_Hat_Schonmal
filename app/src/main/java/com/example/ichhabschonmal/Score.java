@@ -53,11 +53,13 @@ public class Score extends AppCompatActivity {
         Toast.makeText(this, players.size() + "", Toast.LENGTH_SHORT).show();
 
 
+
         confirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 // go back to last intent
                 finish();
+
             }
         });
 

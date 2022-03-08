@@ -7,7 +7,9 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:verticalScrollbarPosition="right"
+        android:fadeScrollbars="false">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -42,7 +44,8 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/recyclerView"
                 android:layout_centerHorizontal="true"
-                android:text="WEITER" />
+                android:text="WEITER"
+                android:layout_marginTop="40dp"/>
 
         </RelativeLayout>
     </ScrollView>

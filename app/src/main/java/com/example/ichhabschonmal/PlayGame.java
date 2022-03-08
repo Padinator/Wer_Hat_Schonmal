@@ -2,10 +2,15 @@ package com.example.ichhabschonmal;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.PopupMenu;
+import android.widget.PopupWindow;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -23,14 +28,15 @@ public class PlayGame extends AppCompatActivity {
 
     //private Gamer[] players;
     //private File directory;
-    private static int roundNumber = 1;
+    static int roundNumber = 1;
+    PopupWindow popUp;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.play_game);
 
-        // test
 
         AppDatabase db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
         List<Game> listOfGames = db.gamesDao().getAll();
@@ -39,7 +45,7 @@ public class PlayGame extends AppCompatActivity {
 
 
         Button solution, nextRound;
-        TextView popupText, player, story,round;
+        TextView popupText, player, story,round,popup;
         //PopupMenu popupMenu;
 
         // Buttons:
@@ -52,11 +58,17 @@ public class PlayGame extends AppCompatActivity {
         story = findViewById(R.id.story);
         round = findViewById(R.id.round);
 
+        // display round number of top
+        // TODO: roundNumber won't increase by one, after replaced finished(); in confirm Method in Score.java
         round.setText("Runde Nr." + roundNumber);
 
 
         //PopupMenus:
         //popupMenu = new PopupMenu(getApplicationContext(), popupText);
+        // inflate the layout of the popup window
+
+
+
 
         CreatePlayers cp = new CreatePlayers();
 
@@ -87,7 +99,25 @@ public class PlayGame extends AppCompatActivity {
         solution.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //popupMenu.getMenu();
+
+                PopupWindow popup = new PopupWindow();
+
+                ((TextView)popup.getContentView().findViewById(R.id.popup_id)).setText("hello there");
+
+                LayoutInflater inflater = (LayoutInflater)
+                        getSystemService(LAYOUT_INFLATER_SERVICE);
+                View popupView = inflater.inflate(R.layout.popup_window, null);
+
+                // create the popup window
+                int width = LinearLayout.LayoutParams.WRAP_CONTENT;
+                int height = LinearLayout.LayoutParams.WRAP_CONTENT;
+
+                // will dismiss, if you tap outside the popup
+                boolean focusable = true;
+                final PopupWindow popupWindow = new PopupWindow(popupView, width, height, focusable);
+
+                // shows the popup
+                popupWindow.showAtLocation(view, Gravity.CENTER, 0, 0);
             }
         });
 
@@ -101,6 +131,7 @@ public class PlayGame extends AppCompatActivity {
             }
         });
     }
+
 
 
     private void findAllPlayers() {
