@@ -1,6 +1,7 @@
 package com.example.ichhabschonmal;
 
 import android.annotation.SuppressLint;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -16,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.ContentView;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.room.Room;
 
@@ -30,6 +32,7 @@ public class PlayGame extends AppCompatActivity {
     private int countOfPlayers;
     private int idOfFirstStory;
     private int countOfStories;
+    private int gameId;
 
     private Gamer[] players, editedPlayers;         // players contains all players of the actual game
                                                     // editedPlayers contains all players, who have not guessed yet
@@ -65,13 +68,18 @@ public class PlayGame extends AppCompatActivity {
         story = findViewById(R.id.story);
         round = findViewById(R.id.round);
 
-        idOfFirstPlayer = getIntent().getExtras().getInt("IdOfFirstPlayer");
-        countOfPlayers = getIntent().getExtras().getInt("CountOfPlayers");
-        idOfFirstStory = getIntent().getExtras().getInt("IdOfFirstStory");
-        countOfStories = getIntent().getExtras().getInt("CountOfStories");
+        // Get from last intent
+        gameId = getIntent().getExtras().getInt("GameId");
 
         // Create database connection
         db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
+        Game actualGame = db.gamesDao().loadAllByGameIds(new int[] {gameId}).get(0);
+
+
+        idOfFirstPlayer = actualGame.idOfFirstPlayer;
+        countOfPlayers = actualGame.countOfPlayers;
+        idOfFirstStory = actualGame.idOfFirstStory;
+        countOfStories = actualGame.countOfStories;
 
         // Find the players' ids belonging to the actual game and their stories
         int[] playerIds = findSomethingOfActualGame(idOfFirstPlayer, countOfPlayers);
@@ -111,12 +119,6 @@ public class PlayGame extends AppCompatActivity {
                     // Korrekturbedarfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
                     if ((spin.getSelectedItem().toString().equals(correctInput))) {       // chosenPlayer has not guessed correctly
                         for (; i < listOfPlayers.size(); i++) {     //Optimize this statementtttttttttttttttttttttttttttttttttttttttttttttttttttt
-                            /*if (listOfPlayers.get(i).playerNumber == chosenPlayer.getNumber()) {
-                                Player player = listOfPlayers.get(i);
-                                player.score--;
-                                listOfPlayers.set(i, player);
-                                db.userDao().updatePlayer(player);
-                            }*/ // -> negative points
                             if (listOfPlayers.get(i).playerNumber == otherPlayer.getNumber()) {
                                 Player player = listOfPlayers.get(i);
                                 player.score++;
@@ -135,12 +137,6 @@ public class PlayGame extends AppCompatActivity {
                                 listOfPlayers.set(i, player);
                                 db.userDao().updatePlayer(player);
                             }
-                            /*if (listOfPlayers.get(i).playerNumber == otherPlayer.getNumber()) {
-                                Player player = listOfPlayers.get(i);
-                                player.score--;
-                                listOfPlayers.set(i, player);
-                                db.userDao().updatePlayer(player);
-                            }*/ // -> negative points
                         }
 
                         winner = "Spieler " + otherPlayer.getNumber() + ", " + otherPlayer.getName() + " hat diese Runde gewonnen";
@@ -361,5 +357,26 @@ public class PlayGame extends AppCompatActivity {
         }
 
         return nextRound;
+    }
+
+    @Override
+    public void onBackPressed() {       // Catch back button
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Spiel beenden")
+                .setMessage("Das Spiel wird zwischengespeichert")
+                .setPositiveButton("Verlassen und speichern", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //finish();
+                    }
+                })
+                .setNegativeButton("Weiterspielen", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        // finish()
+                    }
+                });
+
+        builder.create().show();
     }
 }

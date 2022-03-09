@@ -21,7 +21,7 @@ public interface StoryDao {
     Story findByName(String content, boolean status, int playerId);
 
     @Update
-    public void updateStory(Story story);
+    void updateStory(Story story);
 
     @Insert
     void insertAll(Story... stories);

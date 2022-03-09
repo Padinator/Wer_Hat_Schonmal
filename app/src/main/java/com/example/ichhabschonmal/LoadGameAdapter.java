@@ -50,7 +50,6 @@ public class LoadGameAdapter extends RecyclerView.Adapter<LoadGameAdapter.ViewHo
             load = itemView.findViewById(R.id.load);
             delete = itemView.findViewById(R.id.delete);
         }
-
     }
 
 }

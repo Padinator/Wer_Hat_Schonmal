@@ -1,5 +1,6 @@
 package com.example.ichhabschonmal;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -8,6 +9,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.room.Room;
 
@@ -175,20 +177,15 @@ public class CreatePlayers extends AppCompatActivity {
                     Toast.makeText(CreatePlayers.this, "Spieler " + listOfPlayers[actualPlayer].getNumber() + " erfolgreich gespeichert",
                             Toast.LENGTH_LONG).show();
 
-                    // Database connection
+                    // Create database connection
                     GameDao gamesDao = db.gamesDao();
                     PlayerDao playerDao = db.userDao();
                     StoryDao storyDao = db.storyDao();
 
-                    // Insert name of the game  -> next-Button of the previous intent
-                    Game newGame = new Game();
-                    //newGame.gameId = newGame.gameId;          // Game id is set with autoincrement
-                    newGame.gameName = getIntent().getStringExtra("GameName");
-                    gamesDao.insertAll(newGame);
-
-                    idOfFirstPlayer = playerDao.getAll().size() + 1;
-                    idOfFirstStory = storyDao.getAll().size() + 1;
-                    int actualGameId = gamesDao.getAll().size() + 1;
+                    // Get from last intent
+                    idOfFirstPlayer = playerDao.getAll().get(playerDao.getAll().size() - 1).playerId + 1;       // Id of last player +1 = new playerId
+                    idOfFirstStory = storyDao.getAll().get(storyDao.getAll().size() - 1).playerId + 1;      // Id of last story +1 = new storyId
+                    int actualGameId = gamesDao.getAll().get(gamesDao.getAll().size() - 1).gameId + 1;      // Id of last game +1 = new gameId
                     int actualPlayerId = idOfFirstPlayer;
 
                     // Create an Array to insert in playerDao
@@ -222,19 +219,54 @@ public class CreatePlayers extends AppCompatActivity {
 
                     playerDao.insertAll(listOfNewPlayers);
 
+                    // Insert a game
+                    Game newGame = new Game();
+                    //newGame.gameId = newGame.gameId;          // Game id is set with autoincrement
+                    newGame.gameName = getIntent().getStringExtra("GameName");      // -> next-Button of the previous intent
+                    newGame.idOfFirstPlayer = idOfFirstPlayer;
+                    newGame.countOfPlayers = countOfPlayers;
+                    newGame.idOfFirstStory = idOfFirstStory;
+                    newGame.countOfStories = countOfStories;
+                    gamesDao.insertAll(newGame);
+
+                    // Exceptionnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
+                    if (actualGameId != gamesDao.getAll().size()) {
+                        Toast.makeText(CreatePlayers.this, "Fehler ids stimmen nicht ueberin:" + actualGameId + " : " + newGame.gameId, Toast.LENGTH_SHORT).show();
+                    }
+
                     //Ist das so/auf diese Weise sinnvolllllllllllllllllllllllllllllllllllllllllllllllllllllll
                     if (correctInput) {         // If database is correctly created
                         Intent rules = new Intent(CreatePlayers.this, Rules.class);
-                        rules.putExtra("IdOfFirstPlayer", idOfFirstPlayer);
-                        rules.putExtra("CountOfPlayers", countOfPlayers);
-                        rules.putExtra("IdOfFirstStory", idOfFirstStory);
-                        rules.putExtra("CountOfStories", countOfStories);
+
+                        rules.putExtra("GameId", actualGameId);
+
                         startActivity(rules);
                         finish();
                     }
                 }
             }
         });
-
     }
+
+    @Override
+    public void onBackPressed() {       // Catch back button
+        AlertDialog.Builder builder = new AlertDialog.Builder(getApplicationContext());
+        builder.setTitle("Spieleinstellungen")
+                .setMessage("Wenn du zur\u00fcck gehst, werden die Daten nicht gespeichert!")
+                .setPositiveButton("Zur\u00fcck", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        finish();
+                    }
+                })
+                .setNegativeButton("Abbrechen", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                });
+
+        builder.create().show();
+    }
+
 }

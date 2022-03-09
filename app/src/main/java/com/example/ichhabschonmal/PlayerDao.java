@@ -20,11 +20,8 @@ public interface PlayerDao {
             "gameId LIKE :gameId AND score LIKE :score LIMIT 1")
     Player findByName(int playerNumber, String name, int gameId, int score);
 
-    /*@Query("UPDATE Player SET playerId = :playerId WHERE score = :score")
-    void updateScore(int playerId, int score);*/
-
     @Update
-    public void updatePlayer(Player player);
+    void updatePlayer(Player player);
 
     @Insert
     void insertAll(Player... players);
