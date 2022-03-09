@@ -2,8 +2,6 @@ package com.example.ichhabschonmal;
 
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
@@ -19,8 +17,6 @@ import java.util.List;
 public class LoadGame extends AppCompatActivity {
 
     private LoadGameAdapter loadGameAdapter;
-    private Button load;
-    private Button delete;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,22 +30,10 @@ public class LoadGame extends AppCompatActivity {
         RecyclerView recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-
-        List<String> listGames = new ArrayList<>();
-        for (int i = 0; i < games.size(); i++) {
-            listGames.add(games.get(i).gameName);
-            Toast.makeText(this, games.get(i).gameId + " " + games.get(i).gameName, Toast.LENGTH_SHORT).show();
-        }
-
-
-        loadGameAdapter = new LoadGameAdapter(this, listGames, db);
-        loadGameAdapter.setClickListener(this::onItemClick);
+        loadGameAdapter = new LoadGameAdapter(this, games);
         recyclerView.setAdapter(loadGameAdapter);
 
-    }
 
-    public void onItemClick(View view, int position) {
-        Toast.makeText(this, "You clicked " + loadGameAdapter.getItem(position) + " on row number " + position, Toast.LENGTH_SHORT).show();
 
     }
 

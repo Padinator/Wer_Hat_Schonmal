@@ -2,9 +2,14 @@ package com.example.ichhabschonmal;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.PopupMenu;
+import android.widget.PopupWindow;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -16,6 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PlayGame extends AppCompatActivity {
+
+    private PopupWindow popUp;
 
     private int idOfFirstPlayer;
     private int countOfPlayers;
@@ -32,9 +39,9 @@ public class PlayGame extends AppCompatActivity {
 
     private Gamer chosenPlayer, otherPlayer;        // Define the two playing players here, to proof in button solution, who is which one
 
-    Spinner spin;     // spin is used to select a player
+    private Spinner spin;     // spin is used to select a player
 
-    boolean solutionPressed = false;        // Before next round begins, Button solution has to be pressed
+    private boolean solutionPressed = false;        // Before next round begins, Button solution has to be pressed
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +50,7 @@ public class PlayGame extends AppCompatActivity {
 
         // Definitions
         Button solution, nextRound;
+        TextView popup, popupText;
 
         // Buttons
         solution = findViewById(R.id.solution);
@@ -90,9 +98,11 @@ public class PlayGame extends AppCompatActivity {
         solution.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 if (!solutionPressed) {     // Solution may not been pressed
                     String correctInput = "Spieler " + otherPlayer.getNumber() + ", " + otherPlayer.getName();
                     int i = 0;
+                    String winner = "";
 
                     if (spin.getSelectedItem().toString().equals(correctInput)) {       // chosenPlayer has guessed correctly
                         for (; i < listOfPlayers.size(); i++) {     //Optimize this statementtttttttttttttttttttttttttttttttttttttttttttttttttttt
@@ -102,7 +112,7 @@ public class PlayGame extends AppCompatActivity {
                                 listOfPlayers.get(i).score--;
                         }
 
-                        Toast.makeText(PlayGame.this, "Spieler " + chosenPlayer.getNumber() + ", " + chosenPlayer.getName() + " hat diese Runde gewonnen!", Toast.LENGTH_SHORT).show();
+                        winner = "Spieler " + chosenPlayer.getNumber() + ", " + chosenPlayer.getName() + " hat diese Runde gewonnen!";
                     } else {        // chosenPlayer has not guessed correctly
                         for (; i < listOfPlayers.size(); i++) {     //Optimize this statementtttttttttttttttttttttttttttttttttttttttttttttttttttt
                             if (listOfPlayers.get(i).playerNumber == chosenPlayer.getNumber())
@@ -111,8 +121,28 @@ public class PlayGame extends AppCompatActivity {
                                 listOfPlayers.get(i).score++;
                         }
 
-                        Toast.makeText(PlayGame.this, "Spieler " + otherPlayer.getNumber() + ", " + otherPlayer.getName() + " hat diese Runde gewonnen!", Toast.LENGTH_SHORT).show();
+                        winner = "Spieler " + otherPlayer.getNumber() + ", " + otherPlayer.getName() + " hat diese Runde gewonnen!";
                     }
+                  
+                  // Popup window
+                  PopupWindow popup = new PopupWindow();
+
+                  ((TextView)popup.getContentView().findViewById(R.id.popup_id)).setText("hello there");
+
+                  LayoutInflater inflater = (LayoutInflater)
+                          getSystemService(LAYOUT_INFLATER_SERVICE);
+                  View popupView = inflater.inflate(R.layout.popup_window, null);
+
+                  // create the popup window
+                  int width = LinearLayout.LayoutParams.WRAP_CONTENT;
+                  int height = LinearLayout.LayoutParams.WRAP_CONTENT;
+
+                  // will dismiss, if you tap outside the popup
+                  boolean focusable = true;
+                  final PopupWindow popupWindow = new PopupWindow(popupView, width, height, focusable);
+
+                  // shows the popup
+                  popupWindow.showAtLocation(view, Gravity.CENTER, 0, 0);
 
                     // Change value of solutionPressed
                     solutionPressed = true;
@@ -150,7 +180,7 @@ public class PlayGame extends AppCompatActivity {
             idsOfSomething[i] = idOfFirstSomething;
             idOfFirstSomething++;
         }
-
+      
         return idsOfSomething;
     }
 
