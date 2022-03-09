@@ -15,8 +15,11 @@ public interface GameDao {
     @Query("SELECT * FROM Game WHERE gameId IN (:gameIds)")
     List<Game> loadAllByGameIds(int[] gameIds);
 
-    @Query("SELECT * FROM Game WHERE gameName LIKE :gameName LIMIT 1")
-    Game findByName(String gameName);
+    @Query("SELECT * FROM Game WHERE gameName LIKE :gameName AND idOfFirstPlayer LIKE :idOfFirstPlayer AND " +
+            "countOfPlayers LIKE :countOfPlayers AND idOfFirstStory LIKE :idOfFirstStory AND " +
+            "countOfStories LIKE :countOfStories LIMIT 1")
+    Game findByName(String gameName, int idOfFirstPlayer, int countOfPlayers, int idOfFirstStory,
+                    int countOfStories);
 
     @Insert
     void insertAll(Game... games);

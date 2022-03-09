@@ -17,12 +17,10 @@ public class LoadGame extends AppCompatActivity {
         setContentView(R.layout.load_game);
 
         AppDatabase db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
-
         RecyclerView recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         loadGameAdapter = new LoadGameAdapter(this, db);
         recyclerView.setAdapter(loadGameAdapter);
-
     }
 }

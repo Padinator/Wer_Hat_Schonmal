@@ -1,5 +1,6 @@
 package com.example.ichhabschonmal;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -8,6 +9,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.room.Room;
 
@@ -82,11 +84,14 @@ public class CreatePlayers extends AppCompatActivity {
 
                 // Add a players story
                 if (listOfPlayers[actualPlayer].getCountOfStories() == maxStoryNumber) {      // Stories per player == maxStoryNumber?
-                    Toast.makeText(CreatePlayers.this, "Spieler hat bereits genug Stories aufgeschrieben!",
-                            Toast.LENGTH_LONG).show();
+                    Toast.makeText(CreatePlayers.this, "Spieler hat bereits genug Stories " +
+                                    "aufgeschrieben!", Toast.LENGTH_LONG).show();
                 } else if (writeStories.getText().toString().isEmpty()) {       // Text field for stories is empty
                     Toast.makeText(CreatePlayers.this, "Kein Text zum speichern!",
                             Toast.LENGTH_LONG).show();
+                } else if (writeStories.getText().toString().length() < 25) {
+                    Toast.makeText(CreatePlayers.this, "Story muss aus mindestens 25 zeichen " +
+                            "bestehen.", Toast.LENGTH_SHORT).show();
                 } else {            // Text field is okay
                     listOfPlayers[actualPlayer].addStory(writeStories.getText().toString());
                     writeStories.setText("Schreibe in dieses Feld deine n\u00e4chste Story rein.");
@@ -113,7 +118,11 @@ public class CreatePlayers extends AppCompatActivity {
                     Toast.makeText(CreatePlayers.this, "Zu viele eingeloggte Spieler!",
                             Toast.LENGTH_LONG).show();
                     // Exception has to be added hereeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
-                } else {
+                } else if (playerName.getText().toString().isEmpty()) {
+                    Toast.makeText(CreatePlayers.this, "Spielername darf nicht leer sein", Toast.LENGTH_SHORT).show();
+                } else if (playerName.getText().toString().length() < 5)
+                    Toast.makeText(CreatePlayers.this, "Spielername muss aus mindestens 5 Zeichen bestehen", Toast.LENGTH_SHORT).show();
+                else {
 
                     // Set name of a player
                     listOfPlayers[actualPlayer].setName(playerName.getText().toString());
@@ -156,35 +165,27 @@ public class CreatePlayers extends AppCompatActivity {
                     Toast.makeText(CreatePlayers.this, "Spieler " + listOfPlayers.length + " besitzt zu wenig Storys!", Toast.LENGTH_SHORT).show();
                 else if (maxStoryNumber < listOfPlayers[listOfPlayers.length - 1].getCountOfStories())
                     Toast.makeText(CreatePlayers.this, "Spieler " + listOfPlayers.length + " besitzt zu viele Storys!", Toast.LENGTH_SHORT).show();
+                else if (playerName.getText().toString().isEmpty())
+                    Toast.makeText(CreatePlayers.this, "Spielername darf nicht leer sein", Toast.LENGTH_SHORT).show();
+                else if (playerName.getText().toString().length() < 5)
+                    Toast.makeText(CreatePlayers.this, "Spielername muss aus mindestens 5 Zeichen bestehen", Toast.LENGTH_SHORT).show();
                 else {
+
                     // Set name of the last player
                     listOfPlayers[actualPlayer].setName(playerName.getText().toString());
 
                     Toast.makeText(CreatePlayers.this, "Spieler " + listOfPlayers[actualPlayer].getNumber() + " erfolgreich gespeichert",
                             Toast.LENGTH_LONG).show();
 
-                    /*  -> Schwierig beim zurueckgehen
-                    // Reset Text fields in new_game.xml, if a player goes accidentally to this intent -> No one can see the last players last storie
-                    playerID.setText("Du bist Spieler " + (actualPlayer + 1) + ":");
-                    playerName.setText("Dein Name");
-                    storyNumber.setText("Story 1:");
-                    writeStories.setText("Schreibe in dieses Feld deine Story rein.");
-                    */
-
-                    // Database connection
+                    // Create database connection
                     GameDao gamesDao = db.gamesDao();
                     PlayerDao playerDao = db.userDao();
                     StoryDao storyDao = db.storyDao();
 
-                    // Insert name of the game  -> next-Button of the previous intent
-                    Game newGame = new Game();
-                    //newGame.gameId = newGame.gameId;          // Game id is set with autoincrement
-                    newGame.gameName = getIntent().getStringExtra("GameName");
-                    gamesDao.insertAll(newGame);
-
-                    idOfFirstPlayer = playerDao.getAll().size() + 1;
-                    idOfFirstStory = storyDao.getAll().size() + 1;
-                    int actualGameId = gamesDao.getAll().size() + 1;
+                    // Get from last intent
+                    idOfFirstPlayer = playerDao.getAll().get(playerDao.getAll().size() - 1).playerId + 1;       // Id of last player +1 = new playerId
+                    idOfFirstStory = storyDao.getAll().get(storyDao.getAll().size() - 1).playerId + 1;      // Id of last story +1 = new storyId
+                    int actualGameId = gamesDao.getAll().get(gamesDao.getAll().size() - 1).gameId + 1;      // Id of last game +1 = new gameId
                     int actualPlayerId = idOfFirstPlayer;
 
                     // Create an Array to insert in playerDao
@@ -218,18 +219,54 @@ public class CreatePlayers extends AppCompatActivity {
 
                     playerDao.insertAll(listOfNewPlayers);
 
-                    //Ist das so/auf diese Weise sinnvollllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
+                    // Insert a game
+                    Game newGame = new Game();
+                    //newGame.gameId = newGame.gameId;          // Game id is set with autoincrement
+                    newGame.gameName = getIntent().getStringExtra("GameName");      // -> next-Button of the previous intent
+                    newGame.idOfFirstPlayer = idOfFirstPlayer;
+                    newGame.countOfPlayers = countOfPlayers;
+                    newGame.idOfFirstStory = idOfFirstStory;
+                    newGame.countOfStories = countOfStories;
+                    gamesDao.insertAll(newGame);
+
+                    // Exceptionnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
+                    if (actualGameId != gamesDao.getAll().size()) {
+                        Toast.makeText(CreatePlayers.this, "Fehler ids stimmen nicht ueberin:" + actualGameId + " : " + newGame.gameId, Toast.LENGTH_SHORT).show();
+                    }
+
+                    //Ist das so/auf diese Weise sinnvolllllllllllllllllllllllllllllllllllllllllllllllllllllll
                     if (correctInput) {         // If database is correctly created
                         Intent rules = new Intent(CreatePlayers.this, Rules.class);
-                        rules.putExtra("IdOfFirstPlayer", idOfFirstPlayer);
-                        rules.putExtra("CountOfPlayers", countOfPlayers);
-                        rules.putExtra("IdOfFirstStory", idOfFirstStory);
-                        rules.putExtra("CountOfStories", countOfStories);
+
+                        rules.putExtra("GameId", actualGameId);
+
                         startActivity(rules);
+                        finish();
                     }
                 }
             }
         });
-
     }
+
+    @Override
+    public void onBackPressed() {       // Catch back button
+        AlertDialog.Builder builder = new AlertDialog.Builder(getApplicationContext());
+        builder.setTitle("Spieleinstellungen")
+                .setMessage("Wenn du zur\u00fcck gehst, werden die Daten nicht gespeichert!")
+                .setPositiveButton("Zur\u00fcck", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        finish();
+                    }
+                })
+                .setNegativeButton("Abbrechen", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                });
+
+        builder.create().show();
+    }
+
 }
