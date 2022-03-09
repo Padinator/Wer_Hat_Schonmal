@@ -7,7 +7,6 @@
         <entry key="..\:/AndroidProjects/Ich_hab_schon_mal/app/src/main/res/layout/create_players.xml" value="0.36666666666666664" />
         <entry key="..\:/AndroidProjects/Ich_hab_schon_mal/app/src/main/res/layout/load_game.xml" value="0.36666666666666664" />
         <entry key="..\:/AndroidProjects/Ich_hab_schon_mal/app/src/main/res/layout/load_game_item.xml" value="0.36666666666666664" />
-        <entry key="..\:/AndroidProjects/Ich_hab_schon_mal/app/src/main/res/layout/managegames_layout.xml" value="0.36666666666666664" />
         <entry key="..\:/AndroidProjects/Ich_hab_schon_mal/app/src/main/res/layout/score.xml" value="0.36666666666666664" />
         <entry key="..\:/AndroidProjects/Ich_hab_schon_mal/app/src/main/res/layout/view_all_stories.xml" value="0.36666666666666664" />
         <entry key="..\:/AndroidProjects/Ich_hab_schon_mal/app/src/main/res/layout/view_all_stories_item.xml" value="0.36666666666666664" />
@@ -16,6 +15,7 @@
         <entry key="..\:/Users/Nutzer/AndroidStudioProjects/Ichhabschonmal/app/src/main/res/drawable/textview_story_border.xml" value="0.19583333333333333" />
         <entry key="..\:/Users/Nutzer/AndroidStudioProjects/Ichhabschonmal/app/src/main/res/layout/activity_main.xml" value="0.22" />
         <entry key="..\:/Users/Nutzer/AndroidStudioProjects/Ichhabschonmal/app/src/main/res/layout/create_players.xml" value="0.22" />
+        <entry key="..\:/Users/Nutzer/AndroidStudioProjects/Ichhabschonmal/app/src/main/res/layout/end_score_item.xml" value="0.1796875" />
         <entry key="..\:/Users/Nutzer/AndroidStudioProjects/Ichhabschonmal/app/src/main/res/layout/layout.xml" value="0.165625" />
         <entry key="..\:/Users/Nutzer/AndroidStudioProjects/Ichhabschonmal/app/src/main/res/layout/load_game.xml" value="0.22" />
         <entry key="..\:/Users/Nutzer/AndroidStudioProjects/Ichhabschonmal/app/src/main/res/layout/load_game_item.xml" value="0.17692307692307693" />
@@ -32,8 +32,6 @@
         <entry key="..\:/Users/Nutzer/AndroidStudioProjects/Ichhabschonmal/app/src/main/res/layout/view_all_your_stories.xml" value="0.22" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.2760416666666667" />
         <entry key="app/src/main/res/layout/create_players.xml" value="0.2760416666666667" />
-        <entry key="app/src/main/res/layout/end_score.xml" value="0.28229166666666666" />
-        <entry key="app/src/main/res/layout/end_score_item.xml" value="0.28229166666666666" />
         <entry key="app/src/main/res/layout/load_game.xml" value="0.2760416666666667" />
         <entry key="app/src/main/res/layout/load_game_item.xml" value="0.2760416666666667" />
         <entry key="app/src/main/res/layout/new_game.xml" value="0.2760416666666667" />

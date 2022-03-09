@@ -13,11 +13,6 @@ import java.util.List;
 
 public class EndScore extends AppCompatActivity {
 
-    private int idOfFirstPlayer;
-    private int countOfPlayers;
-    private int idOfFirstStory;
-    private int countOfStories;
-
     private EndScoreAdapter endScoreAdapter;
 
     @Override
@@ -25,18 +20,25 @@ public class EndScore extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.end_score);
 
+        // Get from last intent
+        int gameId = getIntent().getExtras().getInt("GameId");
+
         // Create database connection
         AppDatabase db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
+        Game game = db.gamesDao().loadAllByGameIds(new int[] {gameId}).get(0);
 
-        idOfFirstPlayer = getIntent().getExtras().getInt("IdOfFirstPlayer");
-        countOfPlayers = getIntent().getExtras().getInt("CountOfPlayers");
-        idOfFirstStory = getIntent().getExtras().getInt("IdOfFirstStory");
-        countOfStories = getIntent().getExtras().getInt("CountOfStories");
+        int idOfFirstPlayer = game.idOfFirstPlayer;
+        int countOfPlayers = game.countOfPlayers;
+        int idOfFirstStory = game.idOfFirstStory;
+        int countOfStories = game.countOfStories;
 
-        int[] playerIds = PlayGame.findSomethingOfActualGame(idOfFirstPlayer, countOfPlayers);
+        int[] playerIds = new int[countOfPlayers];
+
+        for (int i = 0; i < countOfPlayers; i++) {
+            playerIds[i] = idOfFirstPlayer + i;
+        }
+        //int[] playerIds = PlayGame.findSomethingOfActualGame(idOfFirstPlayer, countOfPlayers);
         List<Player> players = db.userDao().loadAllByPlayerIds(playerIds);
-
-
 
         RecyclerView recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));

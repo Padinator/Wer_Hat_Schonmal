@@ -19,17 +19,21 @@ public class NewGame extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.new_game);
 
+        // Definitions
         EditText gameName, playerCount, storyMinCount, storyMaxCount;
         Button nextMenu;
         Switch playMode;
 
+        // EditTexts
         gameName = findViewById(R.id.gameName);
         playerCount = findViewById(R.id.playerCount);
         storyMinCount = findViewById(R.id.storyMinCount);
         storyMaxCount = findViewById(R.id.storyMaxCount);
 
+        // Buttons
         nextMenu = findViewById(R.id.nextMenu);
 
+        // Switches
         playMode = findViewById(R.id.playMode);
 
         nextMenu.setOnClickListener(new View.OnClickListener() {

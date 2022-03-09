@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -64,7 +65,6 @@ public class PlayGame extends AppCompatActivity {
         // Create database connection
         db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
         Game actualGame = db.gamesDao().loadAllByGameIds(new int[] {gameId}).get(0);
-
 
         idOfFirstPlayer = actualGame.idOfFirstPlayer;
         countOfPlayers = actualGame.countOfPlayers;
@@ -160,20 +160,18 @@ public class PlayGame extends AppCompatActivity {
 
                     roundNumber++;
                     if (checkRound()) {
-                        next.putExtra("IdOfFirstPlayer", idOfFirstPlayer);
-                        next.putExtra("CountOfPlayers", countOfPlayers);
-                        next.putExtra("IdOfFirstStory", idOfFirstStory);
-                        next.putExtra("CountOfStories", countOfStories);
+
+                        // Show score and then play next round
+                        next.putExtra("GameId", gameId);
                         startActivity(next);
                         playRound();
                     } else {
+
                         // New intent with end score
-                        end.putExtra("IdOfFirstPlayer", idOfFirstPlayer);
-                        end.putExtra("CountOfPlayers", countOfPlayers);
-                        end.putExtra("IdOfFirstStory", idOfFirstStory);
-                        end.putExtra("CountOfStories", countOfStories);
-                        startActivity(end);                        
+                        end.putExtra("GameId", gameId);
+                        startActivity(end);
                     }
+
                     // Change value of solutionPressed
                     solutionPressed = false;
                 } else
@@ -182,7 +180,7 @@ public class PlayGame extends AppCompatActivity {
         });
     }
 
-    public static int[] findSomethingOfActualGame(int idOfFirstSomething, int countOfSomething) {     // Something can be "Player" or "Story"
+    public int[] findSomethingOfActualGame(int idOfFirstSomething, int countOfSomething) {     // Something can be "Player" or "Story"
         int[] idsOfSomething = new int[countOfSomething];
 
         for (int i = 0; i < countOfSomething; i++) {
@@ -224,7 +222,6 @@ public class PlayGame extends AppCompatActivity {
     }
 
     private void playRound() {
-
         if (Gamer.isEmpty(editedPlayers)) {      // Enter, if each player has guessed one time
             editedPlayers = Gamer.copyPlayers(players);
         }
@@ -271,7 +268,7 @@ public class PlayGame extends AppCompatActivity {
         // Choose randomly a player
         do {
             playerNumber = (int) (Math.random() * factor);
-        } while (playerNumber <= 0 || playerNumber > editedPlayers.length|| editedPlayers[playerNumber - 1] == null);
+        } while (playerNumber <= 0 || playerNumber > editedPlayers.length|| editedPlayers[playerNumber - 1] == null);       // If a player is null, he has already guessed
 
         return editedPlayers[playerNumber - 1];
     }

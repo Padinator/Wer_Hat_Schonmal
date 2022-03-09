@@ -17,11 +17,6 @@ import java.util.List;
 
 public class Score extends AppCompatActivity {
 
-    private int idOfFirstPlayer;
-    private int countOfPlayers;
-    private int idOfFirstStory;
-    private int countOfStories;
-
     private ScoreAdapter scoreAdapter;
 
     @Override
@@ -29,12 +24,8 @@ public class Score extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.score);
 
-
         // Get from last intent
-        idOfFirstPlayer = getIntent().getExtras().getInt("IdOfFirstPlayer");
-        countOfPlayers = getIntent().getExtras().getInt("CountOfPlayers");
-        idOfFirstStory = getIntent().getExtras().getInt("IdOfFirstStory");
-        countOfStories = getIntent().getExtras().getInt("CountOfStories");
+        int gameId = getIntent().getExtras().getInt("GameId");
 
         // Definitions
         Button confirm;
@@ -44,11 +35,18 @@ public class Score extends AppCompatActivity {
 
         // Create database connection
         AppDatabase db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
+        Game game = db.gamesDao().loadAllByGameIds(new int[] {gameId}).get(0);
+
+        // Find players
+        int idOfFirstPlayer = game.idOfFirstPlayer;
+        int countOfPlayers = game.countOfPlayers;
         int[] playerIds = new int[countOfPlayers];
+        //int[] playerIds = PlayGame.findSomethingOfActualGame(idOfFirstPlayer, countOfPlayers);
 
         for (int i=0; i<countOfPlayers; i++) {
             playerIds[i] = idOfFirstPlayer + i;
         }
+
         List<Player> players = db.userDao().loadAllByPlayerIds(playerIds);
 
         // RecyclerView
