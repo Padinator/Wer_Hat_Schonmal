@@ -17,6 +17,7 @@ import java.util.List;
 public class LoadGame extends AppCompatActivity {
 
     private LoadGameAdapter loadGameAdapter;
+    AppDatabase db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,7 +25,7 @@ public class LoadGame extends AppCompatActivity {
         setContentView(R.layout.load_game);
 
 
-        AppDatabase db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
+        db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
         List<Game> games = db.gamesDao().getAll();
 
         RecyclerView recyclerView = findViewById(R.id.recyclerView);
@@ -32,9 +33,5 @@ public class LoadGame extends AppCompatActivity {
 
         loadGameAdapter = new LoadGameAdapter(this, games);
         recyclerView.setAdapter(loadGameAdapter);
-
-
-
     }
-
 }
