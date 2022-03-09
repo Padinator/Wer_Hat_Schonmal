@@ -74,12 +74,5 @@ public class Rules extends AppCompatActivity {
             // Code from CreatePlayers.java for Game start is missing here ...
 
         });
-
-
-
-
-
     }
-
-
 }

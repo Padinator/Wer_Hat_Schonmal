@@ -22,6 +22,8 @@ public class MainActivity extends AppCompatActivity {
         newGame = findViewById(R.id.newGame);
         loadGame = findViewById(R.id.loadGame);
 
+
+
         newGame.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
