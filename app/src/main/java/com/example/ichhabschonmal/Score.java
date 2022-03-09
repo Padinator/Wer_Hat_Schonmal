@@ -22,8 +22,6 @@ public class Score extends AppCompatActivity {
     private int idOfFirstStory;
     private int countOfStories;
 
-    private Button confirm;
-
     private ScoreAdapter scoreAdapter;
 
     @Override
@@ -31,11 +29,15 @@ public class Score extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.score);
 
+
         // Get from last intent
         idOfFirstPlayer = getIntent().getExtras().getInt("IdOfFirstPlayer");
         countOfPlayers = getIntent().getExtras().getInt("CountOfPlayers");
         idOfFirstStory = getIntent().getExtras().getInt("IdOfFirstStory");
         countOfStories = getIntent().getExtras().getInt("CountOfStories");
+
+        // Definitions
+        Button confirm;
 
         // Buttons
         confirm = findViewById(R.id.confirm);

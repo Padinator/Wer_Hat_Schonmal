@@ -1,17 +1,13 @@
 package com.example.ichhabschonmal;
 
+import android.app.AlertDialog;
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.PopupMenu;
-import android.widget.PopupWindow;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -25,8 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PlayGame extends AppCompatActivity {
-
-    private PopupWindow popUp;
 
     private int idOfFirstPlayer;
     private int countOfPlayers;
@@ -57,7 +51,6 @@ public class PlayGame extends AppCompatActivity {
 
         // Definitions
         Button solution, nextRound;
-        TextView popup, popupText;
 
         // Buttons
         solution = findViewById(R.id.solution);
@@ -118,7 +111,7 @@ public class PlayGame extends AppCompatActivity {
 
                     // Korrekturbedarfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
                     if ((spin.getSelectedItem().toString().equals(correctInput))) {       // chosenPlayer has not guessed correctly
-                        for (; i < listOfPlayers.size(); i++) {     //Optimize this statementtttttttttttttttttttttttttttttttttttttttttttttttttttt
+                        for (; i < listOfPlayers.size(); i++) {     // Wenn kein Spieler gefunden wird -> Exception
                             if (listOfPlayers.get(i).playerNumber == otherPlayer.getNumber()) {
                                 Player player = listOfPlayers.get(i);
                                 player.score++;
@@ -126,11 +119,11 @@ public class PlayGame extends AppCompatActivity {
                                 db.userDao().updatePlayer(player);
                             }
                         }
-
+                      
                         winner = "Spieler " + chosenPlayer.getNumber() + ", " + chosenPlayer.getName() + " hat diese Runde gewonnen";
                         loser = "Spieler " + otherPlayer.getNumber() + ", " + otherPlayer.getName() + " hat diese Runde verloren!";
                     } else {        // chosenPlayer has guessed correctly
-                        for (; i < listOfPlayers.size(); i++) {     //Optimize this statementttttttttttttttttt
+                        for (; i < listOfPlayers.size(); i++) {     // Wenn kein Spieler gefunden wird -> Exception
                             if (listOfPlayers.get(i).playerNumber == chosenPlayer.getNumber()) {
                                 Player player = listOfPlayers.get(i);
                                 player.score++;
@@ -143,7 +136,16 @@ public class PlayGame extends AppCompatActivity {
                         loser = "Spieler " + chosenPlayer.getNumber() + ", " + chosenPlayer.getName() + " hat diese Runde verloren!";
                     }
 
-                    Toast.makeText(PlayGame.this, winner + " und " + loser, Toast.LENGTH_LONG).show();
+                    AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+                    builder.setTitle("ERGEBNIS")
+                            .setMessage(winner)
+                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+
+                                }
+                            });
+                    builder.create().show();
 
                     // Change value of solutionPressed
                     solutionPressed = true;
@@ -157,6 +159,7 @@ public class PlayGame extends AppCompatActivity {
             public void onClick(View view) {
                 if (solutionPressed) {          // Button solution has to be pressed
                     Intent next = new Intent(PlayGame.this, Score.class);
+                    Intent end = new Intent(PlayGame.this, EndScore.class);
 
                     roundNumber++;
                     if (checkRound()) {
@@ -167,8 +170,12 @@ public class PlayGame extends AppCompatActivity {
                         startActivity(next);
                         playRound();
                     } else {
-                        Toast.makeText(getApplicationContext(), "Alle Stories sind aufgebraucht, das Spiel ist zu Ende!", Toast.LENGTH_SHORT).show();
-                        //Insert new intentttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt
+                        // New intent with end score
+                        end.putExtra("IdOfFirstPlayer", idOfFirstPlayer);
+                        end.putExtra("CountOfPlayers", countOfPlayers);
+                        end.putExtra("IdOfFirstStory", idOfFirstStory);
+                        end.putExtra("CountOfStories", countOfStories);
+                        startActivity(end);                        
                     }
                     // Change value of solutionPressed
                     solutionPressed = false;
@@ -178,7 +185,7 @@ public class PlayGame extends AppCompatActivity {
         });
     }
 
-    private int[] findSomethingOfActualGame(int idOfFirstSomething, int countOfSomething) {     // Something can be "Player" or "Story"
+    public static int[] findSomethingOfActualGame(int idOfFirstSomething, int countOfSomething) {     // Something can be "Player" or "Story"
         int[] idsOfSomething = new int[countOfSomething];
 
         for (int i = 0; i < countOfSomething; i++) {
