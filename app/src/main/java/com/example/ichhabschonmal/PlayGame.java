@@ -1,15 +1,12 @@
 package com.example.ichhabschonmal;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.PopupMenu;
-import android.widget.PopupWindow;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,8 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PlayGame extends AppCompatActivity {
-
-    private PopupWindow popUp;
 
     private int idOfFirstPlayer;
     private int countOfPlayers;
@@ -50,7 +45,6 @@ public class PlayGame extends AppCompatActivity {
 
         // Definitions
         Button solution, nextRound;
-        TextView popup, popupText;
 
         // Buttons
         solution = findViewById(R.id.solution);
@@ -113,6 +107,18 @@ public class PlayGame extends AppCompatActivity {
                         }
 
                         winner = "Spieler " + chosenPlayer.getNumber() + ", " + chosenPlayer.getName() + " hat diese Runde gewonnen!";
+                        AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+                        builder.setTitle("ERGEBNIS")
+                                .setMessage(winner)
+                                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+
+                                    }
+                                });
+                        builder.create().show();
+
+
                     } else {        // chosenPlayer has not guessed correctly
                         for (; i < listOfPlayers.size(); i++) {     //Optimize this statementtttttttttttttttttttttttttttttttttttttttttttttttttttt
                             if (listOfPlayers.get(i).playerNumber == chosenPlayer.getNumber())
@@ -121,28 +127,18 @@ public class PlayGame extends AppCompatActivity {
                                 listOfPlayers.get(i).score++;
                         }
 
-                        winner = "Spieler " + otherPlayer.getNumber() + ", " + otherPlayer.getName() + " hat diese Runde gewonnen!";
+                        winner = "Spieler " + otherPlayer.getNumber() + ", " + otherPlayer.getName() + " hat diese Runde verloren!";
+                        AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+                        builder.setTitle("ERGEBNIS")
+                                .setMessage(winner)
+                                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+
+                                    }
+                                });
+                        builder.create().show();
                     }
-                  
-                  // Popup window
-                  PopupWindow popup = new PopupWindow();
-
-                  ((TextView)popup.getContentView().findViewById(R.id.popup_id)).setText("hello there");
-
-                  LayoutInflater inflater = (LayoutInflater)
-                          getSystemService(LAYOUT_INFLATER_SERVICE);
-                  View popupView = inflater.inflate(R.layout.popup_window, null);
-
-                  // create the popup window
-                  int width = LinearLayout.LayoutParams.WRAP_CONTENT;
-                  int height = LinearLayout.LayoutParams.WRAP_CONTENT;
-
-                  // will dismiss, if you tap outside the popup
-                  boolean focusable = true;
-                  final PopupWindow popupWindow = new PopupWindow(popupView, width, height, focusable);
-
-                  // shows the popup
-                  popupWindow.showAtLocation(view, Gravity.CENTER, 0, 0);
 
                     // Change value of solutionPressed
                     solutionPressed = true;
@@ -159,6 +155,10 @@ public class PlayGame extends AppCompatActivity {
 
                     roundNumber++;
                     if (checkRound()) {
+                        next.putExtra("IdOfFirstPlayer", idOfFirstPlayer);
+                        next.putExtra("CountOfPlayers", countOfPlayers);
+                        next.putExtra("IdOfFirstStory", idOfFirstStory);
+                        next.putExtra("CountOfStories", countOfStories);
                         startActivity(next);
                         playRound();
                     } else {
