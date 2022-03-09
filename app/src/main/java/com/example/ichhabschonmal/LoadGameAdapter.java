@@ -44,7 +44,11 @@ public class LoadGameAdapter extends RecyclerView.Adapter<LoadGameAdapter.ViewHo
 
     @Override
     public int getItemCount() {
-        return mDatabase.gamesDao().getAll().size();
+        if (mDatabase.gamesDao().getAll().size() > 0) {
+            return mDatabase.gamesDao().getAll().size();
+        } else {
+            return 0;
+        }
     }
 
 
@@ -68,8 +72,13 @@ public class LoadGameAdapter extends RecyclerView.Adapter<LoadGameAdapter.ViewHo
                             .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    Game game = mDatabase.gamesDao().getAll().get(getAbsoluteAdapterPosition());
+                                    int gameId = mDatabase.gamesDao().getAll().get(getAbsoluteAdapterPosition()).gameId;
 
+                                    Log.e("MYGAMEID", String.valueOf(gameId));
+
+                                    Intent intent = new Intent(view.getContext(), PlayGame.class);
+                                    intent.putExtra("gameId", gameId);
+                                    mContext.startActivity(intent);
                                 }
                             })
                             .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -79,8 +88,6 @@ public class LoadGameAdapter extends RecyclerView.Adapter<LoadGameAdapter.ViewHo
                                 }
                             });
                     builder.create().show();
-
-
                 }
             });
 
@@ -93,8 +100,23 @@ public class LoadGameAdapter extends RecyclerView.Adapter<LoadGameAdapter.ViewHo
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     Game game = mDatabase.gamesDao().getAll().get(getAbsoluteAdapterPosition());
-                                    Log.e("POS", String.valueOf(getAbsoluteAdapterPosition()));
                                     mDatabase.gamesDao().delete(game);
+                                    List<Player> player = mDatabase.userDao().getAll();
+                                    List<Story> stories = mDatabase.storyDao().getAll();
+
+                                    for (int i = 0; i < player.size(); i++) {
+                                        if (player.get(i).gameId == game.gameId) {
+                                            Log.e("PLAYER", player.get(i).name);
+                                            mDatabase.userDao().delete(player.get(i));
+                                        }
+                                        for (int j = 0; j < stories.size(); j++) {
+                                            if (stories.get(j).playerId == player.get(i).playerId && player.get(i).gameId == game.gameId) {
+                                                Log.e("Story", stories.get(j).content);
+                                                mDatabase.storyDao().delete(stories.get(j));
+                                            }
+                                        }
+                                    }
+
 
                                     int gameId = game.gameId;
 

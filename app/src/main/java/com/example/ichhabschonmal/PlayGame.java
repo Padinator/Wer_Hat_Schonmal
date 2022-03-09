@@ -27,7 +27,7 @@ public class PlayGame extends AppCompatActivity {
     private int gameId;
 
     private Gamer[] players, editedPlayers;         // players contains all players of the actual game
-                                                    // editedPlayers contains all players, who have not guessed yet
+    // editedPlayers contains all players, who have not guessed yet
     private List<Player> listOfPlayers;         // Contains all players of the actual game, listOfPlayers has access to the database
     private List<Story> listOfStories;          // Contains lal stories of the actual game, listOfStories has access to the database
 
@@ -47,6 +47,13 @@ public class PlayGame extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.play_game);
 
+        if (getIntent().hasExtra("gameId")) {
+            int game = getIntent().getExtras().getInt("gameId");
+
+            Log.e("MYGAMEID", String.valueOf(game));
+
+        } else {
+
         // Definitions
         Button solution, nextRound;
 
@@ -64,7 +71,7 @@ public class PlayGame extends AppCompatActivity {
 
         // Create database connection
         db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
-        Game actualGame = db.gamesDao().loadAllByGameIds(new int[] {gameId}).get(0);
+        Game actualGame = db.gamesDao().loadAllByGameIds(new int[]{gameId}).get(0);
 
         idOfFirstPlayer = actualGame.idOfFirstPlayer;
         countOfPlayers = actualGame.countOfPlayers;
@@ -116,7 +123,7 @@ public class PlayGame extends AppCompatActivity {
                                 db.userDao().updatePlayer(player);
                             }
                         }
-                      
+
                         winner = "Spieler " + chosenPlayer.getNumber() + ", " + chosenPlayer.getName() + " hat diese Runde gewonnen";
                         loser = "Spieler " + otherPlayer.getNumber() + ", " + otherPlayer.getName() + " hat diese Runde verloren!";
                     } else {        // chosenPlayer has guessed correctly
@@ -178,6 +185,10 @@ public class PlayGame extends AppCompatActivity {
                     Toast.makeText(PlayGame.this, "Du musst zuerst auflösen!", Toast.LENGTH_SHORT).show();
             }
         });
+
+    }
+
+
     }
 
     public int[] findSomethingOfActualGame(int idOfFirstSomething, int countOfSomething) {     // Something can be "Player" or "Story"
@@ -187,7 +198,7 @@ public class PlayGame extends AppCompatActivity {
             idsOfSomething[i] = idOfFirstSomething;
             idOfFirstSomething++;
         }
-      
+
         return idsOfSomething;
     }
 
@@ -205,7 +216,7 @@ public class PlayGame extends AppCompatActivity {
 
             // Insert stories of a player
             for (; storyCounter < countOfStories
-                    && oldPlayerId == listOfStories.get(storyCounter).playerId ; storyCounter++) {
+                    && oldPlayerId == listOfStories.get(storyCounter).playerId; storyCounter++) {
                 players[i].addStory(listOfStories.get(storyCounter).content);
             }
 
@@ -268,7 +279,7 @@ public class PlayGame extends AppCompatActivity {
         // Choose randomly a player
         do {
             playerNumber = (int) (Math.random() * factor);
-        } while (playerNumber <= 0 || playerNumber > editedPlayers.length|| editedPlayers[playerNumber - 1] == null);       // If a player is null, he has already guessed
+        } while (playerNumber <= 0 || playerNumber > editedPlayers.length || editedPlayers[playerNumber - 1] == null);       // If a player is null, he has already guessed
 
         return editedPlayers[playerNumber - 1];
     }
@@ -310,7 +321,8 @@ public class PlayGame extends AppCompatActivity {
         story = players[otherPlayer.getNumber() - 1].getStory(storyNumber - 1);
 
         // Set guessed story to used = true
-        for (; !(listOfStories.get(i).content.equals(players[otherPlayer.getNumber() - 1].getStory(storyNumber - 1))); i++) {}
+        for (; !(listOfStories.get(i).content.equals(players[otherPlayer.getNumber() - 1].getStory(storyNumber - 1))); i++) {
+        }
 
         if (i >= 0 && i < listOfStories.size()) {
             listOfStories.get(i).status = true;
@@ -328,8 +340,8 @@ public class PlayGame extends AppCompatActivity {
 
     private boolean checkRound() {      // Checks if at least one player has an unused story
         boolean nextRound = false, proofCheckPlayer = false;        // nextRound = true: another round can be played
-                                        // proofCheckPlayer: proof, whether checkPlayer is different to the last
-                                        // remaining player in editedPlayers (case: storyPlayer = 1)
+        // proofCheckPlayer: proof, whether checkPlayer is different to the last
+        // remaining player in editedPlayers (case: storyPlayer = 1)
         int storyPlayer = 0;      // storyPlayer = count of players with at least one story
         //Ist das so/auf diese Weise sinnvolllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
         Gamer checkPlayer = null;
