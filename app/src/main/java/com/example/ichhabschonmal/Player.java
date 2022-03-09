@@ -3,6 +3,7 @@ package com.example.ichhabschonmal;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
+import androidx.room.Update;
 
 @Entity
 public class Player {

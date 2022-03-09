@@ -11,4 +11,16 @@ public class Game {
 
     @ColumnInfo(name = "gameName")
     public String gameName;
+
+    @ColumnInfo(name = "idOfFirstPlayer")
+    public int idOfFirstPlayer;
+
+    @ColumnInfo(name = "countOfPlayers")
+    public int countOfPlayers;
+
+    @ColumnInfo(name = "idOfFirstStory")
+    public int idOfFirstStory;
+
+    @ColumnInfo(name = "countOfStories")
+    public int countOfStories;
 }
