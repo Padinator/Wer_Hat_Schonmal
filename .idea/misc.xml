@@ -27,6 +27,8 @@
         <entry key="..\:/Users/Nutzer/AndroidStudioProjects/Ichhabschonmal/app/src/main/res/layout/view_all_your_stories.xml" value="0.22" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.2760416666666667" />
         <entry key="app/src/main/res/layout/create_players.xml" value="0.2760416666666667" />
+        <entry key="app/src/main/res/layout/end_score.xml" value="0.28229166666666666" />
+        <entry key="app/src/main/res/layout/end_score_item.xml" value="0.28229166666666666" />
         <entry key="app/src/main/res/layout/load_game.xml" value="0.2760416666666667" />
         <entry key="app/src/main/res/layout/load_game_item.xml" value="0.2760416666666667" />
         <entry key="app/src/main/res/layout/new_game.xml" value="0.2760416666666667" />

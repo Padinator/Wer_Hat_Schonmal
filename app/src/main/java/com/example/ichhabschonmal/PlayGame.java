@@ -107,17 +107,6 @@ public class PlayGame extends AppCompatActivity {
                         }
 
                         winner = "Spieler " + chosenPlayer.getNumber() + ", " + chosenPlayer.getName() + " hat diese Runde gewonnen!";
-                        AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
-                        builder.setTitle("ERGEBNIS")
-                                .setMessage(winner)
-                                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-
-                                    }
-                                });
-                        builder.create().show();
-
 
                     } else {        // chosenPlayer has not guessed correctly
                         for (; i < listOfPlayers.size(); i++) {     //Optimize this statementtttttttttttttttttttttttttttttttttttttttttttttttttttt
@@ -127,18 +116,19 @@ public class PlayGame extends AppCompatActivity {
                                 listOfPlayers.get(i).score++;
                         }
 
-                        winner = "Spieler " + otherPlayer.getNumber() + ", " + otherPlayer.getName() + " hat diese Runde verloren!";
-                        AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
-                        builder.setTitle("ERGEBNIS")
-                                .setMessage(winner)
-                                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-
-                                    }
-                                });
-                        builder.create().show();
+                        winner = "Spieler " + otherPlayer.getNumber() + ", " + otherPlayer.getName() + " hat diese Runde gewonnen!";
                     }
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+                    builder.setTitle("ERGEBNIS")
+                            .setMessage(winner)
+                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+
+                                }
+                            });
+                    builder.create().show();
 
                     // Change value of solutionPressed
                     solutionPressed = true;
@@ -152,6 +142,7 @@ public class PlayGame extends AppCompatActivity {
             public void onClick(View view) {
                 if (solutionPressed) {          // Button solution has to be pressed
                     Intent next = new Intent(PlayGame.this, Score.class);
+                    Intent end = new Intent(PlayGame.this, EndScore.class);
 
                     roundNumber++;
                     if (checkRound()) {
@@ -162,8 +153,12 @@ public class PlayGame extends AppCompatActivity {
                         startActivity(next);
                         playRound();
                     } else {
-                        Toast.makeText(getApplicationContext(), "Alle Stories sind aufgebraucht, das Spiel ist zu Ende!", Toast.LENGTH_SHORT).show();
-                        //Insert new intenttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt
+                        // New intent with end score
+                        end.putExtra("IdOfFirstPlayer", idOfFirstPlayer);
+                        end.putExtra("CountOfPlayers", countOfPlayers);
+                        end.putExtra("IdOfFirstStory", idOfFirstStory);
+                        end.putExtra("CountOfStories", countOfStories);
+                        startActivity(end);
                     }
                     // Change value of solutionPressed
                     solutionPressed = false;
@@ -173,7 +168,7 @@ public class PlayGame extends AppCompatActivity {
         });
     }
 
-    private int[] findSomethingOfActualGame(int idOfFirstSomething, int countOfSomething) {     // Something can be "Player" or "Story"
+    public static int[] findSomethingOfActualGame(int idOfFirstSomething, int countOfSomething) {     // Something can be "Player" or "Story"
         int[] idsOfSomething = new int[countOfSomething];
 
         for (int i = 0; i < countOfSomething; i++) {
