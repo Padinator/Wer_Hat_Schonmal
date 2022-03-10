@@ -52,6 +52,142 @@ public class PlayGame extends AppCompatActivity {
 
             Log.e("MYGAMEID", String.valueOf(game));
 
+            // Definitions
+            Button solution, nextRound;
+
+            // Buttons
+            solution = findViewById(R.id.solution);
+            nextRound = findViewById(R.id.nextRound);
+
+            // TextViews
+            player = findViewById(R.id.player);
+            story = findViewById(R.id.story);
+            round = findViewById(R.id.round);
+
+            // Get from last intent
+            gameId = getIntent().getExtras().getInt("gameId");
+
+            // Create database connection
+            db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
+            Game actualGame = db.gamesDao().loadAllByGameIds(new int[]{gameId}).get(0);
+
+            idOfFirstPlayer = actualGame.idOfFirstPlayer;
+            countOfPlayers = actualGame.countOfPlayers;
+            idOfFirstStory = actualGame.idOfFirstStory;
+            countOfStories = actualGame.countOfStories;
+
+            // Find the players' ids belonging to the actual game and their stories
+            int[] playerIds = findSomethingOfActualGame(idOfFirstPlayer, countOfPlayers);
+            int[] storyIds = findSomethingOfActualGame(idOfFirstStory, countOfStories);
+
+            // Get players playing the actual game
+            listOfPlayers = db.userDao().loadAllByPlayerIds(playerIds);
+            listOfStories = db.storyDao().loadAllByStoryIds(storyIds);
+
+            // Save players' numbers and names for Spinner spin
+            List<String> listOfPlayersForSpinner = new ArrayList<>();
+
+            for (int i = 0; i < listOfPlayers.size(); i++) {
+                listOfPlayersForSpinner.add("Spieler " + listOfPlayers.get(i).playerNumber + ", " + listOfPlayers.get(i).name);
+            }
+
+            // Save players in a new data structure
+            players = saveInNewDataStructure(listOfPlayers, listOfStories);
+            editedPlayers = saveInNewDataStructure(listOfPlayers, listOfStories);
+
+            // Create drop down menu for choosing a player
+            spin = findViewById(R.id.dropdown);
+            ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, listOfPlayersForSpinner);
+            spin.setAdapter(adapter);
+
+            playGame();
+
+            solution.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    if (!solutionPressed) {     // Solution may not been pressed
+                        String correctInput = "Spieler " + otherPlayer.getNumber() + ", " + otherPlayer.getName();
+                        int i = 0;
+                        String winner = "", loser = "";
+
+                        // Korrekturbedarfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+                        if ((spin.getSelectedItem().toString().equals(correctInput))) {       // chosenPlayer has not guessed correctly
+                            for (; i < listOfPlayers.size(); i++) {     // Wenn kein Spieler gefunden wird -> Exception
+                                if (listOfPlayers.get(i).playerNumber == otherPlayer.getNumber()) {
+                                    Player player = listOfPlayers.get(i);
+                                    player.score++;
+                                    listOfPlayers.set(i, player);
+                                    db.userDao().updatePlayer(player);
+                                }
+                            }
+
+                            winner = "Spieler " + chosenPlayer.getNumber() + ", " + chosenPlayer.getName() + " hat diese Runde gewonnen";
+                            loser = "Spieler " + otherPlayer.getNumber() + ", " + otherPlayer.getName() + " hat diese Runde verloren!";
+                        } else {        // chosenPlayer has guessed correctly
+                            for (; i < listOfPlayers.size(); i++) {     // Wenn kein Spieler gefunden wird -> Exception
+                                if (listOfPlayers.get(i).playerNumber == chosenPlayer.getNumber()) {
+                                    Player player = listOfPlayers.get(i);
+                                    player.score++;
+                                    listOfPlayers.set(i, player);
+                                    db.userDao().updatePlayer(player);
+                                }
+                            }
+
+                            winner = "Spieler " + otherPlayer.getNumber() + ", " + otherPlayer.getName() + " hat diese Runde gewonnen";
+                            loser = "Spieler " + chosenPlayer.getNumber() + ", " + chosenPlayer.getName() + " hat diese Runde verloren!";
+                        }
+
+                        AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+                        builder.setTitle("ERGEBNIS")
+                                .setMessage(winner)
+                                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+
+                                    }
+                                });
+                        builder.create().show();
+
+                        // Change value of solutionPressed
+                        solutionPressed = true;
+                    } else
+                        Toast.makeText(PlayGame.this, "Starte die nächste Runde!", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            nextRound.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (solutionPressed) {          // Button solution has to be pressed
+                        Intent next = new Intent(PlayGame.this, Score.class);
+                        Intent end = new Intent(PlayGame.this, EndScore.class);
+
+                        roundNumber++;
+                        if (checkRound()) {
+
+                            // Show score and then play next round
+                            next.putExtra("GameId", gameId);
+                            startActivity(next);
+                            playRound();
+                        } else {
+
+                            // New intent with end score
+                            end.putExtra("GameId", gameId);
+                            startActivity(end);
+                        }
+
+                        // Change value of solutionPressed
+                        solutionPressed = false;
+                    } else
+                        Toast.makeText(PlayGame.this, "Du musst zuerst auflösen!", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+
+
+
+
         } else {
 
         // Definitions
