@@ -1,4 +1,4 @@
-package com.example.ichhabschonmal;
+package com.example.ichhabschonmal.adapter;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -13,9 +13,11 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.room.Room;
 
-import java.util.List;
+import com.example.ichhabschonmal.LoadGame;
+import com.example.ichhabschonmal.R;
+import com.example.ichhabschonmal.database.AppDatabase;
+import com.example.ichhabschonmal.database.Game;
 
 public class LoadGameAdapter extends RecyclerView.Adapter<LoadGameAdapter.ViewHolder> {
 
@@ -24,7 +26,7 @@ public class LoadGameAdapter extends RecyclerView.Adapter<LoadGameAdapter.ViewHo
     private Context mContext;
 
 
-    LoadGameAdapter(Context context, AppDatabase database) {
+    public LoadGameAdapter(Context context, AppDatabase database) {
         mInflater = LayoutInflater.from(context);
         mDatabase = database;
         mContext = context;

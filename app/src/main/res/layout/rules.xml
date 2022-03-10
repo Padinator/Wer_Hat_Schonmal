@@ -4,14 +4,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <RelativeLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:verticalScrollbarPosition="right"
-            android:fadeScrollbars="false">
+        android:layout_height="match_parent"
+        android:verticalScrollbarPosition="right"
+        android:fadeScrollbars="false">
+
         <RelativeLayout
             android:id="@+id/rulesTextView"
             android:layout_width="wrap_content"
@@ -19,8 +17,8 @@
 
             <TextView
                 android:id="@+id/rulesText"
-                android:layout_width="200dp"
-                android:layout_height="30dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
                 android:layout_centerInParent="true"
                 android:layout_marginTop="10dp"
@@ -29,14 +27,13 @@
                 android:text="Regeln!"
                 android:textAlignment="center"
                 android:textColor="#f45431"
-                android:textSize="20dp" />
-
+                android:textSize="27dp"/>
 
             <ListView
                 android:id="@+id/listView"
                 android:layout_width="match_parent"
                 android:layout_height="550dp"
-                android:layout_marginTop="40dp" />
+                android:layout_marginTop="60dp" />
 
             <Button
                 android:id="@+id/start"
@@ -51,9 +48,6 @@
 
         </RelativeLayout>
 
-        </ScrollView>
-
-        </RelativeLayout>
-
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
