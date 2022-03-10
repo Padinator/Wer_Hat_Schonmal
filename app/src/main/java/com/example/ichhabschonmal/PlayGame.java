@@ -14,40 +14,47 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.room.Room;
 
+import com.example.ichhabschonmal.database.AppDatabase;
+import com.example.ichhabschonmal.database.Game;
+import com.example.ichhabschonmal.database.Player;
+import com.example.ichhabschonmal.database.Story;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class PlayGame extends AppCompatActivity {
+    private Gamer[] players, editedPlayers;         // players contains all players of the actual game
+                                                    // editedPlayers contains all players, who have not guessed yet
+    private Gamer chosenPlayer, otherPlayer;        // Define the two playing players here, to proof in button solution, who is which one
+
+    private List<Player> listOfPlayers;             // Contains all players of the actual game, listOfPlayers has access to the database
+    private List<Story> listOfStories;              // Contains lal stories of the actual game, listOfStories has access to the database
+
+    private TextView player, story, round;
+    private Spinner spin;                           // spin is used to select a player
+
+    private AppDatabase db;                         // Database connection
 
     private int idOfFirstPlayer;
     private int countOfPlayers;
     private int idOfFirstStory;
     private int countOfStories;
     private int gameId;
-
-    private Gamer[] players, editedPlayers;         // players contains all players of the actual game
-                                                    // editedPlayers contains all players, who have not guessed yet
-    private List<Player> listOfPlayers;         // Contains all players of the actual game, listOfPlayers has access to the database
-    private List<Story> listOfStories;          // Contains lal stories of the actual game, listOfStories has access to the database
-
     private int roundNumber = 1;
-    private TextView player, story, round;
-
-    private Gamer chosenPlayer, otherPlayer;        // Define the two playing players here, to proof in button solution, who is which one
-
-    private Spinner spin;     // spin is used to select a player
-
     private boolean solutionPressed = false;        // Before next round begins, Button solution has to be pressed
-
-    private AppDatabase db;         // Database connection
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.play_game);
 
+        // Preconditions before playing until method "playGame()" is called
         // Definitions
         Button solution, nextRound;
+        List<String> listOfPlayersForSpinner;
+        ArrayAdapter<String> adapter;
+        Game actualGame;
+        int[] playerIds, storyIds;
 
         // Buttons
         solution = findViewById(R.id.solution);
@@ -63,24 +70,24 @@ public class PlayGame extends AppCompatActivity {
 
         // Create database connection
         db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
-        Game actualGame = db.gamesDao().loadAllByGameIds(new int[] {gameId}).get(0);
+        actualGame = db.gamesDao().loadAllByGameIds(new int[] {gameId}).get(0);
 
-
+        // Used variables
         idOfFirstPlayer = actualGame.idOfFirstPlayer;
         countOfPlayers = actualGame.countOfPlayers;
         idOfFirstStory = actualGame.idOfFirstStory;
         countOfStories = actualGame.countOfStories;
 
         // Find the players' ids belonging to the actual game and their stories
-        int[] playerIds = findSomethingOfActualGame(idOfFirstPlayer, countOfPlayers);
-        int[] storyIds = findSomethingOfActualGame(idOfFirstStory, countOfStories);
+        playerIds = findSomethingOfActualGame(idOfFirstPlayer, countOfPlayers);
+        storyIds = findSomethingOfActualGame(idOfFirstStory, countOfStories);
 
         // Get players playing the actual game
         listOfPlayers = db.userDao().loadAllByPlayerIds(playerIds);
         listOfStories = db.storyDao().loadAllByStoryIds(storyIds);
 
         // Save players' numbers and names for Spinner spin
-        List<String> listOfPlayersForSpinner = new ArrayList<>();
+        listOfPlayersForSpinner = new ArrayList<>();
 
         for (int i = 0; i < listOfPlayers.size(); i++) {
             listOfPlayersForSpinner.add("Spieler " + listOfPlayers.get(i).playerNumber + ", " + listOfPlayers.get(i).name);
@@ -92,10 +99,10 @@ public class PlayGame extends AppCompatActivity {
 
         // Create drop down menu for choosing a player
         spin = findViewById(R.id.dropdown);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, listOfPlayersForSpinner);
+        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, listOfPlayersForSpinner);
         spin.setAdapter(adapter);
 
-        playGame();
+        playGame();     // Play a game
 
         solution.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -160,20 +167,18 @@ public class PlayGame extends AppCompatActivity {
 
                     roundNumber++;
                     if (checkRound()) {
-                        next.putExtra("IdOfFirstPlayer", idOfFirstPlayer);
-                        next.putExtra("CountOfPlayers", countOfPlayers);
-                        next.putExtra("IdOfFirstStory", idOfFirstStory);
-                        next.putExtra("CountOfStories", countOfStories);
+
+                        // Show score and then play next round
+                        next.putExtra("GameId", gameId);
                         startActivity(next);
                         playRound();
                     } else {
+
                         // New intent with end score
-                        end.putExtra("IdOfFirstPlayer", idOfFirstPlayer);
-                        end.putExtra("CountOfPlayers", countOfPlayers);
-                        end.putExtra("IdOfFirstStory", idOfFirstStory);
-                        end.putExtra("CountOfStories", countOfStories);
-                        startActivity(end);                        
+                        end.putExtra("GameId", gameId);
+                        startActivity(end);
                     }
+
                     // Change value of solutionPressed
                     solutionPressed = false;
                 } else
@@ -224,7 +229,6 @@ public class PlayGame extends AppCompatActivity {
     }
 
     private void playRound() {
-
         if (Gamer.isEmpty(editedPlayers)) {      // Enter, if each player has guessed one time
             editedPlayers = Gamer.copyPlayers(players);
         }
@@ -271,7 +275,7 @@ public class PlayGame extends AppCompatActivity {
         // Choose randomly a player
         do {
             playerNumber = (int) (Math.random() * factor);
-        } while (playerNumber <= 0 || playerNumber > editedPlayers.length|| editedPlayers[playerNumber - 1] == null);
+        } while (playerNumber <= 0 || playerNumber > editedPlayers.length|| editedPlayers[playerNumber - 1] == null);       // If a player is null, he has already guessed
 
         return editedPlayers[playerNumber - 1];
     }
@@ -371,13 +375,14 @@ public class PlayGame extends AppCompatActivity {
                 .setPositiveButton("Verlassen und speichern", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        //finish();
+                        // No safe, which is currently which player and who has already gussed
+                        finish();
                     }
                 })
                 .setNegativeButton("Weiterspielen", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        // finish()
+
                     }
                 });
 

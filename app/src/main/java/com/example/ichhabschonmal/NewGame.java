@@ -1,16 +1,21 @@
 package com.example.ichhabschonmal;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.room.Room;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.Toast;
 
-import java.io.File;
+import com.example.ichhabschonmal.database.AppDatabase;
+import com.example.ichhabschonmal.database.Game;
+
+import java.util.List;
 
 public class NewGame extends AppCompatActivity {
 
@@ -19,30 +24,40 @@ public class NewGame extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.new_game);
 
+        // Definitions
         EditText gameName, playerCount, storyMinCount, storyMaxCount;
         Button nextMenu;
         Switch playMode;
+        AppDatabase db;
+        List<Game> listOfGames;
 
+        // EditTexts
         gameName = findViewById(R.id.gameName);
         playerCount = findViewById(R.id.playerCount);
         storyMinCount = findViewById(R.id.storyMinCount);
         storyMaxCount = findViewById(R.id.storyMaxCount);
 
+        // Buttons
         nextMenu = findViewById(R.id.nextMenu);
 
+        // Switches
         playMode = findViewById(R.id.playMode);
+
+        // Create database connection
+        db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
+        listOfGames = db.gamesDao().getAll();
 
         nextMenu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                File directory = new File(getApplicationContext().getFilesDir().toString() + "/" + gameName.getText().toString());
+                String fileName = gameName.getText().toString();
                 String playerNumber = playerCount.getText().toString();
                 String storyMinNumber = storyMinCount.getText().toString();
                 String storyMaxNumber = storyMaxCount.getText().toString();
 
-                if (gameName.getText().toString().isEmpty())            // Check only if gameName is valid, creating starts later
+                if (fileName.isEmpty())            // Check only if gameName is valid, creating starts later
                     Toast.makeText(NewGame.this, "Dateiname darf nicht leer sein!", Toast.LENGTH_SHORT).show();
-                else if (directory.exists())
+                else if (exists(fileName, listOfGames))
                     Toast.makeText(NewGame.this, "Dateiname darf nicht mehrfach verwendet werden!", Toast.LENGTH_SHORT).show();
                 else if (playerNumber.isEmpty())
                         Toast.makeText(NewGame.this, "Spielerzahlfeld darf nicht leer sein!", Toast.LENGTH_SHORT).show();
@@ -79,7 +94,7 @@ public class NewGame extends AppCompatActivity {
                 else if (Integer.parseInt(storyMinNumber) > Integer.parseInt(storyMaxNumber))          // Casts are valid, because of if-cases before
                     Toast.makeText(NewGame.this, "Minimum-Storyzahl muss kleiner oder gleich der Maximum-Storyzahl sein!", Toast.LENGTH_SHORT).show();
                 else {
-                     if (!playMode.isChecked()) {       // One phone for all player, only one counter:
+                     if (!playMode.isChecked()) {       // One phone for all player, only one counter
                          Intent newGameIntent = new Intent(getApplicationContext(), CreatePlayers.class);
                          newGameIntent.putExtra("MinStoryNumber", Integer.parseInt(storyMinNumber));     // Give storyMinNumber
                          newGameIntent.putExtra("MaxStoryNumber", Integer.parseInt(storyMaxNumber));     // Give storyMaxNumber
@@ -94,5 +109,14 @@ public class NewGame extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private boolean exists(String fileName, List<Game> games) {         // Check, if file name exists
+        for (int i = 0; i < games.size(); i++) {
+            if (fileName.equals(games.get(i).gameName))
+                return true;        // File name already exists
+        }
+
+        return false;       // File name exists not yet
     }
 }

@@ -16,13 +16,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Definitions
         Button newGame, loadGame;
 
         // Buttons:
         newGame = findViewById(R.id.newGame);
         loadGame = findViewById(R.id.loadGame);
-
-
 
         newGame.setOnClickListener(new View.OnClickListener() {
             @Override

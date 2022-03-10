@@ -13,7 +13,13 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.room.Room;
 
-import java.util.List;
+import com.example.ichhabschonmal.database.AppDatabase;
+import com.example.ichhabschonmal.database.Game;
+import com.example.ichhabschonmal.database.GameDao;
+import com.example.ichhabschonmal.database.Player;
+import com.example.ichhabschonmal.database.PlayerDao;
+import com.example.ichhabschonmal.database.Story;
+import com.example.ichhabschonmal.database.StoryDao;
 
 public class CreatePlayers extends AppCompatActivity {
 
@@ -22,7 +28,6 @@ public class CreatePlayers extends AppCompatActivity {
     private int minStoryNumber;
     private int maxStoryNumber;
     private int playerNumber;       // Number of players
-
     private int idOfFirstPlayer = -1, countOfPlayers = 0, idOfFirstStory = -1, countOfStories = 0;
 
     @Override
@@ -30,9 +35,11 @@ public class CreatePlayers extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.create_players);
 
+        // Definitions
         Button saveAndNextStory, nextPerson, viewYourStories, next;
         EditText writeStories, playerName;
         TextView playerID, storyNumber;
+        AppDatabase db;
 
         // Buttons:
         saveAndNextStory = findViewById(R.id.saveAndNextStory);
@@ -65,9 +72,7 @@ public class CreatePlayers extends AppCompatActivity {
             playerNumber = 5;
 
         // Database connection:
-        AppDatabase db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
-
-        //muss uebergeben werdennnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
+        db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
 
         viewYourStories.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -165,11 +170,18 @@ public class CreatePlayers extends AppCompatActivity {
                     Toast.makeText(CreatePlayers.this, "Spieler " + listOfPlayers.length + " besitzt zu wenig Storys!", Toast.LENGTH_SHORT).show();
                 else if (maxStoryNumber < listOfPlayers[listOfPlayers.length - 1].getCountOfStories())
                     Toast.makeText(CreatePlayers.this, "Spieler " + listOfPlayers.length + " besitzt zu viele Storys!", Toast.LENGTH_SHORT).show();
-                else if (playerName.getText().toString().isEmpty())
+                else if (playerName.getText().toString().isEmpty())     // Check last player's name
                     Toast.makeText(CreatePlayers.this, "Spielername darf nicht leer sein", Toast.LENGTH_SHORT).show();
-                else if (playerName.getText().toString().length() < 5)
+                else if (playerName.getText().toString().length() < 5)      // Check last player's name
                     Toast.makeText(CreatePlayers.this, "Spielername muss aus mindestens 5 Zeichen bestehen", Toast.LENGTH_SHORT).show();
                 else {
+
+                    // Definitions
+                    int actualGameId = 0, actualPlayerId;
+                    GameDao gamesDao;
+                    PlayerDao playerDao;
+                    StoryDao storyDao;
+                    Player[] listOfNewPlayers;
 
                     // Set name of the last player
                     listOfPlayers[actualPlayer].setName(playerName.getText().toString());
@@ -178,18 +190,27 @@ public class CreatePlayers extends AppCompatActivity {
                             Toast.LENGTH_LONG).show();
 
                     // Create database connection
-                    GameDao gamesDao = db.gamesDao();
-                    PlayerDao playerDao = db.userDao();
-                    StoryDao storyDao = db.storyDao();
+                    gamesDao = db.gamesDao();
+                    playerDao = db.userDao();
+                    storyDao = db.storyDao();
 
-                    // Get from last intent
-                    idOfFirstPlayer = playerDao.getAll().get(playerDao.getAll().size() - 1).playerId + 1;       // Id of last player +1 = new playerId
-                    idOfFirstStory = storyDao.getAll().get(storyDao.getAll().size() - 1).playerId + 1;      // Id of last story +1 = new storyId
-                    int actualGameId = gamesDao.getAll().get(gamesDao.getAll().size() - 1).gameId + 1;      // Id of last game +1 = new gameId
-                    int actualPlayerId = idOfFirstPlayer;
+                    // Get from database
+                    if (gamesDao.getAll().size() == 0 && playerDao.getAll().size() == 0 && storyDao.getAll().size() == 0) {
+                        idOfFirstPlayer = 1;
+                        idOfFirstStory = 1;
+                        actualGameId = 1;
+                    } else if (gamesDao.getAll().size() > 0 && playerDao.getAll().size() > 0 && storyDao.getAll().size() > 0) {
+                        idOfFirstPlayer = playerDao.getAll().get(playerDao.getAll().size() - 1).playerId + 1;       // Id of last player +1 = new playerId
+                        idOfFirstStory = storyDao.getAll().get(storyDao.getAll().size() - 1).storyId + 1;      // Id of last story +1 = new storyId
+                        actualGameId = gamesDao.getAll().get(gamesDao.getAll().size() - 1).gameId + 1;      // Id of last game +1 = new gameId
+                    } else {        // Exception handlingggggggggggggggggggggggggggggggggggggggggggggggggggggg
+                        Toast.makeText(CreatePlayers.this, "Fehler beim festlegen der Ids", Toast.LENGTH_SHORT).show();
+                    }
+
+                    actualPlayerId = idOfFirstPlayer;
 
                     // Create an Array to insert in playerDao
-                    Player[] listOfNewPlayers = new Player[listOfPlayers.length];
+                    listOfNewPlayers = new Player[listOfPlayers.length];
 
                     // Insert all players     -> nextPlayer-Button
                     for (int i = 0; i < listOfPlayers.length; i++) {
@@ -213,6 +234,7 @@ public class CreatePlayers extends AppCompatActivity {
                             listOfStories[j].playerId = actualPlayerId;
                             countOfStories++;
                         }
+
                         actualPlayerId++;
                         storyDao.insertAll(listOfStories);
                     }
@@ -229,7 +251,7 @@ public class CreatePlayers extends AppCompatActivity {
                     newGame.countOfStories = countOfStories;
                     gamesDao.insertAll(newGame);
 
-                    // Exceptionnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
+                    // Exception handlingggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg
                     if (actualGameId != gamesDao.getAll().size()) {
                         Toast.makeText(CreatePlayers.this, "Fehler ids stimmen nicht ueberin:" + actualGameId + " : " + newGame.gameId, Toast.LENGTH_SHORT).show();
                     }
@@ -250,7 +272,7 @@ public class CreatePlayers extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {       // Catch back button
-        AlertDialog.Builder builder = new AlertDialog.Builder(getApplicationContext());
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Spieleinstellungen")
                 .setMessage("Wenn du zur\u00fcck gehst, werden die Daten nicht gespeichert!")
                 .setPositiveButton("Zur\u00fcck", new DialogInterface.OnClickListener() {
