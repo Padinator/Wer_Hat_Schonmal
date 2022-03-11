@@ -4,6 +4,7 @@ import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
+import androidx.room.Update;
 
 import java.util.List;
 
@@ -21,8 +22,14 @@ public interface GameDao {
     Game findByName(String gameName, int idOfFirstPlayer, int countOfPlayers, int idOfFirstStory,
                     int countOfStories);
 
+    @Update
+    void updateGame(Game game);
+
     @Insert
     void insertAll(Game... games);
+
+    @Insert
+    void insert(Game game);
 
     @Delete
     void delete(Game game);

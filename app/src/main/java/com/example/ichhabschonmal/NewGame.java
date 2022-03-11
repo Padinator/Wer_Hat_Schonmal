@@ -3,10 +3,9 @@ package com.example.ichhabschonmal;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.room.Room;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Switch;
@@ -19,6 +18,7 @@ import java.util.List;
 
 public class NewGame extends AppCompatActivity {
 
+    @SuppressLint("UseSwitchCompatOrMaterialCode")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,68 +45,66 @@ public class NewGame extends AppCompatActivity {
 
         // Create database connection
         db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
-        listOfGames = db.gamesDao().getAll();
+        listOfGames = db.gamesDao().getAll();////////////////////////////
 
-        nextMenu.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String fileName = gameName.getText().toString();
-                String playerNumber = playerCount.getText().toString();
-                String storyMinNumber = storyMinCount.getText().toString();
-                String storyMaxNumber = storyMaxCount.getText().toString();
+        nextMenu.setOnClickListener(view -> {
+            String fileName, playerNumber, storyMinNumber, storyMaxNumber;
+            fileName = gameName.getText().toString();
+            playerNumber = playerCount.getText().toString();
+            storyMinNumber = storyMinCount.getText().toString();
+            storyMaxNumber = storyMaxCount.getText().toString();
 
-                if (fileName.isEmpty())            // Check only if gameName is valid, creating starts later
-                    Toast.makeText(NewGame.this, "Dateiname darf nicht leer sein!", Toast.LENGTH_SHORT).show();
-                else if (exists(fileName, listOfGames))
-                    Toast.makeText(NewGame.this, "Dateiname darf nicht mehrfach verwendet werden!", Toast.LENGTH_SHORT).show();
-                else if (playerNumber.isEmpty())
-                        Toast.makeText(NewGame.this, "Spielerzahlfeld darf nicht leer sein!", Toast.LENGTH_SHORT).show();
-                else if (playerNumber.indexOf(".") != -1)
-                    Toast.makeText(NewGame.this, "Spielerzahl darf keinen Punkt enthalten!", Toast.LENGTH_SHORT).show();
-                else if (storyMinNumber.indexOf(".") != -1)
-                    Toast.makeText(NewGame.this, "Mindest-Storyzahl darf keinen Punkt enthalten!", Toast.LENGTH_SHORT).show();
-                else if (storyMaxNumber.indexOf(".") != -1)
-                    Toast.makeText(NewGame.this, "Maximale Storyzahl darf keinen Punkt enthalten!", Toast.LENGTH_SHORT).show();
-                else if (playerNumber.indexOf("1") != -1 && playerNumber.indexOf("2") != -1
-                        && playerNumber.indexOf("3") != -1 && playerNumber.indexOf("4") != -1
-                        && playerNumber.indexOf("5") != -1 && playerNumber.indexOf("6") != -1
-                        && playerNumber.indexOf("7") != -1 && playerNumber.indexOf("8") != -1
-                        && playerNumber.indexOf("9") != -1)
-                    Toast.makeText(NewGame.this, "Mindest-Storyzahl darf nur aus Zahlen bestehen!", Toast.LENGTH_SHORT).show();
-                else if (storyMinNumber.indexOf("1") != -1 && storyMinNumber.indexOf("2") != -1
-                        && storyMinNumber.indexOf("3") != -1 && storyMinNumber.indexOf("4") != -1
-                        && storyMinNumber.indexOf("5") != -1 && storyMinNumber.indexOf("6") != -1
-                        && storyMinNumber.indexOf("7") != -1 && storyMinNumber.indexOf("8") != -1
-                        && storyMinNumber.indexOf("9") != -1)
-                    Toast.makeText(NewGame.this, "Maximale Storyzahl darf nur aus Zahlen bestehen!", Toast.LENGTH_SHORT).show();
-                else if (storyMaxNumber.indexOf("1") != -1 && storyMaxNumber.indexOf("2") != -1
-                        && storyMaxNumber.indexOf("3") != -1 && storyMaxNumber.indexOf("4") != -1
-                        && storyMaxNumber.indexOf("5") != -1 && storyMaxNumber.indexOf("6") != -1
-                        && storyMaxNumber.indexOf("7") != -1 && storyMaxNumber.indexOf("8") != -1
-                        && storyMaxNumber.indexOf("9") != -1)
-                    Toast.makeText(NewGame.this, "Spielerzahl darf nur aus Zahlen bestehen!", Toast.LENGTH_SHORT).show();
-                else if (Integer.parseInt(playerNumber) < 3)
-                    Toast.makeText(NewGame.this, "Spielerzahl muss gr\u00f6\u00dfer als 2 sein!", Toast.LENGTH_SHORT).show();
-                else if (Integer.parseInt(storyMinNumber) <= 0)          // Cast is valid, because of if-cases before
-                    Toast.makeText(NewGame.this, "Mindest-Storyzahl muss gr\u00f6\u00dfer 0 sein!", Toast.LENGTH_SHORT).show();
-                else if (Integer.parseInt(storyMaxNumber) <= 0)          // Cast is valid, because of if-cases before
-                    Toast.makeText(NewGame.this, "Maximum-Storyzahl muss gr\u00f6\u00dfer 0 sein!", Toast.LENGTH_SHORT).show();
-                else if (Integer.parseInt(storyMinNumber) > Integer.parseInt(storyMaxNumber))          // Casts are valid, because of if-cases before
-                    Toast.makeText(NewGame.this, "Minimum-Storyzahl muss kleiner oder gleich der Maximum-Storyzahl sein!", Toast.LENGTH_SHORT).show();
-                else {
-                     if (!playMode.isChecked()) {       // One phone for all player, only one counter
-                         Intent newGameIntent = new Intent(getApplicationContext(), CreatePlayers.class);
-                         newGameIntent.putExtra("MinStoryNumber", Integer.parseInt(storyMinNumber));     // Give storyMinNumber
-                         newGameIntent.putExtra("MaxStoryNumber", Integer.parseInt(storyMaxNumber));     // Give storyMaxNumber
-                         newGameIntent.putExtra("playerNumber", Integer.parseInt(playerNumber));     // Give number of players
-                         //newGame.putExtra("directory", directory);       // Give directory
-                         newGameIntent.putExtra("GameName", gameName.getText().toString());     // Give the name of the game
-                         startActivity(newGameIntent);
-                     } /*else {
-                        Intent newGameMultipleDevicesIntent = new Intent(getApplicationContext(), NewGameMultipleDevices.class);
-                        startActivity(newGameMultipleDevicesIntent);
-                    }*/
-                }
+            if (fileName.isEmpty())            // Check only if gameName is valid, creating starts later
+                Toast.makeText(NewGame.this, "Dateiname darf nicht leer sein!", Toast.LENGTH_SHORT).show();
+            else if (exists(fileName, listOfGames))
+                Toast.makeText(NewGame.this, "Dateiname darf nicht mehrfach verwendet werden!", Toast.LENGTH_SHORT).show();
+            else if (playerNumber.isEmpty())
+                    Toast.makeText(NewGame.this, "Spielerzahlfeld darf nicht leer sein!", Toast.LENGTH_SHORT).show();
+            else if (playerNumber.contains("."))
+                Toast.makeText(NewGame.this, "Spielerzahl darf keinen Punkt enthalten!", Toast.LENGTH_SHORT).show();
+            else if (storyMinNumber.contains("."))
+                Toast.makeText(NewGame.this, "Mindest-Storyzahl darf keinen Punkt enthalten!", Toast.LENGTH_SHORT).show();
+            else if (storyMaxNumber.contains("."))
+                Toast.makeText(NewGame.this, "Maximale Storyzahl darf keinen Punkt enthalten!", Toast.LENGTH_SHORT).show();
+            else if (playerNumber.contains("1") && playerNumber.contains("2")
+                    && playerNumber.contains("3") && playerNumber.contains("4")
+                    && playerNumber.contains("5") && playerNumber.contains("6")
+                    && playerNumber.contains("7") && playerNumber.contains("8")
+                    && playerNumber.contains("9"))
+                Toast.makeText(NewGame.this, "Mindest-Storyzahl darf nur aus Zahlen bestehen!", Toast.LENGTH_SHORT).show();
+            else if (storyMinNumber.contains("1") && storyMinNumber.contains("2")
+                    && storyMinNumber.contains("3") && storyMinNumber.contains("4")
+                    && storyMinNumber.contains("5") && storyMinNumber.contains("6")
+                    && storyMinNumber.contains("7") && storyMinNumber.contains("8")
+                    && storyMinNumber.contains("9"))
+                Toast.makeText(NewGame.this, "Maximale Storyzahl darf nur aus Zahlen bestehen!", Toast.LENGTH_SHORT).show();
+            else if (storyMaxNumber.contains("1") && storyMaxNumber.contains("2")
+                    && storyMaxNumber.contains("3") && storyMaxNumber.contains("4")
+                    && storyMaxNumber.contains("5") && storyMaxNumber.contains("6")
+                    && storyMaxNumber.contains("7") && storyMaxNumber.contains("8")
+                    && storyMaxNumber.contains("9"))
+                Toast.makeText(NewGame.this, "Spielerzahl darf nur aus Zahlen bestehen!", Toast.LENGTH_SHORT).show();
+            else if (Integer.parseInt(playerNumber) < 3)
+                Toast.makeText(NewGame.this, "Spielerzahl muss gr\u00f6\u00dfer als 2 sein!", Toast.LENGTH_SHORT).show();
+            else if (Integer.parseInt(storyMinNumber) <= 0)          // Cast is valid, because of if-cases before
+                Toast.makeText(NewGame.this, "Mindest-Storyzahl muss gr\u00f6\u00dfer 0 sein!", Toast.LENGTH_SHORT).show();
+            else if (Integer.parseInt(storyMaxNumber) <= 0)          // Cast is valid, because of if-cases before
+                Toast.makeText(NewGame.this, "Maximum-Storyzahl muss gr\u00f6\u00dfer 0 sein!", Toast.LENGTH_SHORT).show();
+            else if (Integer.parseInt(storyMinNumber) > Integer.parseInt(storyMaxNumber))          // Casts are valid, because of if-cases before
+                Toast.makeText(NewGame.this, "Minimum-Storyzahl muss kleiner oder gleich der Maximum-Storyzahl sein!", Toast.LENGTH_SHORT).show();
+            else {
+                 if (!playMode.isChecked()) {       // One phone for all player, only one counter
+                     Intent newGameIntent = new Intent(getApplicationContext(), CreatePlayers.class);
+                     newGameIntent.putExtra("MinStoryNumber", Integer.parseInt(storyMinNumber));     // Give storyMinNumber
+                     newGameIntent.putExtra("MaxStoryNumber", Integer.parseInt(storyMaxNumber));     // Give storyMaxNumber
+                     newGameIntent.putExtra("playerNumber", Integer.parseInt(playerNumber));     // Give number of players
+                     //newGame.putExtra("directory", directory);       // Give directory
+                     newGameIntent.putExtra("GameName", gameName.getText().toString());     // Give the name of the game
+                     startActivity(newGameIntent);
+                 } /*else {
+                    Intent newGameMultipleDevicesIntent = new Intent(getApplicationContext(), NewGameMultipleDevices.class);
+                    startActivity(newGameMultipleDevicesIntent);
+                }*/
             }
         });
     }

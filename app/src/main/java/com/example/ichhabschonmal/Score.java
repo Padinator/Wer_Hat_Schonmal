@@ -41,7 +41,7 @@ public class Score extends AppCompatActivity {
 
         // Create database connection
         db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
-        game = db.gamesDao().loadAllByGameIds(new int[] {gameId}).get(0);
+        game = db.gamesDao().loadAllByGameIds(new int[] {gameId}).get(0);////////////////////////
 
         // Find players
         idOfFirstPlayer = game.idOfFirstPlayer;
@@ -58,13 +58,10 @@ public class Score extends AppCompatActivity {
         scoreAdapter = new ScoreAdapter(this, players);
         recyclerView.setAdapter(scoreAdapter);
 
-        confirm.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Go back to last intent
-                finish();
-            }
-        });
+        // Close database connection
+        db.close();
+
+        confirm.setOnClickListener(view -> onBackPressed());
     }
 
     @Override

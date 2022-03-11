@@ -4,15 +4,24 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
+import android.os.StrictMode;
 import android.widget.Button;
-import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+/*
+        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                .detectAll()            // for all detectable problems
+                .build());
+        StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+                .detectLeakedSqlLiteObjects()
+                .detectLeakedClosableObjects()
+                .penaltyLog()
+                .penaltyDeath()
+                .build());
+*/
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -23,20 +32,14 @@ public class MainActivity extends AppCompatActivity {
         newGame = findViewById(R.id.newGame);
         loadGame = findViewById(R.id.loadGame);
 
-        newGame.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent newGame = new Intent(getApplicationContext(), NewGame.class);
-                startActivity(newGame);
-            }
+        newGame.setOnClickListener(v -> {
+            Intent newGame1 = new Intent(getApplicationContext(), NewGame.class);
+            startActivity(newGame1);
         });
 
-        loadGame.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent loadGame = new Intent(getApplicationContext(), LoadGame.class);
-                startActivity(loadGame);
-            }
+        loadGame.setOnClickListener(v -> {
+            Intent loadGame1 = new Intent(getApplicationContext(), LoadGame.class);
+            startActivity(loadGame1);
         });
     }
 }
