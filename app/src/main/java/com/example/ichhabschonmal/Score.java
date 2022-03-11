@@ -1,7 +1,6 @@
 package com.example.ichhabschonmal;
 
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -47,8 +46,10 @@ public class Score extends AppCompatActivity {
         idOfFirstPlayer = game.idOfFirstPlayer;
         countOfPlayers = game.countOfPlayers;
         playerIds = PlayGame.findSomethingOfActualGame(idOfFirstPlayer, countOfPlayers);
-
         players = db.userDao().loadAllByPlayerIds(playerIds);
+
+        // Close database connection
+        db.close();
 
         // RecyclerView
         recyclerView = findViewById(R.id.recyclerView);
@@ -57,9 +58,6 @@ public class Score extends AppCompatActivity {
         // ScoreAdapter
         scoreAdapter = new ScoreAdapter(this, players);
         recyclerView.setAdapter(scoreAdapter);
-
-        // Close database connection
-        db.close();
 
         confirm.setOnClickListener(view -> onBackPressed());
     }

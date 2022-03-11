@@ -8,13 +8,15 @@ import android.widget.ListView;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.room.Room;
+
+import com.example.ichhabschonmal.database.AppDatabase;
 
 import java.util.ArrayList;
 
 public class Rules extends AppCompatActivity {
 
-    ListView listView;
-    int gameId;
+    private int gameId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,6 +24,7 @@ public class Rules extends AppCompatActivity {
         setContentView(R.layout.rules);
 
         // Definitions
+        ListView listView;
         Button start;
         ArrayAdapter<String> adapter;
 
@@ -65,8 +68,15 @@ public class Rules extends AppCompatActivity {
         builder.setTitle("Spiel verlassen")
                 .setMessage("Wenn du zur\u00fcck gehst, werden die Daten gel\u00f6scht!")
                 .setPositiveButton("Zur\u00fcck", (dialog, which) -> {
+                    // Create database connection
+                    AppDatabase db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
+
                     // Delete game and its players and their stories
-                    //ManageGame.deleteGame(gameId);
+                    db.gamesDao().delete(db.gamesDao().loadAllByGameIds(new int[] {gameId}).get(0));
+
+                    // Close database connection
+                    db.close();
+
                     finish();
                 })
                 .setNegativeButton("Abbrechen", (dialogInterface, i) -> {

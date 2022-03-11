@@ -2,9 +2,14 @@ package com.example.ichhabschonmal.database;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.ForeignKey;
 import androidx.room.PrimaryKey;
 
-@Entity
+@Entity(foreignKeys = {@ForeignKey(entity = Game.class,
+        parentColumns = "gameId",
+        childColumns = "gameId",
+        onDelete = ForeignKey.CASCADE)
+})
 public class Player {
     @PrimaryKey(autoGenerate = true)        // Autoincrement is on
     public int playerId;        // Every player has a unique player id

@@ -1,9 +1,7 @@
 package com.example.ichhabschonmal;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,6 +18,8 @@ import java.util.List;
 
 public class EndScore extends AppCompatActivity {
 
+    private int gameId;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,8 +32,9 @@ public class EndScore extends AppCompatActivity {
         AppDatabase db;
         List<Player> players;
         int[] playerIds;
-        int gameId, idOfFirstPlayer, countOfPlayers;
+        int idOfFirstPlayer, countOfPlayers;
 
+        // Buttons
         exitGame = findViewById(R.id.exitGame);
 
         // Get from last intent
@@ -49,6 +50,9 @@ public class EndScore extends AppCompatActivity {
         playerIds = PlayGame.findSomethingOfActualGame(idOfFirstPlayer, countOfPlayers);
         players = db.userDao().loadAllByPlayerIds(playerIds);
 
+        // Close database connection
+        db.close();
+
         // RecyclerView
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -56,9 +60,6 @@ public class EndScore extends AppCompatActivity {
         // EndScoreAdapter
         endScoreAdapter = new EndScoreAdapter(this, players);
         recyclerView.setAdapter(endScoreAdapter);
-
-        // Close database connection
-        db.close();
 
         exitGame.setOnClickListener(view -> onBackPressed());
     }
@@ -69,8 +70,15 @@ public class EndScore extends AppCompatActivity {
         builder.setTitle("Spiel beenden")
                 .setMessage("Das Spiel wird gel\u00f6scht")
                 .setPositiveButton("Verlassen und l\u00f6schen", (dialog, which) -> {
+                    // Create database connection
+                    AppDatabase db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
+
                     // Delete game and its players and their stories
-                    //ManageGame.deleteGame(gameId);
+                    db.gamesDao().delete(db.gamesDao().loadAllByGameIds(new int[] {gameId}).get(0));
+
+                    // Close database connection
+                    db.close();
+
                     finish();
                 })
                 .setNegativeButton("Abbrechen", (dialogInterface, i) -> {

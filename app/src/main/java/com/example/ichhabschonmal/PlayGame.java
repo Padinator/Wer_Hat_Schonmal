@@ -2,10 +2,8 @@ package com.example.ichhabschonmal;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
@@ -27,24 +25,13 @@ public class PlayGame extends AppCompatActivity {
     private Gamer[] players, editedPlayers;         // players contains all players of the actual game
                                                     // editedPlayers contains all players, who have not guessed yet
     private Gamer chosenPlayer, otherPlayer;        // Define the two playing players here, to proof in button solution, who is which one
-
     private List<Player> listOfPlayers;             // Contains all players of the actual game, listOfPlayers has access to the database
     private List<Story> listOfStories;              // Contains lal stories of the actual game, listOfStories has access to the database
-
     private TextView player, story, round;
     private Spinner spin;                           // spin is used to select a player
-
     private AppDatabase db;
-
-    private int idOfFirstPlayer;
-    private int countOfPlayers;
-    private int idOfFirstStory;
-    private int countOfStories;
-    private int gameId;
-    private int roundNumber = 1;
     private boolean solutionPressed = false;        // Before next round begins, Button solution has to be pressed
-
-    private Context context;
+    private int idOfFirstPlayer, countOfPlayers, idOfFirstStory, countOfStories, gameId, roundNumber = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,6 +76,9 @@ public class PlayGame extends AppCompatActivity {
         listOfPlayers = db.userDao().loadAllByPlayerIds(playerIds);
         listOfStories = db.storyDao().loadAllByStoryIds(storyIds);
 
+        // Close database connection
+        db.close();
+
         // Save players' numbers and names for Spinner spin
         listOfPlayersForSpinner = new ArrayList<>();
 
@@ -105,13 +95,8 @@ public class PlayGame extends AppCompatActivity {
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, listOfPlayersForSpinner);
         spin.setAdapter(adapter);
 
-        // Close database connection
-        db.close();
-
-        // Save context to use db in OnClickListener
-        context = getApplicationContext();
-
-        playGame();     // Play a game
+        // Play a game
+        playGame();
 
         solution.setOnClickListener(view -> {
             if (!solutionPressed) {     // Solution may not been pressed
@@ -120,7 +105,7 @@ public class PlayGame extends AppCompatActivity {
                 String winner = "", loser = "";
 
                 // Create database connection
-                db = Room.databaseBuilder(context, AppDatabase.class, "database").allowMainThreadQueries().build();
+                db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
 
                 // Korrekturbedarfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
                 if ((spin.getSelectedItem().toString().equals(correctInput))) {       // chosenPlayer has not guessed correctly
@@ -159,11 +144,11 @@ public class PlayGame extends AppCompatActivity {
 
                 // Change value of solutionPressed
                 solutionPressed = true;
+
+                // Close database connection
+                db.close();
             } else
                 Toast.makeText(PlayGame.this, "Starte die nächste Runde!", Toast.LENGTH_SHORT).show();
-
-            // Close database connection
-            db.close();
         });
 
         nextRound.setOnClickListener(view -> {
@@ -239,8 +224,6 @@ public class PlayGame extends AppCompatActivity {
         if (Gamer.isEmpty(editedPlayers)) {      // Enter, if each player has guessed one time
             editedPlayers = Gamer.copyPlayers(players);
         }
-
-        Log log = null;
 
         // Choose randomly a player to guess someone's story
         chosenPlayer = chooseRandomPlayerWhoGuesses();
@@ -336,8 +319,8 @@ public class PlayGame extends AppCompatActivity {
             listOfStories.get(i).status = true;
 
             // Set guessed story in database to used = true
-            db.storyDao().updateStory(listOfStories.get(i));/////////////////////////////////////7
-        } else        // Exceptionnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
+            db.storyDao().updateStory(listOfStories.get(i));//////////////////////////////////////
+        } else        // Exception handling
             Toast.makeText(this, "Fehler, Story konnte nicht auf benutzt gesetzt werden!", Toast.LENGTH_SHORT).show();
 
         // Delete story in the List "players"
@@ -345,8 +328,6 @@ public class PlayGame extends AppCompatActivity {
 
         // Close database connection
         db.close();
-
-        context = getApplicationContext();
 
         return story;
     }

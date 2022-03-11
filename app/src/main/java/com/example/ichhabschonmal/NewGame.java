@@ -47,6 +47,9 @@ public class NewGame extends AppCompatActivity {
         db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
         listOfGames = db.gamesDao().getAll();////////////////////////////
 
+        // Close database connection
+        db.close();
+
         nextMenu.setOnClickListener(view -> {
             String fileName, playerNumber, storyMinNumber, storyMaxNumber;
             fileName = gameName.getText().toString();

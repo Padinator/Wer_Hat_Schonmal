@@ -32,5 +32,8 @@ public class LoadGame extends AppCompatActivity {
         // LoadGameAdapter
         loadGameAdapter = new LoadGameAdapter(this, db);
         recyclerView.setAdapter(loadGameAdapter);
+
+        // Close database connection
+        db.close();
     }
 }

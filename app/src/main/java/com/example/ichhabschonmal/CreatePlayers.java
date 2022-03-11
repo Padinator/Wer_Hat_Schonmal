@@ -15,19 +15,15 @@ import androidx.room.Room;
 
 import com.example.ichhabschonmal.database.AppDatabase;
 import com.example.ichhabschonmal.database.Game;
-import com.example.ichhabschonmal.database.GameDao;
 import com.example.ichhabschonmal.database.Player;
-import com.example.ichhabschonmal.database.PlayerDao;
 import com.example.ichhabschonmal.database.Story;
-import com.example.ichhabschonmal.database.StoryDao;
 
 public class CreatePlayers extends AppCompatActivity {
 
-    private Gamer[] listOfPlayers = new Gamer[]{new Gamer(1)};       // List of all players
-    private int actualPlayer = 0;
-    private int minStoryNumber;
-    private int maxStoryNumber;
-    private int playerNumber;       // Number of players
+    private int actualPlayerNumber = 1, minStoryNumber, maxStoryNumber, maxPlayerNumber;
+    private int actualGameId, idOfFirstPlayer = -1, idOfActualPlayer, idOfFirstStory = -1;
+    private int countOfPlayers = 1, countOfStories = 0, countOfStoriesOfActualPlayer = 0;
+    private AppDatabase db;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -39,7 +35,6 @@ public class CreatePlayers extends AppCompatActivity {
         Button saveAndNextStory, nextPerson, viewYourStories, next;
         EditText writeStories, playerName;
         TextView playerID, storyNumber;
-        AppDatabase db;
 
         // Buttons:
         saveAndNextStory = findViewById(R.id.saveAndNextStory);
@@ -58,175 +53,199 @@ public class CreatePlayers extends AppCompatActivity {
         // Set minimum and maximum of story per player
         if (getIntent().hasExtra("MinStoryNumber"))
             minStoryNumber = getIntent().getExtras().getInt("MinStoryNumber");
-        else
+        else    // Exception handling
             minStoryNumber = 3;
         if (getIntent().hasExtra("MaxStoryNumber"))
             maxStoryNumber = getIntent().getExtras().getInt("MaxStoryNumber");
-        else
+        else    // Exception handling
             maxStoryNumber = 5;
 
         // Set number of players
         if (getIntent().hasExtra("playerNumber"))
-            playerNumber = getIntent().getExtras().getInt("playerNumber");
-        else
-            playerNumber = 5;
+            maxPlayerNumber = getIntent().getExtras().getInt("playerNumber");
+        else    // Exception handling
+            maxPlayerNumber = 5;
 
-        // Database connection:
+        // Create database connection
         db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
+
+        // Create new game
+        Game newGame = new Game();
+        // newGame.gameId = newGame.gameId;      // Game id are set with autoincrement
+        newGame.gameName = getIntent().getStringExtra("GameName");      // -> next-Button of the previous intent
+        db.gamesDao().insert(newGame);
+
+        // Get id of the actual game
+        actualGameId = db.gamesDao().getAll().get(db.gamesDao().getAll().size() - 1).gameId;
+
+        // Create first player and insert him
+        Player player = new Player();
+        player.gameId = actualGameId;
+        db.userDao().insert(player);
+
+        // Get id of first player
+        idOfFirstPlayer = db.userDao().getAll().get(db.userDao().getAll().size() - 1).playerId;
+
+        // Set used variable
+        idOfActualPlayer = idOfFirstPlayer;
+
+        /*
+        // Close database connection
+        db.close();
+        */
 
         viewYourStories.setOnClickListener(v -> {
             Intent viewStories = new Intent(getApplicationContext(), ViewAllStories.class);
             startActivity(viewStories);
         });
 
-
         saveAndNextStory.setOnClickListener(v -> {
 
-            // Add a players story
-            if (listOfPlayers[actualPlayer].getCountOfStories() == maxStoryNumber) {      // Stories per player == maxStoryNumber?
+            if (countOfStoriesOfActualPlayer == maxStoryNumber) {      // Stories per player == maxStoryNumber?
                 Toast.makeText(CreatePlayers.this, "Spieler hat bereits genug Stories " +
-                                "aufgeschrieben!", Toast.LENGTH_LONG).show();
+                        "aufgeschrieben!", Toast.LENGTH_LONG).show();
             } else if (writeStories.getText().toString().isEmpty()) {       // Text field for stories is empty
                 Toast.makeText(CreatePlayers.this, "Kein Text zum speichern!",
                         Toast.LENGTH_LONG).show();
             } else if (writeStories.getText().toString().length() < 25) {
                 Toast.makeText(CreatePlayers.this, "Story muss aus mindestens 25 zeichen " +
                         "bestehen.", Toast.LENGTH_SHORT).show();
-            } else {            // Text field is okay
-                listOfPlayers[actualPlayer].addStory(writeStories.getText().toString());
-                writeStories.setText("Schreibe in dieses Feld deine n\u00e4chste Story rein.");
-                storyNumber.setText("Story " + (listOfPlayers[actualPlayer].getCountOfStories() + 1) + ":");
+            } else {
 
-                Toast.makeText(CreatePlayers.this, "Story " + listOfPlayers[actualPlayer].getCountOfStories() + " gespeichert",
+                // Create new Story
+                Story newStory = new Story();
+                newStory.content = writeStories.getText().toString();
+                newStory.status = false;
+                newStory.playerId = idOfActualPlayer;
+
+                db.storyDao().insert(newStory);
+
+                countOfStoriesOfActualPlayer++;
+                countOfStories++;
+
+                if (idOfFirstPlayer == idOfActualPlayer && countOfStories == 1)
+                    idOfFirstStory = db.storyDao().getAll().get(db.storyDao().getAll().size() - 1).storyId;
+
+                /*
+                // Close database connection
+                db.close();
+                */
+
+                // Set TextViews
+                writeStories.setText("Schreibe in dieses Feld deine n\u00e4chste Story rein.");
+                storyNumber.setText("Story " + (countOfStoriesOfActualPlayer  +1) + ":");
+
+                Toast.makeText(CreatePlayers.this, "Story " + countOfStoriesOfActualPlayer + " gespeichert",
                         Toast.LENGTH_LONG).show();
             }
         });
 
         nextPerson.setOnClickListener(v -> {
 
-            // Check inserting a new player
-            if (listOfPlayers.length == playerNumber)
+            // Check if a player meet all necessary conditions
+            // Exception handling
+            if (countOfPlayers == maxPlayerNumber)
                 Toast.makeText(CreatePlayers.this, "Es k\u00f6nnen nicht weitere Spieler teilnehmen!",
                         Toast.LENGTH_LONG).show();
-            else if (listOfPlayers[actualPlayer].getCountOfStories() < minStoryNumber)
-                Toast.makeText(CreatePlayers.this, "Spieler muss mindestens " + minStoryNumber + " Stories besitzen!",
-                        Toast.LENGTH_LONG).show();
-            else if (listOfPlayers.length > playerNumber) {
+            else if (countOfPlayers > maxPlayerNumber)      // Exception habdling
                 Toast.makeText(CreatePlayers.this, "Zu viele eingeloggte Spieler!",
                         Toast.LENGTH_LONG).show();
-                // Exception has to be added hereeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
-            } else if (playerName.getText().toString().isEmpty()) {
+            else if (countOfStoriesOfActualPlayer < minStoryNumber)
+                Toast.makeText(CreatePlayers.this, "Spieler muss mindestens " + minStoryNumber + " Stories besitzen!",
+                        Toast.LENGTH_LONG).show();
+            else if (countOfStoriesOfActualPlayer > maxStoryNumber)     // Exception handling
+                Toast.makeText(CreatePlayers.this, "Spieler " + actualPlayerNumber + " besitzt zu viele Storys!", Toast.LENGTH_SHORT).show();
+            else if (playerName.getText().toString().isEmpty()) {     // No text in playerName EditText
                 Toast.makeText(CreatePlayers.this, "Spielername darf nicht leer sein", Toast.LENGTH_SHORT).show();
-            } else if (playerName.getText().toString().length() < 5)
-                Toast.makeText(CreatePlayers.this, "Spielername muss aus mindestens 5 Zeichen bestehen", Toast.LENGTH_SHORT).show();
+            } else if (playerName.getText().toString().length() < 2)    // Player name has to consist of at least two chars
+                Toast.makeText(CreatePlayers.this, "Spielername muss aus mindestens 2 Zeichen bestehen", Toast.LENGTH_SHORT).show();
             else {
 
-                // Set name of a player
-                listOfPlayers[actualPlayer].setName(playerName.getText().toString());
+                // Update a player
+                player.playerId = idOfActualPlayer;
+                player.playerNumber = actualPlayerNumber;
+                player.name = playerName.getText().toString();
+                player.gameId = actualGameId;
+                player.score = 0;
+                db.userDao().updatePlayer(player);
 
-                Toast.makeText(CreatePlayers.this, "Spieler " + listOfPlayers[actualPlayer].getNumber() + " erfolgreich gespeichert",
+                // Create new player and insert him
+                Player newPlayer = new Player();
+                newPlayer.gameId = actualGameId;
+                db.userDao().insert(newPlayer);
+
+                /*
+                // Close database connection
+                db.close();
+                */
+
+                Toast.makeText(CreatePlayers.this, "Spieler " + actualPlayerNumber + " erfolgreich gespeichert",
                         Toast.LENGTH_LONG).show();
 
-                // Insert a new player
-                actualPlayer++;
-                Gamer[] tmpListOfPlayers = new Gamer[listOfPlayers.length + 1];
-                System.arraycopy(listOfPlayers, 0, tmpListOfPlayers, 0, listOfPlayers.length);      // Flat copy
-                tmpListOfPlayers[listOfPlayers.length] = new Gamer(actualPlayer + 1);       // New player with no stories inserted
-                listOfPlayers = tmpListOfPlayers;
+                // Set used variables
+                idOfActualPlayer++;
+                actualPlayerNumber++;
+                countOfPlayers++;
+                countOfStoriesOfActualPlayer = 0;
 
                 // Reset Text fields in new_game.xml
-                playerID.setText("Du bist Spieler " + (actualPlayer + 1) + ":");
+                playerID.setText("Du bist Spieler " + actualPlayerNumber + ":");
                 playerName.setText("Dein Name");
                 storyNumber.setText("Story 1:");
                 writeStories.setText("Schreibe in dieses Feld deine Story rein.");
             }
         });
 
+        viewYourStories.setOnClickListener(view -> {
+            Intent yourStories = new Intent(CreatePlayers.this, ViewAllStories.class);
+            yourStories.putExtra("GameId", actualGameId);
+            startActivity(yourStories);
+        });
+
         next.setOnClickListener(view -> {
 
             // Check, if all players meet all conditions
-            //Auch durch Exceptions bzw. Assertions austauschennnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
-            if (listOfPlayers.length < playerNumber)
+            // Exception handling
+            if (countOfPlayers < maxPlayerNumber)
                 Toast.makeText(CreatePlayers.this, "Zu wenig eingeloggte Spieler", Toast.LENGTH_SHORT).show();
-            else if (listOfPlayers.length > playerNumber)
+            else if (countOfPlayers > maxPlayerNumber)      // Exception handling
                 Toast.makeText(CreatePlayers.this, "Zu viele eingeloggte Spieler", Toast.LENGTH_SHORT).show();
-            else if (listOfPlayers[listOfPlayers.length - 1].getCountOfStories() < minStoryNumber)
-                Toast.makeText(CreatePlayers.this, "Spieler " + listOfPlayers.length + " besitzt zu wenig Storys!", Toast.LENGTH_SHORT).show();
-            else if (maxStoryNumber < listOfPlayers[listOfPlayers.length - 1].getCountOfStories())
-                Toast.makeText(CreatePlayers.this, "Spieler " + listOfPlayers.length + " besitzt zu viele Storys!", Toast.LENGTH_SHORT).show();
+            else if (countOfStoriesOfActualPlayer < minStoryNumber)
+                Toast.makeText(CreatePlayers.this, "Spieler besitzt zu wenig Storys!", Toast.LENGTH_SHORT).show();
+            else if (countOfStoriesOfActualPlayer > maxStoryNumber)     // Exception handling
+                Toast.makeText(CreatePlayers.this, "Spieler " + actualPlayerNumber + " besitzt zu viele Storys!", Toast.LENGTH_SHORT).show();
             else if (playerName.getText().toString().isEmpty())     // Check last player's name
                 Toast.makeText(CreatePlayers.this, "Spielername darf nicht leer sein", Toast.LENGTH_SHORT).show();
-            else if (playerName.getText().toString().length() < 5)      // Check last player's name
-                Toast.makeText(CreatePlayers.this, "Spielername muss aus mindestens 5 Zeichen bestehen", Toast.LENGTH_SHORT).show();
+            else if (playerName.getText().toString().length() < 2)      // Check last player's name
+                Toast.makeText(CreatePlayers.this, "Spielername muss aus mindestens 2 Zeichen bestehen", Toast.LENGTH_SHORT).show();
             else {
 
-                // Definitions
-                int actualGameId, idOfFirstPlayer = -1, countOfPlayers = 0, idOfFirstStory = -1, countOfStories = 0;
-                GameDao gamesDao;
-                PlayerDao playerDao;
-                StoryDao storyDao;
+                // Update a player
+                player.playerId = idOfActualPlayer;
+                player.playerNumber = actualPlayerNumber;
+                player.name = playerName.getText().toString();
+                player.gameId = actualGameId;
+                player.score = 0;
+                db.userDao().updatePlayer(player);
 
-                // Set name of the last player
-                listOfPlayers[actualPlayer].setName(playerName.getText().toString());
-
-                Toast.makeText(CreatePlayers.this, "Spieler " + listOfPlayers[actualPlayer].getNumber() + " erfolgreich gespeichert",
+                Toast.makeText(CreatePlayers.this, "Spieler " + actualPlayerNumber + " erfolgreich gespeichert",
                         Toast.LENGTH_LONG).show();
 
-                // Create database connection
-                gamesDao = db.gamesDao();
-                playerDao = db.userDao();
-                storyDao = db.storyDao();
+                // Set used variables
+                countOfPlayers++;
 
-                // Insert a game
-                Game newGame = new Game();
-                // newGame.gameId = newGame.gameId;      // Game id are set with
-                newGame.gameName = getIntent().getStringExtra("GameName");      // -> next-Button of the previous intent
-                gamesDao.insert(newGame);
-
-                // Set actual game Id
-                actualGameId = gamesDao.getAll().get(gamesDao.getAll().size() - 1).gameId;
-
-                // Insert all players
-                for (int i = 0; i < listOfPlayers.length; i++) {
-                    Player newPlayer = new Player();
-                    // player.playerId = player.playerId;       // A player's id is set with autoincrement
-                    newPlayer.playerNumber = listOfPlayers[i].getNumber();
-                    newPlayer.name = listOfPlayers[i].getName();
-                    newPlayer.gameId = actualGameId;
-                    newPlayer.score = 0;
-                    playerDao.insert(newPlayer);
-                    countOfPlayers++;
-
-                    if (i == 0)
-                        idOfFirstPlayer = playerDao.getAll().get(playerDao.getAll().size() - 1).playerId;
-
-                    // Insert a player's stories
-                    for (int j = 0; j < listOfPlayers[i].getCountOfStories(); j++) {
-                        Story newStory = new Story();
-                        // newStory.storyId = newStory.storyId;        // Story ids are set with autoincrement
-                        newStory.content = listOfPlayers[i].getStory(j);
-                        newStory.playerId = playerDao.getAll().get(playerDao.getAll().size() - 1).playerId;
-                        newStory.status = false;
-                        storyDao.insert(newStory);
-                        countOfStories++;
-
-                        if (i == 0 && j == 0)
-                            idOfFirstStory = storyDao.getAll().get(storyDao.getAll().size() - 1).storyId;
-                    }
-                }
-
-                // Updated game
+                //Update newGame
                 newGame.gameId = actualGameId;
                 newGame.idOfFirstPlayer = idOfFirstPlayer;
-                newGame.countOfPlayers = countOfPlayers;
+                newGame.countOfPlayers = countOfPlayers - 1;
                 newGame.idOfFirstStory = idOfFirstStory;
                 newGame.countOfStories = countOfStories;
-                gamesDao.updateGame(newGame);
+                db.gamesDao().updateGame(newGame);
 
                 // Close database connection
                 db.close();
 
-                // Open new intent
+                // Start next activity
                 Intent rules = new Intent(CreatePlayers.this, Rules.class);
                 rules.putExtra("GameId", actualGameId);
                 startActivity(rules);
@@ -240,7 +259,12 @@ public class CreatePlayers extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Spieleinstellungen")
                 .setMessage("Wenn du zur\u00fcck gehst, werden die Daten nicht gespeichert!")
-                .setPositiveButton("Zur\u00fcck", (dialog, which) -> finish())
+                .setPositiveButton("Zur\u00fcck", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        db.gamesDao().delete(db.gamesDao().getAll().get(db.gamesDao().getAll().size() - 1));
+                        finish();
+                    }
+                })
                 .setNegativeButton("Abbrechen", (dialogInterface, i) -> {
 
                 });
