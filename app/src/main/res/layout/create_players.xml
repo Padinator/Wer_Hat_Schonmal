@@ -2,7 +2,8 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -42,8 +43,8 @@
                 android:id="@+id/explanation"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
                 android:layout_below="@+id/player"
+                android:layout_centerHorizontal="true"
                 android:layout_marginHorizontal="30dp"
                 android:layout_marginBottom="30dp"
                 android:background="@drawable/textview_border_explanation"
@@ -57,7 +58,7 @@
                 android:layout_below="@+id/explanation"
                 android:layout_marginLeft="50dp"
                 android:text="Story 1:"
-                android:textSize="20dp"/>
+                android:textSize="20dp" />
 
             <EditText
                 android:id="@+id/writeStories"
@@ -66,11 +67,12 @@
                 android:layout_below="@+id/storyNumber"
                 android:layout_centerHorizontal="true"
                 android:layout_marginLeft="50dp"
+                android:layout_marginTop="20dp"
                 android:layout_marginRight="50dp"
                 android:layout_marginBottom="30dp"
                 android:background="@drawable/textview_story_border"
                 android:padding="50dp"
-                android:text="Schreibe in dieses Feld deine Story rein." />
+                android:text="Ich hab schonmal " />
 
             <RelativeLayout
                 android:id="@+id/buttons"

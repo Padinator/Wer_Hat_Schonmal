@@ -55,6 +55,8 @@ public class CreatePlayers extends AppCompatActivity {
         playerID = findViewById(R.id.playerID);
         storyNumber = findViewById(R.id.storyNumber);
 
+
+
         // Set minimum and maximum of story per player
         if (getIntent().hasExtra("MinStoryNumber"))
             minStoryNumber = getIntent().getExtras().getInt("MinStoryNumber");
@@ -90,16 +92,16 @@ public class CreatePlayers extends AppCompatActivity {
                 // Add a players story
                 if (listOfPlayers[actualPlayer].getCountOfStories() == maxStoryNumber) {      // Stories per player == maxStoryNumber?
                     Toast.makeText(CreatePlayers.this, "Spieler hat bereits genug Stories " +
-                                    "aufgeschrieben!", Toast.LENGTH_LONG).show();
+                            "aufgeschrieben!", Toast.LENGTH_LONG).show();
                 } else if (writeStories.getText().toString().isEmpty()) {       // Text field for stories is empty
                     Toast.makeText(CreatePlayers.this, "Kein Text zum speichern!",
                             Toast.LENGTH_LONG).show();
-                } else if (writeStories.getText().toString().length() < 25) {
-                    Toast.makeText(CreatePlayers.this, "Story muss aus mindestens 25 zeichen " +
+                } else if (writeStories.getText().toString().length() < 15) {
+                    Toast.makeText(CreatePlayers.this, "Story muss aus mindestens 15 zeichen " +
                             "bestehen.", Toast.LENGTH_SHORT).show();
                 } else {            // Text field is okay
                     listOfPlayers[actualPlayer].addStory(writeStories.getText().toString());
-                    writeStories.setText("Schreibe in dieses Feld deine n\u00e4chste Story rein.");
+                    writeStories.setText("Ich hab schonmal ");
                     storyNumber.setText("Story " + (listOfPlayers[actualPlayer].getCountOfStories() + 1) + ":");
 
                     Toast.makeText(CreatePlayers.this, "Story " + listOfPlayers[actualPlayer].getCountOfStories() + " gespeichert",
@@ -149,7 +151,7 @@ public class CreatePlayers extends AppCompatActivity {
                     playerID.setText("Du bist Spieler " + (actualPlayer + 1) + ":");
                     playerName.setText("Dein Name");
                     storyNumber.setText("Story 1:");
-                    writeStories.setText("Schreibe in dieses Feld deine Story rein.");
+                    writeStories.setText("Ich hab schonmal ");
                 }
             }
         });

@@ -4,11 +4,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.ichhabschonmal.database.AppDatabase;
 
-public class ManageGames extends AppCompatActivity {
+public class ManageGame extends AppCompatActivity {
 
     private static AppDatabase mDatabase;
 
-    ManageGames(AppDatabase database) {
+    ManageGame(AppDatabase database) {
         mDatabase = database;
     }
 

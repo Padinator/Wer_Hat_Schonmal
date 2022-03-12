@@ -142,6 +142,7 @@ public class PlayGame extends AppCompatActivity {
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
                     builder.setTitle("ERGEBNIS")
+                            // set text for who has to drink
                             .setMessage(winner)
                             .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                 @Override
