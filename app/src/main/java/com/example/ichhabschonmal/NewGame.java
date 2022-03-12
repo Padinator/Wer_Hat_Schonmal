@@ -45,7 +45,7 @@ public class NewGame extends AppCompatActivity {
 
         // Create database connection
         db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
-        listOfGames = db.gamesDao().getAll();////////////////////////////
+        listOfGames = db.gameDao().getAll();////////////////////////////
 
         // Close database connection
         db.close();
@@ -101,9 +101,9 @@ public class NewGame extends AppCompatActivity {
                      newGameIntent.putExtra("MinStoryNumber", Integer.parseInt(storyMinNumber));     // Give storyMinNumber
                      newGameIntent.putExtra("MaxStoryNumber", Integer.parseInt(storyMaxNumber));     // Give storyMaxNumber
                      newGameIntent.putExtra("playerNumber", Integer.parseInt(playerNumber));     // Give number of players
-                     //newGame.putExtra("directory", directory);       // Give directory
                      newGameIntent.putExtra("GameName", gameName.getText().toString());     // Give the name of the game
                      startActivity(newGameIntent);
+                     finish();
                  } /*else {
                     Intent newGameMultipleDevicesIntent = new Intent(getApplicationContext(), NewGameMultipleDevices.class);
                     startActivity(newGameMultipleDevicesIntent);

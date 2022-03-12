@@ -41,12 +41,12 @@ public class LoadGameAdapter extends RecyclerView.Adapter<LoadGameAdapter.ViewHo
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         //String game = mData.get(position);
-        holder.name.setText(mDatabase.gamesDao().getAll().get(position).gameName);
+        holder.name.setText(mDatabase.gameDao().getAll().get(position).gameName);
     }
 
     @Override
     public int getItemCount() {
-        return mDatabase.gamesDao().getAll().size();
+        return mDatabase.gameDao().getAll().size();
     }
 
 
@@ -71,7 +71,7 @@ public class LoadGameAdapter extends RecyclerView.Adapter<LoadGameAdapter.ViewHo
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     Intent playGame = new Intent(view.getContext().getApplicationContext(), PlayGame.class);
-                                    Game game = mDatabase.gamesDao().getAll().get(getAbsoluteAdapterPosition());
+                                    Game game = mDatabase.gameDao().getAll().get(getAbsoluteAdapterPosition());
 
                                     playGame.putExtra("GameId", game.gameId);
 
@@ -101,10 +101,10 @@ public class LoadGameAdapter extends RecyclerView.Adapter<LoadGameAdapter.ViewHo
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     Intent intent = new Intent(view.getContext().getApplicationContext(), LoadGame.class);
-                                    Game game = mDatabase.gamesDao().getAll().get(getAbsoluteAdapterPosition());
+                                    Game game = mDatabase.gameDao().getAll().get(getAbsoluteAdapterPosition());
 
                                     // Delete a game
-                                    mDatabase.gamesDao().delete(game);
+                                    mDatabase.gameDao().delete(game);
 
                                     // Close database connection
                                     mDatabase.close();

@@ -60,7 +60,7 @@ public class PlayGame extends AppCompatActivity {
 
         // Create database connection
         db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
-        actualGame = db.gamesDao().loadAllByGameIds(new int[] {gameId}).get(0);////////////////////////
+        actualGame = db.gameDao().loadAllByGameIds(new int[] {gameId}).get(0);////////////////////////
 
         // Used variables
         idOfFirstPlayer = actualGame.idOfFirstPlayer;
@@ -73,7 +73,7 @@ public class PlayGame extends AppCompatActivity {
         storyIds = findSomethingOfActualGame(idOfFirstStory, countOfStories);
 
         // Get players playing the actual game
-        listOfPlayers = db.userDao().loadAllByPlayerIds(playerIds);
+        listOfPlayers = db.playerDao().loadAllByPlayerIds(playerIds);
         listOfStories = db.storyDao().loadAllByStoryIds(storyIds);
 
         // Close database connection
@@ -102,7 +102,7 @@ public class PlayGame extends AppCompatActivity {
             if (!solutionPressed) {     // Solution may not been pressed
                 String correctInput = "Spieler " + otherPlayer.getNumber() + ", " + otherPlayer.getName();
                 int i = 0;
-                String winner = "", loser = "";
+                String winner, loser = "";
 
                 // Create database connection
                 db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
@@ -114,7 +114,7 @@ public class PlayGame extends AppCompatActivity {
                             Player player = listOfPlayers.get(i);
                             player.score++;
                             listOfPlayers.set(i, player);
-                            db.userDao().updatePlayer(player);
+                            db.playerDao().updatePlayer(player);
                         }
                     }
 
@@ -126,7 +126,7 @@ public class PlayGame extends AppCompatActivity {
                             Player player = listOfPlayers.get(i);
                             player.score++;
                             listOfPlayers.set(i, player);
-                            db.userDao().updatePlayer(player);//////////////////////////////
+                            db.playerDao().updatePlayer(player);//////////////////////////////
                         }
                     }
 

@@ -42,13 +42,13 @@ public class EndScore extends AppCompatActivity {
 
         // Create database connection
         db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
-        Game game = db.gamesDao().loadAllByGameIds(new int[] {gameId}).get(0);
+        Game game = db.gameDao().loadAllByGameIds(new int[] {gameId}).get(0);
 
         // Used variables
         idOfFirstPlayer = game.idOfFirstPlayer;
         countOfPlayers = game.countOfPlayers;
         playerIds = PlayGame.findSomethingOfActualGame(idOfFirstPlayer, countOfPlayers);
-        players = db.userDao().loadAllByPlayerIds(playerIds);
+        players = db.playerDao().loadAllByPlayerIds(playerIds);
 
         // Close database connection
         db.close();
@@ -74,7 +74,7 @@ public class EndScore extends AppCompatActivity {
                     AppDatabase db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
 
                     // Delete game and its players and their stories
-                    db.gamesDao().delete(db.gamesDao().loadAllByGameIds(new int[] {gameId}).get(0));
+                    db.gameDao().delete(db.gameDao().loadAllByGameIds(new int[] {gameId}).get(0));
 
                     // Close database connection
                     db.close();

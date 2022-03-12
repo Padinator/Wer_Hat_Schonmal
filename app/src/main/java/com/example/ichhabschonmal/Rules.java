@@ -72,7 +72,7 @@ public class Rules extends AppCompatActivity {
                     AppDatabase db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
 
                     // Delete game and its players and their stories
-                    db.gamesDao().delete(db.gamesDao().loadAllByGameIds(new int[] {gameId}).get(0));
+                    db.gameDao().delete(db.gameDao().loadAllByGameIds(new int[] {gameId}).get(0));
 
                     // Close database connection
                     db.close();

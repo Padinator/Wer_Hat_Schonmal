@@ -40,13 +40,13 @@ public class Score extends AppCompatActivity {
 
         // Create database connection
         db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
-        game = db.gamesDao().loadAllByGameIds(new int[] {gameId}).get(0);////////////////////////
+        game = db.gameDao().loadAllByGameIds(new int[] {gameId}).get(0);////////////////////////
 
         // Find players
         idOfFirstPlayer = game.idOfFirstPlayer;
         countOfPlayers = game.countOfPlayers;
         playerIds = PlayGame.findSomethingOfActualGame(idOfFirstPlayer, countOfPlayers);
-        players = db.userDao().loadAllByPlayerIds(playerIds);
+        players = db.playerDao().loadAllByPlayerIds(playerIds);
 
         // Close database connection
         db.close();

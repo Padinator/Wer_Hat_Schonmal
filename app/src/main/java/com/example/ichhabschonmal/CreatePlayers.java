@@ -73,26 +73,21 @@ public class CreatePlayers extends AppCompatActivity {
         Game newGame = new Game();
         // newGame.gameId = newGame.gameId;      // Game id are set with autoincrement
         newGame.gameName = getIntent().getStringExtra("GameName");      // -> next-Button of the previous intent
-        db.gamesDao().insert(newGame);
+        db.gameDao().insert(newGame);
 
         // Get id of the actual game
-        actualGameId = db.gamesDao().getAll().get(db.gamesDao().getAll().size() - 1).gameId;
+        actualGameId = db.gameDao().getAll().get(db.gameDao().getAll().size() - 1).gameId;
 
         // Create first player and insert him
         Player player = new Player();
         player.gameId = actualGameId;
-        db.userDao().insert(player);
+        db.playerDao().insert(player);
 
         // Get id of first player
-        idOfFirstPlayer = db.userDao().getAll().get(db.userDao().getAll().size() - 1).playerId;
+        idOfFirstPlayer = db.playerDao().getAll().get(db.playerDao().getAll().size() - 1).playerId;
 
         // Set used variable
         idOfActualPlayer = idOfFirstPlayer;
-
-        /*
-        // Close database connection
-        db.close();
-        */
 
         viewYourStories.setOnClickListener(v -> {
             Intent viewStories = new Intent(getApplicationContext(), ViewAllStories.class);
@@ -107,9 +102,11 @@ public class CreatePlayers extends AppCompatActivity {
             } else if (writeStories.getText().toString().isEmpty()) {       // Text field for stories is empty
                 Toast.makeText(CreatePlayers.this, "Kein Text zum speichern!",
                         Toast.LENGTH_LONG).show();
+            } else if (writeStories.getText().toString().length() > 250) {
+                Toast.makeText(this, "Story darf nicht l\u00e4nger als 250 Zeichen sein!", Toast.LENGTH_SHORT).show();
             } else if (writeStories.getText().toString().length() < 25) {
                 Toast.makeText(CreatePlayers.this, "Story muss aus mindestens 25 zeichen " +
-                        "bestehen.", Toast.LENGTH_SHORT).show();
+                        "bestehen!", Toast.LENGTH_SHORT).show();
             } else {
 
                 // Create new Story
@@ -125,11 +122,6 @@ public class CreatePlayers extends AppCompatActivity {
 
                 if (idOfFirstPlayer == idOfActualPlayer && countOfStories == 1)
                     idOfFirstStory = db.storyDao().getAll().get(db.storyDao().getAll().size() - 1).storyId;
-
-                /*
-                // Close database connection
-                db.close();
-                */
 
                 // Set TextViews
                 writeStories.setText("Schreibe in dieses Feld deine n\u00e4chste Story rein.");
@@ -155,10 +147,14 @@ public class CreatePlayers extends AppCompatActivity {
                         Toast.LENGTH_LONG).show();
             else if (countOfStoriesOfActualPlayer > maxStoryNumber)     // Exception handling
                 Toast.makeText(CreatePlayers.this, "Spieler " + actualPlayerNumber + " besitzt zu viele Storys!", Toast.LENGTH_SHORT).show();
-            else if (playerName.getText().toString().isEmpty()) {     // No text in playerName EditText
-                Toast.makeText(CreatePlayers.this, "Spielername darf nicht leer sein", Toast.LENGTH_SHORT).show();
-            } else if (playerName.getText().toString().length() < 2)    // Player name has to consist of at least two chars
-                Toast.makeText(CreatePlayers.this, "Spielername muss aus mindestens 2 Zeichen bestehen", Toast.LENGTH_SHORT).show();
+            else if (playerName.getText().toString().isEmpty())     // No text in playerName EditText
+                Toast.makeText(CreatePlayers.this, "Spielername darf nicht leer sein!", Toast.LENGTH_SHORT).show();
+            else if (checkPlayerName(playerName.getText().toString()))
+                Toast.makeText(this, "Spielername darf keine Sonderzeichen enthalten!", Toast.LENGTH_SHORT).show();
+            else if (playerName.getText().toString().length() < 2)    // Player name has to consist of at least two chars
+                Toast.makeText(CreatePlayers.this, "Spielername muss aus mindestens 2 Zeichen bestehen!", Toast.LENGTH_SHORT).show();
+            else if (playerName.getText().toString().length() > 20)
+                Toast.makeText(CreatePlayers.this, "Spielername darf aus maximal 20 Zeichen bestehen!", Toast.LENGTH_SHORT).show();
             else {
 
                 // Update a player
@@ -167,17 +163,12 @@ public class CreatePlayers extends AppCompatActivity {
                 player.name = playerName.getText().toString();
                 player.gameId = actualGameId;
                 player.score = 0;
-                db.userDao().updatePlayer(player);
+                db.playerDao().updatePlayer(player);
 
                 // Create new player and insert him
                 Player newPlayer = new Player();
                 newPlayer.gameId = actualGameId;
-                db.userDao().insert(newPlayer);
-
-                /*
-                // Close database connection
-                db.close();
-                */
+                db.playerDao().insert(newPlayer);
 
                 Toast.makeText(CreatePlayers.this, "Spieler " + actualPlayerNumber + " erfolgreich gespeichert",
                         Toast.LENGTH_LONG).show();
@@ -207,17 +198,21 @@ public class CreatePlayers extends AppCompatActivity {
             // Check, if all players meet all conditions
             // Exception handling
             if (countOfPlayers < maxPlayerNumber)
-                Toast.makeText(CreatePlayers.this, "Zu wenig eingeloggte Spieler", Toast.LENGTH_SHORT).show();
+                Toast.makeText(CreatePlayers.this, "Zu wenig eingeloggte Spieler!", Toast.LENGTH_SHORT).show();
             else if (countOfPlayers > maxPlayerNumber)      // Exception handling
-                Toast.makeText(CreatePlayers.this, "Zu viele eingeloggte Spieler", Toast.LENGTH_SHORT).show();
+                Toast.makeText(CreatePlayers.this, "Zu viele eingeloggte Spieler!", Toast.LENGTH_SHORT).show();
             else if (countOfStoriesOfActualPlayer < minStoryNumber)
                 Toast.makeText(CreatePlayers.this, "Spieler besitzt zu wenig Storys!", Toast.LENGTH_SHORT).show();
             else if (countOfStoriesOfActualPlayer > maxStoryNumber)     // Exception handling
                 Toast.makeText(CreatePlayers.this, "Spieler " + actualPlayerNumber + " besitzt zu viele Storys!", Toast.LENGTH_SHORT).show();
             else if (playerName.getText().toString().isEmpty())     // Check last player's name
-                Toast.makeText(CreatePlayers.this, "Spielername darf nicht leer sein", Toast.LENGTH_SHORT).show();
+                Toast.makeText(CreatePlayers.this, "Spielername darf nicht leer sein!", Toast.LENGTH_SHORT).show();
+            else if (checkPlayerName(playerName.getText().toString()))
+                Toast.makeText(this, "Spielername darf keine Sonderzeichen enthalten!", Toast.LENGTH_SHORT).show();
             else if (playerName.getText().toString().length() < 2)      // Check last player's name
-                Toast.makeText(CreatePlayers.this, "Spielername muss aus mindestens 2 Zeichen bestehen", Toast.LENGTH_SHORT).show();
+                Toast.makeText(CreatePlayers.this, "Spielername muss aus mindestens 2 Zeichen bestehen!", Toast.LENGTH_SHORT).show();
+            else if (playerName.getText().toString().length() > 20)
+                Toast.makeText(CreatePlayers.this, "Spielername darf aus maximal 20 Zeichen bestehen!", Toast.LENGTH_SHORT).show();
             else {
 
                 // Update a player
@@ -226,7 +221,7 @@ public class CreatePlayers extends AppCompatActivity {
                 player.name = playerName.getText().toString();
                 player.gameId = actualGameId;
                 player.score = 0;
-                db.userDao().updatePlayer(player);
+                db.playerDao().updatePlayer(player);
 
                 Toast.makeText(CreatePlayers.this, "Spieler " + actualPlayerNumber + " erfolgreich gespeichert",
                         Toast.LENGTH_LONG).show();
@@ -240,7 +235,7 @@ public class CreatePlayers extends AppCompatActivity {
                 newGame.countOfPlayers = countOfPlayers - 1;
                 newGame.idOfFirstStory = idOfFirstStory;
                 newGame.countOfStories = countOfStories;
-                db.gamesDao().updateGame(newGame);
+                db.gameDao().updateGame(newGame);
 
                 // Close database connection
                 db.close();
@@ -259,11 +254,9 @@ public class CreatePlayers extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Spieleinstellungen")
                 .setMessage("Wenn du zur\u00fcck gehst, werden die Daten nicht gespeichert!")
-                .setPositiveButton("Zur\u00fcck", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        db.gamesDao().delete(db.gamesDao().getAll().get(db.gamesDao().getAll().size() - 1));
-                        finish();
-                    }
+                .setPositiveButton("Zur\u00fcck", (dialog, id) -> {
+                    db.gameDao().delete(db.gameDao().getAll().get(db.gameDao().getAll().size() - 1));
+                    finish();
                 })
                 .setNegativeButton("Abbrechen", (dialogInterface, i) -> {
 
@@ -272,4 +265,12 @@ public class CreatePlayers extends AppCompatActivity {
         builder.create().show();
     }
 
+    private boolean checkPlayerName(String name) {
+        for (int i = 0; i < name.length(); i++) {
+            if (!Character.isLetter(name.charAt(i)) && !Character.isDigit(name.charAt(i)) && !Character.isWhitespace(name.charAt(i)))
+                return true;
+        }
+
+        return false;       // name contains no special characters
+    }
 }
