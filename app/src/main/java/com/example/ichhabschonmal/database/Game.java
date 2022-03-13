@@ -1,4 +1,4 @@
-package com.example.ichhabschonmal;
+package com.example.ichhabschonmal.database;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;

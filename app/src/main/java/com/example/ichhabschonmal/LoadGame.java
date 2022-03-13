@@ -7,19 +7,29 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
 
-public class LoadGame extends AppCompatActivity {
+import com.example.ichhabschonmal.adapter.LoadGameAdapter;
+import com.example.ichhabschonmal.database.AppDatabase;
 
-    private LoadGameAdapter loadGameAdapter;
+public class LoadGame extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.load_game);
 
-        AppDatabase db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
-        RecyclerView recyclerView = findViewById(R.id.recyclerView);
+        // Definitions
+        RecyclerView recyclerView;
+        LoadGameAdapter loadGameAdapter;
+        AppDatabase db;
+
+        // Create database connection
+        db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
+
+        // RecyclerView
+        recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
+        // LoadGameAdapter
         loadGameAdapter = new LoadGameAdapter(this, db);
         recyclerView.setAdapter(loadGameAdapter);
     }

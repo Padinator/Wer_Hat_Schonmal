@@ -1,4 +1,4 @@
-package com.example.ichhabschonmal;
+package com.example.ichhabschonmal.adapter;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -9,6 +9,8 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.ichhabschonmal.R;
 
 public class ViewAllStoriesAdapter extends RecyclerView.Adapter<ViewAllStoriesAdapter.StoryViewHolder> {
 
