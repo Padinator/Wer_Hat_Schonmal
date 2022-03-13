@@ -70,7 +70,7 @@
                 android:layout_marginBottom="30dp"
                 android:background="@drawable/textview_story_border"
                 android:padding="50dp"
-                android:text="Schreibe in dieses Feld deine Story rein." />
+                android:text="Schreibe in dieses Feld deine Story rein."/>
 
             <RelativeLayout
                 android:id="@+id/buttons"

@@ -17,11 +17,6 @@ public class ViewAllStoriesAdapter extends RecyclerView.Adapter<ViewAllStoriesAd
     private Context mContext;
     private Cursor mCursor;
 
-
-    public ViewAllStoriesAdapter() {
-
-    }
-
     public ViewAllStoriesAdapter(Context context, Cursor cursor) {
         mContext = context;
         mCursor = cursor;
