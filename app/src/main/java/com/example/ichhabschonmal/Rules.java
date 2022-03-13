@@ -8,9 +8,6 @@ import android.widget.ListView;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.room.Room;
-
-import com.example.ichhabschonmal.database.AppDatabase;
 
 import java.util.ArrayList;
 
@@ -20,7 +17,7 @@ public class Rules extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+       super.onCreate(savedInstanceState);
         setContentView(R.layout.rules);
 
         // Definitions
@@ -66,17 +63,10 @@ public class Rules extends AppCompatActivity {
     public void onBackPressed() {       // Catch back button
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Spiel verlassen")
-                .setMessage("Wenn du zur\u00fcck gehst, werden die Daten gel\u00f6scht!")
+                .setMessage("Wenn du zur\u00fcck gehst, wird das Spiel gespeichert und beendet!")
                 .setPositiveButton("Zur\u00fcck", (dialog, which) -> {
-                    // Create database connection
-                    AppDatabase db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
-
-                    // Delete game and its players and their stories
-                    db.gameDao().delete(db.gameDao().loadAllByGameIds(new int[] {gameId}).get(0));
-
-                    // Close database connection
-                    db.close();
-
+                    Intent mainActivity = new Intent(Rules.this, MainActivity.class);
+                    startActivity(mainActivity);
                     finish();
                 })
                 .setNegativeButton("Abbrechen", (dialogInterface, i) -> {

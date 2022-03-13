@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.room.Room;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
@@ -18,6 +19,8 @@ import java.util.List;
 
 public class NewGame extends AppCompatActivity {
 
+    private AppDatabase db;
+
     @SuppressLint("UseSwitchCompatOrMaterialCode")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,7 +31,6 @@ public class NewGame extends AppCompatActivity {
         EditText gameName, playerCount, storyMinCount, storyMaxCount;
         Button nextMenu;
         Switch playMode;
-        AppDatabase db;
         List<Game> listOfGames;
 
         // EditTexts
@@ -110,6 +112,23 @@ public class NewGame extends AppCompatActivity {
                 }*/
             }
         });
+    }
+
+    @Override
+    public void onBackPressed() {       // Catch back button
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Spieleinstellungen")
+                .setMessage("Wenn du zur\u00fcck gehst, werden die Daten nicht gespeichert!")
+                .setPositiveButton("Zur\u00fcck", (dialog, id) -> {
+                    Intent mainActivity = new Intent(NewGame.this, MainActivity.class);
+                    startActivity(mainActivity);
+                    finish();
+                })
+                .setNegativeButton("Abbrechen", (dialogInterface, i) -> {
+
+                });
+
+        builder.create().show();
     }
 
     private boolean exists(String fileName, List<Game> games) {         // Check, if file name exists

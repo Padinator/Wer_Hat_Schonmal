@@ -38,7 +38,7 @@ public class PlayGame extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.play_game);
 
-        // Preconditions before playing until method "playGame()" is called
+        // Preconditions before playing, until method "playGame()" is called
         // Definitions
         Button solution, nextRound;
         List<String> listOfPlayersForSpinner;
@@ -372,7 +372,9 @@ public class PlayGame extends AppCompatActivity {
         builder.setTitle("Spiel beenden")
                 .setMessage("Das Spiel wird zwischengespeichert")
                 .setPositiveButton("Verlassen und speichern", (dialog, which) -> {
-                    // No safe, which is currently which player and who has already gussed
+                    // No safe, which player is currently guessing and which player has already guessed
+                    Intent mainActivity = new Intent(PlayGame.this, MainActivity.class);
+                    startActivity(mainActivity);
                     finish();
                 })
                 .setNegativeButton("Weiterspielen", (dialogInterface, i) -> {

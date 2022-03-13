@@ -1,5 +1,7 @@
 package com.example.ichhabschonmal;
 
+import android.app.AlertDialog;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -35,5 +37,12 @@ public class LoadGame extends AppCompatActivity {
 
         // Close database connection
         db.close();
+    }
+
+    @Override
+    public void onBackPressed() {       // Catch back button
+        Intent mainActivity = new Intent(LoadGame.this, MainActivity.class);
+        startActivity(mainActivity);
+        finish();
     }
 }

@@ -46,7 +46,7 @@ public class LoadGameAdapter extends RecyclerView.Adapter<LoadGameAdapter.ViewHo
 
     @Override
     public int getItemCount() {
-        return mDatabase.gameDao().getAll().size();
+        return mDatabase.gameDao().getAll().size();//////////////////
     }
 
 

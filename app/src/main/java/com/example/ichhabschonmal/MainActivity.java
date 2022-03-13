@@ -23,11 +23,13 @@ public class MainActivity extends AppCompatActivity {
         newGame.setOnClickListener(v -> {
             Intent newGame1 = new Intent(getApplicationContext(), NewGame.class);
             startActivity(newGame1);
+            finish();
         });
 
         loadGame.setOnClickListener(v -> {
             Intent loadGame1 = new Intent(getApplicationContext(), LoadGame.class);
             startActivity(loadGame1);
+            finish();
         });
     }
 }

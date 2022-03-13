@@ -1,6 +1,7 @@
 package com.example.ichhabschonmal;
 
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 
@@ -70,7 +71,7 @@ public class EndScore extends AppCompatActivity {
         builder.setTitle("Spiel beenden")
                 .setMessage("Das Spiel wird gel\u00f6scht")
                 .setPositiveButton("Verlassen und l\u00f6schen", (dialog, which) -> {
-                    // Create database connection
+                    Intent mainActivity = new Intent(EndScore.this, MainActivity.class);
                     AppDatabase db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
 
                     // Delete game and its players and their stories
@@ -79,6 +80,7 @@ public class EndScore extends AppCompatActivity {
                     // Close database connection
                     db.close();
 
+                    startActivity(mainActivity);
                     finish();
                 })
                 .setNegativeButton("Abbrechen", (dialogInterface, i) -> {

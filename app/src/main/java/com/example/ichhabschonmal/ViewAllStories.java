@@ -23,4 +23,9 @@ public class ViewAllStories extends AppCompatActivity {
 
         //viewAllStoriesAdapter = new ViewAllStoriesAdapter(this, stories);
     }
+
+    @Override
+    public void onBackPressed() {       // Catch back button
+
+    }
 }
