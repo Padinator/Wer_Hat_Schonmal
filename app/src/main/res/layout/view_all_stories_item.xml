@@ -5,30 +5,12 @@
     android:layout_height="wrap_content"
     android:layout_margin="16dp">
 
-    <TextView
-        android:id="@+id/name"
+    <ListView
+        android:id="@+id/myStories"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="3dp"
-        android:layout_marginLeft="3dp"
-        android:layout_marginTop="3dp"
-        android:layout_marginEnd="3dp"
-        android:layout_marginRight="3dp"
-        android:layout_marginBottom="3dp"
-        android:text="Stroy"
-        android:textSize="20dp" />
+        android:layout_height="wrap_content">
 
-
-    <Button
-        android:id="@+id/delete"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="69dp"
-        android:layout_marginBottom="3dp"
-        android:layout_marginTop="3dp"
-        android:layout_alignParentEnd="true"
-        android:text="X"
-        android:layout_alignParentRight="true" />
+    </ListView>
 
 
 </RelativeLayout>

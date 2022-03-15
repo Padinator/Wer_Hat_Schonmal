@@ -2,10 +2,17 @@ package com.example.ichhabschonmal;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.ContextMenu;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,6 +28,8 @@ import com.example.ichhabschonmal.database.PlayerDao;
 import com.example.ichhabschonmal.database.Story;
 import com.example.ichhabschonmal.database.StoryDao;
 
+import java.util.ArrayList;
+
 public class CreatePlayers extends AppCompatActivity {
 
     private Gamer[] listOfPlayers = new Gamer[]{new Gamer(1)};       // List of all players
@@ -29,6 +38,11 @@ public class CreatePlayers extends AppCompatActivity {
     private int maxStoryNumber;
     private int playerNumber;       // Number of players
     private int idOfFirstPlayer = -1, countOfPlayers = 0, idOfFirstStory = -1, countOfStories = 0;
+
+    ArrayList<String> stories = new ArrayList<>();
+    ArrayAdapter<String> adapter;
+    int playerCounter = 0;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,11 +88,12 @@ public class CreatePlayers extends AppCompatActivity {
         // Database connection:
         db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
 
+
         viewYourStories.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent viewStories = new Intent(getApplicationContext(), ViewAllStories.class);
-                startActivity(viewStories);
+                openDialog(v);
+
             }
         });
 
@@ -86,11 +101,13 @@ public class CreatePlayers extends AppCompatActivity {
         saveAndNextStory.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                ViewAllStories viewAllStories = new ViewAllStories();
+                Bundle bundle = new Bundle();
 
                 // Add a players story
                 if (listOfPlayers[actualPlayer].getCountOfStories() == maxStoryNumber) {      // Stories per player == maxStoryNumber?
                     Toast.makeText(CreatePlayers.this, "Spieler hat bereits genug Stories " +
-                                    "aufgeschrieben!", Toast.LENGTH_LONG).show();
+                            "aufgeschrieben!", Toast.LENGTH_LONG).show();
                 } else if (writeStories.getText().toString().isEmpty()) {       // Text field for stories is empty
                     Toast.makeText(CreatePlayers.this, "Kein Text zum speichern!",
                             Toast.LENGTH_LONG).show();
@@ -99,9 +116,23 @@ public class CreatePlayers extends AppCompatActivity {
                             "bestehen.", Toast.LENGTH_SHORT).show();
                 } else {            // Text field is okay
                     listOfPlayers[actualPlayer].addStory(writeStories.getText().toString());
+
+                    //stories.add(writeStories.getText().toString());
+
+                    int currentPlayer = actualPlayer;
+                    if (currentPlayer == playerCounter) {
+                        stories.add(writeStories.getText().toString());
+                    } else {
+                        playerCounter = actualPlayer;
+                        stories = new ArrayList<>();
+                    }
+
+                    /*storyArr[] = writeStories.getText().toString();
+                    int maxStories = getIntent().getExtras().getInt("MaxStoryNumber");
+                    bundle.putInt("maxStories", maxStories);
+                    viewAllStories.setArguments(bundle);*/
                     writeStories.setText("Schreibe in dieses Feld deine n\u00e4chste Story rein.");
                     storyNumber.setText("Story " + (listOfPlayers[actualPlayer].getCountOfStories() + 1) + ":");
-
                     Toast.makeText(CreatePlayers.this, "Story " + listOfPlayers[actualPlayer].getCountOfStories() + " gespeichert",
                             Toast.LENGTH_LONG).show();
                 }
@@ -290,5 +321,20 @@ public class CreatePlayers extends AppCompatActivity {
 
         builder.create().show();
     }
+
+
+    public void openDialog(View v) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View row = getLayoutInflater().inflate(R.layout.view_all_stories_item, null);
+        ListView listView = (ListView) row.findViewById(R.id.myStories);
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, stories);
+        listView.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
+        builder.setView(row);
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+    }
+
 
 }
