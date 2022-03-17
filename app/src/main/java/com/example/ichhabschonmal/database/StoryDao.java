@@ -26,6 +26,9 @@ public interface StoryDao {
     @Insert
     void insertAll(Story... stories);
 
+    @Insert
+    void insert(Story story);
+
     @Delete
     void delete(Story story);
 }

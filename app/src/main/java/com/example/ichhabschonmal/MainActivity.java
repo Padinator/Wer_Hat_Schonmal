@@ -4,10 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -23,20 +20,16 @@ public class MainActivity extends AppCompatActivity {
         newGame = findViewById(R.id.newGame);
         loadGame = findViewById(R.id.loadGame);
 
-        newGame.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent newGame = new Intent(getApplicationContext(), NewGame.class);
-                startActivity(newGame);
-            }
+        newGame.setOnClickListener(v -> {
+            Intent newGame1 = new Intent(getApplicationContext(), NewGame.class);
+            startActivity(newGame1);
+            finish();
         });
 
-        loadGame.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent loadGame = new Intent(getApplicationContext(), LoadGame.class);
-                startActivity(loadGame);
-            }
+        loadGame.setOnClickListener(v -> {
+            Intent loadGame1 = new Intent(getApplicationContext(), LoadGame.class);
+            startActivity(loadGame1);
+            finish();
         });
     }
 }

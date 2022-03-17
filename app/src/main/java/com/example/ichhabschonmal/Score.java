@@ -1,7 +1,6 @@
 package com.example.ichhabschonmal;
 
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,7 +19,7 @@ public class Score extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+       super.onCreate(savedInstanceState);
         setContentView(R.layout.score);
 
         // Definitions
@@ -41,14 +40,16 @@ public class Score extends AppCompatActivity {
 
         // Create database connection
         db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
-        game = db.gamesDao().loadAllByGameIds(new int[] {gameId}).get(0);
+        game = db.gameDao().loadAllByGameIds(new int[] {gameId}).get(0);////////////////////////
 
         // Find players
         idOfFirstPlayer = game.idOfFirstPlayer;
         countOfPlayers = game.countOfPlayers;
         playerIds = PlayGame.findSomethingOfActualGame(idOfFirstPlayer, countOfPlayers);
+        players = db.playerDao().loadAllByPlayerIds(playerIds);
 
-        players = db.userDao().loadAllByPlayerIds(playerIds);
+        // Close database connection
+        db.close();
 
         // RecyclerView
         recyclerView = findViewById(R.id.recyclerView);
@@ -58,13 +59,7 @@ public class Score extends AppCompatActivity {
         scoreAdapter = new ScoreAdapter(this, players);
         recyclerView.setAdapter(scoreAdapter);
 
-        confirm.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Go back to last intent
-                finish();
-            }
-        });
+        confirm.setOnClickListener(view -> onBackPressed());
     }
 
     @Override
