@@ -1,5 +1,6 @@
 package com.example.ichhabschonmal;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.room.Room;
 
@@ -7,6 +8,7 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Switch;
@@ -51,6 +53,13 @@ public class NewGame extends AppCompatActivity {
 
         // Close database connection
         db.close();
+
+        // calling the action bar
+        ActionBar actionBar = getSupportActionBar();
+
+        // showing the back button in action bar
+        actionBar.setDisplayHomeAsUpEnabled(true);
+
 
         nextMenu.setOnClickListener(view -> {
             String fileName, playerNumber, storyMinNumber, storyMaxNumber;
@@ -138,5 +147,15 @@ public class NewGame extends AppCompatActivity {
         }
 
         return false;       // File name exists not yet
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
