@@ -1,10 +1,15 @@
 package com.example.ichhabschonmal;
 
 import android.annotation.SuppressLint;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,6 +29,11 @@ public class CreatePlayers extends AppCompatActivity {
     private int idOfFirstPlayer = -1, countOfPlayers = 0, idOfFirstStory = -1, countOfStories = 0;
     private AppDatabase db;
 
+    private ListView listView;
+    private ArrayAdapter<String> adapter;
+
+    private TextView storyNumber;
+
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +43,7 @@ public class CreatePlayers extends AppCompatActivity {
         // Definitions
         Button saveAndNextStory, nextPerson, viewYourStories, next;
         EditText writeStories, playerName;
-        TextView playerID, storyNumber;
+        TextView playerID;
 
         // Buttons:
         saveAndNextStory = findViewById(R.id.saveAndNextStory);
@@ -69,9 +79,12 @@ public class CreatePlayers extends AppCompatActivity {
         // Create database connection:
         db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
 
-        viewYourStories.setOnClickListener(v -> {
-            Intent viewStories = new Intent(getApplicationContext(), ViewAllStories.class);
-            startActivity(viewStories);
+
+        viewYourStories.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openDialog(v);
+            }
         });
 
 
@@ -234,6 +247,48 @@ public class CreatePlayers extends AppCompatActivity {
         });
     }
 
+    public void openDialog(View v) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View row = getLayoutInflater().inflate(R.layout.view_all_stories, null);
+        listView = row.findViewById(R.id.myStories);
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, listOfPlayers[actualPlayer].getAllStories());
+        listView.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
+        builder.setView(row);
+        AlertDialog dialog = builder.create();
+        dialog.show();
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+                builder.setTitle("Wollen Sie diese Story editieren?")
+                        .setMessage(listView.getItemAtPosition(i).toString())
+                        .setPositiveButton("L\u00f6schen", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                                // Delete story
+                                listOfPlayers[actualPlayer].deleteStory(i);
+
+                                // Actualize layout
+                                storyNumber.setText("Story " + (listOfPlayers[actualPlayer].getCountOfStories() + 1) + ":");
+                                listView.invalidateViews();
+                            }
+                        })
+                        .setNegativeButton("Abbrechen", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+
+                            }
+                        });
+                builder.create().show();
+
+
+            }
+        });
+    }
+
     @Override
     public void onBackPressed() {       // Catch back button
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -250,5 +305,4 @@ public class CreatePlayers extends AppCompatActivity {
 
         builder.create().show();
     }
-
 }
