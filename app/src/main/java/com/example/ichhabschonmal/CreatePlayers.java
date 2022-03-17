@@ -2,17 +2,13 @@ package com.example.ichhabschonmal;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.ContextMenu;
-import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,8 +24,6 @@ import com.example.ichhabschonmal.database.PlayerDao;
 import com.example.ichhabschonmal.database.Story;
 import com.example.ichhabschonmal.database.StoryDao;
 
-import java.util.ArrayList;
-
 public class CreatePlayers extends AppCompatActivity {
 
     private Gamer[] listOfPlayers = new Gamer[]{new Gamer(1)};       // List of all players
@@ -39,9 +33,10 @@ public class CreatePlayers extends AppCompatActivity {
     private int playerNumber;       // Number of players
     private int idOfFirstPlayer = -1, countOfPlayers = 0, idOfFirstStory = -1, countOfStories = 0;
 
-    ArrayList<String> stories = new ArrayList<>();
-    ArrayAdapter<String> adapter;
-    int playerCounter = 0;
+    private ListView listView;
+    private ArrayAdapter<String> adapter;
+
+    private TextView storyNumber;
 
 
     @Override
@@ -52,7 +47,7 @@ public class CreatePlayers extends AppCompatActivity {
         // Definitions
         Button saveAndNextStory, nextPerson, viewYourStories, next;
         EditText writeStories, playerName;
-        TextView playerID, storyNumber;
+        TextView playerID;
         AppDatabase db;
 
         // Buttons:
@@ -101,9 +96,6 @@ public class CreatePlayers extends AppCompatActivity {
         saveAndNextStory.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ViewAllStories viewAllStories = new ViewAllStories();
-                Bundle bundle = new Bundle();
-
                 // Add a players story
                 if (listOfPlayers[actualPlayer].getCountOfStories() == maxStoryNumber) {      // Stories per player == maxStoryNumber?
                     Toast.makeText(CreatePlayers.this, "Spieler hat bereits genug Stories " +
@@ -116,21 +108,9 @@ public class CreatePlayers extends AppCompatActivity {
                             "bestehen.", Toast.LENGTH_SHORT).show();
                 } else {            // Text field is okay
                     listOfPlayers[actualPlayer].addStory(writeStories.getText().toString());
-
                     //stories.add(writeStories.getText().toString());
 
-                    int currentPlayer = actualPlayer;
-                    if (currentPlayer == playerCounter) {
-                        stories.add(writeStories.getText().toString());
-                    } else {
-                        playerCounter = actualPlayer;
-                        stories = new ArrayList<>();
-                    }
 
-                    /*storyArr[] = writeStories.getText().toString();
-                    int maxStories = getIntent().getExtras().getInt("MaxStoryNumber");
-                    bundle.putInt("maxStories", maxStories);
-                    viewAllStories.setArguments(bundle);*/
                     writeStories.setText("Schreibe in dieses Feld deine n\u00e4chste Story rein.");
                     storyNumber.setText("Story " + (listOfPlayers[actualPlayer].getCountOfStories() + 1) + ":");
                     Toast.makeText(CreatePlayers.this, "Story " + listOfPlayers[actualPlayer].getCountOfStories() + " gespeichert",
@@ -181,6 +161,8 @@ public class CreatePlayers extends AppCompatActivity {
                     playerName.setText("Dein Name");
                     storyNumber.setText("Story 1:");
                     writeStories.setText("Schreibe in dieses Feld deine Story rein.");
+                    //stories = new ArrayList<>();
+
                 }
             }
         });
@@ -325,14 +307,46 @@ public class CreatePlayers extends AppCompatActivity {
 
     public void openDialog(View v) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        View row = getLayoutInflater().inflate(R.layout.view_all_stories_item, null);
-        ListView listView = (ListView) row.findViewById(R.id.myStories);
-        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, stories);
+        View row = getLayoutInflater().inflate(R.layout.view_all_stories, null);
+        listView = row.findViewById(R.id.myStories);
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, listOfPlayers[actualPlayer].getAllStories());
         listView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
         builder.setView(row);
         AlertDialog dialog = builder.create();
         dialog.show();
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                //Log.e("MIMIMIM", listView.getAdapter().getItem(i).toString());
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+                builder.setTitle("Wollen Sie diese Story editieren?").setMessage(listView.getItemAtPosition(i).toString())
+                        .setPositiveButton("L\u00f6schen", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                //Log.e("Delete", String.valueOf(adapterView.getPositionForView(view)));
+                                //Log.e("Delete", String.valueOf(listView.getItemAtPosition(i)));
+
+                                // Delete story
+                                listOfPlayers[actualPlayer].deleteStory(i);
+
+                                // Actualize layout
+                                storyNumber.setText("Story " + (listOfPlayers[actualPlayer].getCountOfStories() + 1) + ":");
+                                listView.invalidateViews();
+                            }
+                        })
+                        .setNegativeButton("Abbrechen", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+
+                            }
+                        });
+                builder.create().show();
+
+
+            }
+        });
 
     }
 

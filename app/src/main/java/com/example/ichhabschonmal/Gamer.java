@@ -42,6 +42,10 @@ public class Gamer {        // Data entity is already named Player
         return "Keine Story gefunden, falscher Indexwert";//Exceptionnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
     }
 
+    public List<String> getAllStories() {
+        return listOfStories;
+    }
+
     public void addStory(String story) {        // Add a story to the story list of a player
         listOfStories.add(story);
     }
