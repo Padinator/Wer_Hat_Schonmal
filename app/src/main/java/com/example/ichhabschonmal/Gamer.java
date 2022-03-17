@@ -1,12 +1,10 @@
 package com.example.ichhabschonmal;
 
-import android.widget.Toast;
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class Gamer {        // Data entity is already named Player
-    private List<String> listOfStories = new ArrayList<>();     // Stories are saved temporary in listOfStories
+    private final List<String> listOfStories = new ArrayList<>();     // Stories are saved temporary in listOfStories
     private final int number;
     private String name;
 

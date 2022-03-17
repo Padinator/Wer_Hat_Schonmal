@@ -24,21 +24,17 @@ public class ScoreAdapter extends RecyclerView.Adapter<ScoreAdapter.ViewHolder> 
         mPlayers = players;
     }
 
-
-
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = mInflater.inflate(R.layout.score_item, parent, false);
         return new ViewHolder(view);
     }
 
-
     @Override
     public void onBindViewHolder(ViewHolder holder, int pos) {
         holder.player.setText(mPlayers.get(pos).name + "");
         holder.points.setText(mPlayers.get(pos).score + "");
     }
-
 
     @Override
     public int getItemCount() {
