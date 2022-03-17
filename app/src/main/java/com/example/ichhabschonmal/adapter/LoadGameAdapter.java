@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.ichhabschonmal.LoadGame;
 import com.example.ichhabschonmal.PlayGame;
 import com.example.ichhabschonmal.R;
+import com.example.ichhabschonmal.Rules;
 import com.example.ichhabschonmal.database.AppDatabase;
 import com.example.ichhabschonmal.database.Game;
 
@@ -70,13 +71,13 @@ public class LoadGameAdapter extends RecyclerView.Adapter<LoadGameAdapter.ViewHo
                             .setPositiveButton("Laden", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    Intent playGame = new Intent(view.getContext().getApplicationContext(), PlayGame.class);
+                                    Intent rules = new Intent(view.getContext().getApplicationContext(), Rules.class);
                                     Game game = mDatabase.gameDao().getAll().get(getAbsoluteAdapterPosition());
 
-                                    playGame.putExtra("GameId", game.gameId);
+                                    rules.putExtra("GameId", game.gameId);
 
                                     // Start PlayGame
-                                    mContext.startActivity(playGame);
+                                    mContext.startActivity(rules);
                                     ((Activity) mContext).finish();
                                 }
                             })
