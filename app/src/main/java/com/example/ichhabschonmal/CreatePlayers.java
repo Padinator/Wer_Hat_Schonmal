@@ -183,6 +183,7 @@ public class CreatePlayers extends AppCompatActivity {
                 Game newGame = new Game();
                 // newGame.gameId = newGame.gameId;         // Game id are set with autoincrement
                 newGame.gameName = getIntent().getStringExtra("GameName");
+                newGame.roundNumber = 1;
                 newGame.drinkOfTheGame = getIntent().getStringExtra("DrinkOfTheGame");
                 db.gameDao().insert(newGame);
 

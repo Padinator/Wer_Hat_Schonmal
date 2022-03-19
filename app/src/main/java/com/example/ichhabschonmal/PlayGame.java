@@ -34,7 +34,7 @@ public class PlayGame extends AppCompatActivity {
     private AppDatabase db;
     private int[] playerIds, storyIds;
     private boolean solutionPressed = false;        // Before next round begins, Button solution has to be pressed
-    private int idOfFirstPlayer, countOfPlayers, idOfFirstStory, countOfStories, gameId, roundNumber = 1;
+    private int idOfFirstPlayer, countOfPlayers, idOfFirstStory, countOfStories, gameId, roundNumber;
     private int actualStoryNumberInList, actualStoryNumber;     // actualStoryNumber is a counter to set stories to used
 
     @Override
@@ -69,6 +69,7 @@ public class PlayGame extends AppCompatActivity {
         countOfPlayers = actualGame.countOfPlayers;
         idOfFirstStory = actualGame.idOfFirstStory;
         countOfStories = actualGame.countOfStories;
+        roundNumber = actualGame.roundNumber;
 
         // Find the players' ids belonging to the actual game and their stories
         playerIds = findSomethingOfActualGame(idOfFirstPlayer, countOfPlayers);
@@ -121,7 +122,7 @@ public class PlayGame extends AppCompatActivity {
                 String winner, loser = "";
 
                 // Create database connection
-                db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
+                //db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
 
                 // Korrekturbedarfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
                 if (spin.getSelectedItem().toString().equals(correctInput)) {       // chosenPlayer has guessed correctly
@@ -129,15 +130,10 @@ public class PlayGame extends AppCompatActivity {
                         if (listOfPlayers.get(i).playerNumber == otherPlayer.getNumber()) {
 
                             // Update a player in the database
-                            listOfPlayers.get(i).score++;
-                            listOfPlayers.get(i).countOfBeers++;          // Adjust later
-                            db.playerDao().updatePlayer(listOfPlayers.get(i));
+                            updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers + 1);
 
                             // Update a story in the database
-                            listOfStories.get(actualStoryNumberInList).status = true;     // Set guessed story to used = true
-                            listOfStories.get(actualStoryNumberInList).guessingPerson = chosenPlayer.getName();       // Set guessing Person in story
-                            listOfStories.get(actualStoryNumberInList).guessedStatus = true;
-                            db.storyDao().updateStory(listOfStories.get(actualStoryNumberInList));
+                            updateAStory(actualStoryNumberInList, true, true, chosenPlayer.getName());
                         }
                     }
 
@@ -148,15 +144,10 @@ public class PlayGame extends AppCompatActivity {
                         if (listOfPlayers.get(i).playerNumber == chosenPlayer.getNumber()) {
 
                             // Update a player in the database
-                            listOfPlayers.get(i).score++;
-                            listOfPlayers.get(i).countOfBeers++;          // Adjust later
-                            db.playerDao().updatePlayer(listOfPlayers.get(i));//////////////////////////////
+                            updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers + 1);
 
                             // Update a story in the database
-                            listOfStories.get(actualStoryNumberInList).status = true;     // Set guessed story to used = true
-                            listOfStories.get(actualStoryNumberInList).guessingPerson = chosenPlayer.getName();       // Set guessing Person in story
-                            listOfStories.get(actualStoryNumberInList).guessedStatus = false;
-                            db.storyDao().updateStory(listOfStories.get(actualStoryNumberInList));
+                            updateAStory(actualStoryNumberInList, true, false, chosenPlayer.getName());
                         }
                     }
 
@@ -179,7 +170,7 @@ public class PlayGame extends AppCompatActivity {
                 solutionPressed = true;
 
                 // Close database connection
-                db.close();
+                //db.close();
             } else
                 Toast.makeText(PlayGame.this, "Starte zuerst die nächste Runde!", Toast.LENGTH_SHORT).show();
         });
@@ -189,16 +180,14 @@ public class PlayGame extends AppCompatActivity {
                 Intent next = new Intent(PlayGame.this, Score.class);
                 Intent end = new Intent(PlayGame.this, EndScore.class);
 
-                roundNumber++;
-                if (checkRound()) {
+                // Create database connection
+                updateAGame(++roundNumber);
 
-                    // Show score and then play next round
+                if (checkRound()) {         // Show score and then play next round
                     next.putExtra("GameId", gameId);
                     startActivity(next);
                     playRound();
-                } else {
-
-                    // New intent with end score
+                } else {            // New intent with end score
                     end.putExtra("GameId", gameId);
                     startActivity(end);
                     finish();       // Game is over
@@ -333,15 +322,17 @@ public class PlayGame extends AppCompatActivity {
             factor *= 10;
         }
 
+        checkAll();
+
         // Choose randomly a player
         do {
             playerNumber = (int) (Math.random() * factor);
             if (playerNumber > 0 && playerNumber <= players.length && playerNumber != chosenPlayer.getNumber())
-                Log.e("endlosschleife", "Endlosschleife2, Bedingung passt: " + players[playerNumber - 1].getCountOfStories());
+                Log.e("endlosschleife", "Endlosschleife2, Bedingung passt: " + "Spieler: " + playerNumber + ", " + players[playerNumber - 1].getCountOfStories());
             else if (chosenPlayer.getNumber() == playerNumber)
-                Log.e("endlosschleife", "Endlosschleife2, playerNumber == chosenPlayer.getNumber()" + "playerNumber: " + playerNumber + ", chosenPlayerNumber " + chosenPlayer.getNumber());
+                Log.e("endlosschleife", "Endlosschleife2, playerNumber == chosenPlayer.getNumber(): " + "playerNumber: " + playerNumber + ", chosenPlayerNumber " + chosenPlayer.getNumber());
             else
-                Log.e("endlosschleife", "Endlosschleife2, Bedingungen passen nicht, zufaellige Spielerauswahl will nicht mehr");
+                Log.e("endlosschleife", "Endlosschleife2, Bedingungen passen nicht, zufaellige Spielerauswahl will nicht mehr: " + playerNumber);
         } while (playerNumber == chosenPlayer.getNumber() || playerNumber <= 0 || playerNumber > players.length
                 || players[playerNumber - 1].getCountOfStories() == 0);     // If a player has no stories, he can not be chosen to be guessed
 
@@ -390,8 +381,44 @@ public class PlayGame extends AppCompatActivity {
         return story;
     }
 
-    private void updateDatabase() {
+    private void updateAGame(int roundNumber) {
 
+        // Create database connection
+        db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
+
+        actualGame.roundNumber = roundNumber;
+        db.gameDao().updateGame(actualGame);
+
+        // Close database connection
+        db.close();
+    }
+
+    // Adjust later
+    private void updateAPlayer(int playerNumber, int score, int countOfBeers) {     // Add later: "int typeOfDrink
+
+        // Create database connection
+        db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
+
+        listOfPlayers.get(playerNumber).score = score;
+        listOfPlayers.get(playerNumber).countOfBeers = countOfBeers;          // Adjust later
+        db.playerDao().updatePlayer(listOfPlayers.get(playerNumber));
+
+        // Close database connection
+        db.close();
+    }
+
+    private void updateAStory(int actualStoryNumberInList, boolean status, boolean guessedStatus, String name) {
+
+        // Create database connection
+        db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
+
+        listOfStories.get(actualStoryNumberInList).status = status;     // Set guessed story to used = true
+        listOfStories.get(actualStoryNumberInList).guessingPerson = name;       // Set guessing Person in story
+        listOfStories.get(actualStoryNumberInList).guessedStatus = guessedStatus;
+        db.storyDao().updateStory(listOfStories.get(actualStoryNumberInList));
+
+        // Close database connection
+        db.close();
     }
 
     private boolean checkRound() {      // Checks if at least one player has an unused story
@@ -414,14 +441,15 @@ public class PlayGame extends AppCompatActivity {
 
         if (storyPlayer == 1) {     // Check, if the last player with a story is not as the only one contained in editedPlayers
             int i = 0;
+
             for (; !proofCheckPlayer && i < editedPlayers.length; i++) {       // nextRound have to be true, if this line is accessed
-                if (editedPlayers[i] != null && editedPlayers[i].getNumber() != checkPlayer.getNumber())
+                if (editedPlayers[i] != null && editedPlayers[i].getNumber() != checkPlayer.getNumber())        // Searches checkPlayer in editedPlayers
                     proofCheckPlayer = true;
             }
 
-            if (!proofCheckPlayer) {        // case: editedPlayers[i].getNumber() == checkPlayer.getNumber()
+            if (i != editedPlayers.length && !proofCheckPlayer) {        // case: editedPlayers[i].getNumber() == checkPlayer.getNumber()
                 editedPlayers = Gamer.copyPlayers(players);
-                editedPlayers[i - 1] = null;        // The player with the last story/stories can not guess
+                editedPlayers[i] = null;        // The player with the last story/stories can not guess
             }
         }
 
@@ -446,7 +474,7 @@ public class PlayGame extends AppCompatActivity {
         builder.create().show();
     }
 
-    /*private void checkAll() {
+    private void checkAll() {
         for (int i = 0; i < listOfPlayers.size(); i++) {
             Log.e("aaa", listOfPlayers.get(i).playerId + ", Spieler" +
                     listOfPlayers.get(i).playerNumber + " " + listOfPlayers.get(i).name +
@@ -461,5 +489,5 @@ public class PlayGame extends AppCompatActivity {
                     listOfStories.get(i).guessingPerson + ", Story erraten?:" +
                     listOfStories.get(i).guessedStatus);
         }
-    }*/
+    }
 }
