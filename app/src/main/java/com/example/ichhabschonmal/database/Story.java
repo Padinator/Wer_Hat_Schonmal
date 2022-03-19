@@ -27,5 +27,5 @@ public class Story {
     public int playerId;                        // PlayerId of player, who owns the story
 
     @ColumnInfo(name = "guessingPerson")
-    public String guessingPerson;               // Player id of player, who guessed this story
+    public String guessingPerson;               // Player number and name of a player, who guessed this story
 }

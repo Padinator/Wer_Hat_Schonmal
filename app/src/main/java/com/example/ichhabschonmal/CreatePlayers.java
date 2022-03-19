@@ -216,8 +216,9 @@ public class CreatePlayers extends AppCompatActivity {
                         //listOfStories[i].storyId = listOfStories[i].storyId;        // Story id is set with autoincrement
                         newStory.content = listOfPlayers[i].getStory(j);
                         newStory.status = false;
-                        newStory.guessedStatus = false;           // Set a "default value"
+                        newStory.guessedStatus = false;         // Set a "default value"
                         newStory.playerId = db.playerDao().getAll().get(db.playerDao().getAll().size() - 1).playerId;
+                        newStory.guessingPerson = "";           // Set a "default value"
 
                         // Insert a story
                         db.storyDao().insert(newStory);

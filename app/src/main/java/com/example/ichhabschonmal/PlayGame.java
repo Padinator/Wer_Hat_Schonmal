@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
@@ -25,14 +26,16 @@ public class PlayGame extends AppCompatActivity {
     private Gamer[] players, editedPlayers;         // players contains all players of the actual game
                                                     // editedPlayers contains all players, who have not guessed yet
     private Gamer chosenPlayer, otherPlayer;        // Define the two playing players here, to proof in button solution, who is which one
+    private Game actualGame;
     private List<Player> listOfPlayers;             // Contains all players of the actual game, listOfPlayers has access to the database
     private List<Story> listOfStories;              // Contains lal stories of the actual game, listOfStories has access to the database
     private TextView player, story, round;
     private Spinner spin;                           // spin is used to select a player
     private AppDatabase db;
+    private int[] playerIds, storyIds;
     private boolean solutionPressed = false;        // Before next round begins, Button solution has to be pressed
     private int idOfFirstPlayer, countOfPlayers, idOfFirstStory, countOfStories, gameId, roundNumber = 1;
-    private int actualStoryNumberInList;
+    private int actualStoryNumberInList, actualStoryNumber;     // actualStoryNumber is a counter to set stories to used
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,8 +47,6 @@ public class PlayGame extends AppCompatActivity {
         Button solution, nextRound;
         List<String> listOfPlayersForSpinner;
         ArrayAdapter<String> adapter;
-        Game actualGame;
-        int[] playerIds, storyIds;
 
         // Buttons
         solution = findViewById(R.id.solution);
@@ -80,24 +81,38 @@ public class PlayGame extends AppCompatActivity {
         // Close database connection
         db.close();
 
-        // Save players' numbers and names for Spinner spin
-        listOfPlayersForSpinner = new ArrayList<>();
+        // Case if a game is loaded, only use unused stories
+        storyIds = findUnusedStories();
 
-        for (int i = 0; i < listOfPlayers.size(); i++) {
-            listOfPlayersForSpinner.add("Spieler " + listOfPlayers.get(i).playerNumber + ", " + listOfPlayers.get(i).name);
+        if (storyIds.length > 0) {      // Continue/start playing game
+            listOfStories = db.storyDao().loadAllByStoryIds(storyIds);
+            countOfStories = storyIds.length;
+            idOfFirstStory = storyIds[0];
+
+            // Save players' numbers and names for Spinner spin
+            listOfPlayersForSpinner = new ArrayList<>();
+
+            for (int i = 0; i < listOfPlayers.size(); i++) {
+                listOfPlayersForSpinner.add("Spieler " + listOfPlayers.get(i).playerNumber + ", " + listOfPlayers.get(i).name);
+            }
+
+            // Save players in a new data structure
+            players = saveInNewDataStructure(listOfPlayers, listOfStories);
+            editedPlayers = saveInNewDataStructure(listOfPlayers, listOfStories);
+
+            // Create drop down menu for choosing a player
+            spin = findViewById(R.id.dropdown);
+            adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, listOfPlayersForSpinner);
+            spin.setAdapter(adapter);
+
+            playGame();             // Play a game
+        } else {        // The game is already over
+            Intent end = new Intent(PlayGame.this, EndScore.class);
+            end.putExtra("GameId", gameId);
+            startActivity(end);
+            finish();
         }
 
-        // Save players in a new data structure
-        players = saveInNewDataStructure(listOfPlayers, listOfStories);
-        editedPlayers = saveInNewDataStructure(listOfPlayers, listOfStories);
-
-        // Create drop down menu for choosing a player
-        spin = findViewById(R.id.dropdown);
-        adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, listOfPlayersForSpinner);
-        spin.setAdapter(adapter);
-
-        // Play a game
-        playGame();
 
         solution.setOnClickListener(view -> {
             if (!solutionPressed) {     // Solution may not been pressed
@@ -109,14 +124,18 @@ public class PlayGame extends AppCompatActivity {
                 db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
 
                 // Korrekturbedarfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
-                if ((spin.getSelectedItem().toString().equals(correctInput))) {       // chosenPlayer has not guessed correctly
+                if (spin.getSelectedItem().toString().equals(correctInput)) {       // chosenPlayer has guessed correctly
                     for (; i < listOfPlayers.size(); i++) {     // Wenn kein Spieler gefunden wird -> Exception
                         if (listOfPlayers.get(i).playerNumber == otherPlayer.getNumber()) {
-                            Player player = listOfPlayers.get(i);
-                            player.score++;
-                            player.countOfBeers++;          // Adjust later
-                            listOfPlayers.set(i, player);
-                            db.playerDao().updatePlayer(player);
+
+                            // Update a player in the database
+                            listOfPlayers.get(i).score++;
+                            listOfPlayers.get(i).countOfBeers++;          // Adjust later
+                            db.playerDao().updatePlayer(listOfPlayers.get(i));
+
+                            // Update a story in the database
+                            listOfStories.get(actualStoryNumberInList).status = true;     // Set guessed story to used = true
+                            listOfStories.get(actualStoryNumberInList).guessingPerson = chosenPlayer.getName();       // Set guessing Person in story
                             listOfStories.get(actualStoryNumberInList).guessedStatus = true;
                             db.storyDao().updateStory(listOfStories.get(actualStoryNumberInList));
                         }
@@ -124,14 +143,18 @@ public class PlayGame extends AppCompatActivity {
 
                     winner = "Spieler " + chosenPlayer.getNumber() + ", " + chosenPlayer.getName() + " hat diese Runde gewonnen";
                     loser = "Spieler " + otherPlayer.getNumber() + ", " + otherPlayer.getName() + " hat diese Runde verloren!";
-                } else {        // chosenPlayer has guessed correctly
+                } else {        // chosenPlayer has not guessed correctly
                     for (; i < listOfPlayers.size(); i++) {     // Wenn kein Spieler gefunden wird -> Exception
                         if (listOfPlayers.get(i).playerNumber == chosenPlayer.getNumber()) {
-                            Player player = listOfPlayers.get(i);
-                            player.score++;
-                            player.countOfBeers++;          // Adjust later
-                            listOfPlayers.set(i, player);
-                            db.playerDao().updatePlayer(player);//////////////////////////////
+
+                            // Update a player in the database
+                            listOfPlayers.get(i).score++;
+                            listOfPlayers.get(i).countOfBeers++;          // Adjust later
+                            db.playerDao().updatePlayer(listOfPlayers.get(i));//////////////////////////////
+
+                            // Update a story in the database
+                            listOfStories.get(actualStoryNumberInList).status = true;     // Set guessed story to used = true
+                            listOfStories.get(actualStoryNumberInList).guessingPerson = chosenPlayer.getName();       // Set guessing Person in story
                             listOfStories.get(actualStoryNumberInList).guessedStatus = false;
                             db.storyDao().updateStory(listOfStories.get(actualStoryNumberInList));
                         }
@@ -140,6 +163,9 @@ public class PlayGame extends AppCompatActivity {
                     winner = "Spieler " + otherPlayer.getNumber() + ", " + otherPlayer.getName() + " hat diese Runde gewonnen";
                     loser = "Spieler " + chosenPlayer.getNumber() + ", " + chosenPlayer.getName() + " hat diese Runde verloren!";
                 }
+
+                // Delete story in the List "players"
+                players[otherPlayer.getNumber() - 1].deleteStory(actualStoryNumber - 1);
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
                 builder.setTitle("ERGEBNIS")
@@ -155,7 +181,7 @@ public class PlayGame extends AppCompatActivity {
                 // Close database connection
                 db.close();
             } else
-                Toast.makeText(PlayGame.this, "Starte die nächste Runde!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(PlayGame.this, "Starte zuerst die nächste Runde!", Toast.LENGTH_SHORT).show();
         });
 
         nextRound.setOnClickListener(view -> {
@@ -194,6 +220,25 @@ public class PlayGame extends AppCompatActivity {
         }
       
         return idsOfSomething;
+    }
+
+    private int[] findUnusedStories() {
+        List<Integer> listOfNewStoryIds = new ArrayList<>();
+        int[] newStoryIds;
+
+        for (int i = 0; i < storyIds.length; i++) {     // Find count of unused stories
+            if (!listOfStories.get(i).status)
+                listOfNewStoryIds.add(storyIds[i]);
+        }
+
+        // Insert story ids in an array
+        newStoryIds = new int[listOfNewStoryIds.size()];
+
+        for (int i = 0; i < listOfNewStoryIds.size(); i++) {       // Copy unused story ids
+            newStoryIds[i] = listOfNewStoryIds.get(i);
+        }
+
+        return newStoryIds;
     }
 
     // Save players of listOfPlayers in the List players
@@ -236,16 +281,16 @@ public class PlayGame extends AppCompatActivity {
         chosenPlayer = chooseRandomPlayerWhoGuesses();
 
         // Choose a story of an other player than chosenPlayer
-        otherPlayer = chooseRandomPlayerToBeGuessed(chosenPlayer.getNumber());           // First choose another player
-        String chosenStory = chooseRandomStory(otherPlayer, chosenPlayer.getName());         // Then choose randomly story of otherPlayer
+        otherPlayer = chooseRandomPlayerToBeGuessed();           // First choose another player
+        String chosenStory = chooseRandomStory();         // Then choose randomly story of otherPlayer
 
         // Set TextViews
         round.setText("Runde Nr." + roundNumber);
         player.setText("Spieler " + chosenPlayer.getNumber() + ": " + chosenPlayer.getName() + " ist an der Reihe");
         story.setText(chosenStory);
 
-        //log.e("aaa", "Raten:" + chosenPlayer.getName() + ", " + chosenPlayer.getNumber() + ", " + chosenPlayer.getCountOfStories());
-        //log.e("aaa", "Erraten werden: " + otherPlayer.getName() + ", " + otherPlayer.getNumber() + ", " + otherPlayer.getCountOfStories());
+        //Log.e("bbb", "Raten:" + chosenPlayer.getName() + ", " + chosenPlayer.getNumber() + ", " + chosenPlayer.getCountOfStories());        // Count of stories has not been adjusted in editedPlayers
+        //Log.e("bbb", "Erraten werden: " + otherPlayer.getName() + ", " + otherPlayer.getNumber() + ", " + otherPlayer.getCountOfStories());
 
         // Save players' numbers and names for Spinner spin
         List<String> listOfPlayersForSpinner = new ArrayList<>();
@@ -261,7 +306,6 @@ public class PlayGame extends AppCompatActivity {
 
         // chosenPlayer may guess again, when all players have guessed
         editedPlayers[chosenPlayer.getNumber() - 1] = null;
-
     }
 
     private Gamer chooseRandomPlayerWhoGuesses() {
@@ -275,12 +319,13 @@ public class PlayGame extends AppCompatActivity {
         // Choose randomly a player
         do {
             playerNumber = (int) (Math.random() * factor);
+            Log.e("endlosschleife", "Endlosschleife1");
         } while (playerNumber <= 0 || playerNumber > editedPlayers.length|| editedPlayers[playerNumber - 1] == null);       // If a player is null, he has already guessed
 
         return editedPlayers[playerNumber - 1];
     }
 
-    private Gamer chooseRandomPlayerToBeGuessed(int notNumber) {
+    private Gamer chooseRandomPlayerToBeGuessed() {
         int playerNumber, factor = 1;
 
         // factor is for calculating a number of a player in the range of the count of players
@@ -291,16 +336,22 @@ public class PlayGame extends AppCompatActivity {
         // Choose randomly a player
         do {
             playerNumber = (int) (Math.random() * factor);
-        } while (playerNumber == notNumber || playerNumber <= 0 || playerNumber > players.length
+            if (playerNumber > 0 && playerNumber <= players.length && playerNumber != chosenPlayer.getNumber())
+                Log.e("endlosschleife", "Endlosschleife2, Bedingung passt: " + players[playerNumber - 1].getCountOfStories());
+            else if (chosenPlayer.getNumber() == playerNumber)
+                Log.e("endlosschleife", "Endlosschleife2, playerNumber == chosenPlayer.getNumber()" + "playerNumber: " + playerNumber + ", chosenPlayerNumber " + chosenPlayer.getNumber());
+            else
+                Log.e("endlosschleife", "Endlosschleife2, Bedingungen passen nicht, zufaellige Spielerauswahl will nicht mehr");
+        } while (playerNumber == chosenPlayer.getNumber() || playerNumber <= 0 || playerNumber > players.length
                 || players[playerNumber - 1].getCountOfStories() == 0);     // If a player has no stories, he can not be chosen to be guessed
 
         return players[playerNumber - 1];
     }
 
-    private String chooseRandomStory(Gamer otherPlayer, String guessingPerson) {       // Choose randomly a story of otherPlayer
-        int storyNumber, factor = 1;        // storyNumber = storyNumber in Array listOfStories (see class Gamer), storyNumber is not an index
-        int i = 0;                          // i is a counter to set stories to used
+    private String chooseRandomStory() {        // Choose randomly a story of otherPlayer
+        int storyNumber, factor = 1;            // storyNumber = storyNumber in Array listOfStories (see class Gamer), storyNumber is not an index
         int countOfStories = players[otherPlayer.getNumber() - 1].getCountOfStories();      // Count of stories of otherPlayer
+        int actualStoryNumber = 0;
         String story;
 
         // Create database connection
@@ -311,37 +362,36 @@ public class PlayGame extends AppCompatActivity {
             factor *= 10;
         }
 
+        // Set used variable
+        while (listOfStories.get(actualStoryNumber).playerId != playerIds[otherPlayer.getNumber() - 1]) {       // Find the right player
+            actualStoryNumber++;
+            Log.e("endlosschleife", "Endlosschleife3");
+        }
+
         // Choose randomly a story
         do {
             storyNumber = (int) (Math.random() * factor);
-        } while (storyNumber <= 0 || storyNumber > countOfStories);
+            Log.e("endlosschleife", "Endlosschleife4");
+        } while (storyNumber <= 0 || storyNumber > countOfStories || listOfStories.get(actualStoryNumber + storyNumber - 1).status);
 
         // Save story in variable story
         story = players[otherPlayer.getNumber() - 1].getStory(storyNumber - 1);
 
-        // Update story in database
-        for (; !(listOfStories.get(i).content.equals(players[otherPlayer.getNumber() - 1].getStory(storyNumber - 1))); i++) {}
+        // Set used variable
+        actualStoryNumber += storyNumber - 1;       // Has now the value of the actual story in the List "players[otherPlayer.getNumber() - 1]"
 
-        if (i >= 0 && i < listOfStories.size()) {
-
-            // Set guessed story to used = true
-            listOfStories.get(i).status = true;
-
-            // Set guessing Person in story
-            listOfStories.get(i).guessingPerson = guessingPerson;
-
-            db.storyDao().updateStory(listOfStories.get(i));//////////////////////////////////////
-            actualStoryNumberInList = i;
+        if (actualStoryNumber >= 0 && actualStoryNumber < listOfStories.size()) {
+            actualStoryNumberInList = actualStoryNumber;
         } else        // Exception handling
             Toast.makeText(this, "Fehler, Story konnte nicht auf benutzt gesetzt werden!", Toast.LENGTH_SHORT).show();
 
-        // Delete story in the List "players"
-        players[otherPlayer.getNumber() - 1].deleteStory(storyNumber - 1);
-
-        // Close database connection
-        db.close();
+        this.actualStoryNumber = storyNumber;
 
         return story;
+    }
+
+    private void updateDatabase() {
+
     }
 
     private boolean checkRound() {      // Checks if at least one player has an unused story
@@ -395,4 +445,21 @@ public class PlayGame extends AppCompatActivity {
 
         builder.create().show();
     }
+
+    /*private void checkAll() {
+        for (int i = 0; i < listOfPlayers.size(); i++) {
+            Log.e("aaa", listOfPlayers.get(i).playerId + ", Spieler" +
+                    listOfPlayers.get(i).playerNumber + " " + listOfPlayers.get(i).name +
+                    ", Score: " + listOfPlayers.get(i).score + ":" + listOfPlayers.get(i).countOfBeers +
+                    ", GameId: " + listOfPlayers.get(i).gameId);
+        }
+
+        for (int i = 0; i <listOfStories.size(); i++) {
+            Log.e("aaa", listOfStories.get(i).playerId + ", StoryId: " +
+                    listOfStories.get(i).storyId + ", Content: " + listOfStories.get(i).content +
+                    ", Story benutzt?: " + listOfStories.get(i).status + ", Rater: " +
+                    listOfStories.get(i).guessingPerson + ", Story erraten?:" +
+                    listOfStories.get(i).guessedStatus);
+        }
+    }*/
 }

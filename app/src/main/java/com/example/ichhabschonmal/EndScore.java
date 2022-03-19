@@ -31,7 +31,8 @@ public class EndScore extends AppCompatActivity {
         EndScoreAdapter endScoreAdapter;
         Button exitGame;
         AppDatabase db;
-        List<Player> players;
+        Game actualGame;
+        List<Player> listOfPlayers;
         int[] playerIds;
         int idOfFirstPlayer, countOfPlayers;
 
@@ -43,13 +44,13 @@ public class EndScore extends AppCompatActivity {
 
         // Create database connection
         db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
-        Game game = db.gameDao().loadAllByGameIds(new int[] {gameId}).get(0);
+        actualGame = db.gameDao().loadAllByGameIds(new int[] {gameId}).get(0);
 
         // Used variables
-        idOfFirstPlayer = game.idOfFirstPlayer;
-        countOfPlayers = game.countOfPlayers;
+        idOfFirstPlayer = actualGame.idOfFirstPlayer;
+        countOfPlayers = actualGame.countOfPlayers;
         playerIds = PlayGame.findSomethingOfActualGame(idOfFirstPlayer, countOfPlayers);
-        players = db.playerDao().loadAllByPlayerIds(playerIds);
+        listOfPlayers = db.playerDao().loadAllByPlayerIds(playerIds);
 
         // Close database connection
         db.close();
@@ -59,7 +60,7 @@ public class EndScore extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         // EndScoreAdapter
-        endScoreAdapter = new EndScoreAdapter(this, players);
+        endScoreAdapter = new EndScoreAdapter(this, listOfPlayers);
         recyclerView.setAdapter(endScoreAdapter);
 
         exitGame.setOnClickListener(view -> onBackPressed());
