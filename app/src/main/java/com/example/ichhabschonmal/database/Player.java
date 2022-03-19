@@ -20,12 +20,12 @@ public class Player {
     @ColumnInfo(name = "name")
     public String name;
 
-    /*@ColumnInfo(name = "numberOfStories")
-    public int numberOfStories;*/
-
     @ColumnInfo(name = "gameId")
-    public int gameId;
+    public int gameId;              // Every player belongs to a game
 
     @ColumnInfo(name = "score")
     public int score;
+
+    @ColumnInfo(name = "countOfBeers")
+    public int countOfBeers;
 }

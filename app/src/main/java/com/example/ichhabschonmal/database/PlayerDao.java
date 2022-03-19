@@ -17,8 +17,8 @@ public interface PlayerDao {
     List<Player> loadAllByPlayerIds(int[] playerIds);
 
     @Query("SELECT * FROM Player WHERE playerNumber LIKE :playerNumber AND name LIKE :name AND " +
-            "gameId LIKE :gameId AND score LIKE :score LIMIT 1")
-    Player findByName(int playerNumber, String name, int gameId, int score);
+            "gameId LIKE :gameId AND score LIKE :score AND countOfBeers LIKE :countOfBeers LIMIT 1")
+    Player findByName(int playerNumber, String name, int gameId, int score, int countOfBeers);
 
     @Update
     void updatePlayer(Player player);

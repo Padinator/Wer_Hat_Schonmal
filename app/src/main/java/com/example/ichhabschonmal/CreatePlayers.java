@@ -183,6 +183,7 @@ public class CreatePlayers extends AppCompatActivity {
                 Game newGame = new Game();
                 // newGame.gameId = newGame.gameId;         // Game id are set with autoincrement
                 newGame.gameName = getIntent().getStringExtra("GameName");
+                newGame.drinkOfTheGame = getIntent().getStringExtra("DrinkOfTheGame");
                 db.gameDao().insert(newGame);
 
                 // Set used variable
@@ -198,6 +199,7 @@ public class CreatePlayers extends AppCompatActivity {
                     newPlayer.playerNumber = listOfPlayers[i].getNumber();
                     newPlayer.gameId = actualGameId;
                     newPlayer.score = 0;
+                    newPlayer.countOfBeers = 0;
 
                     // Insert the player
                     db.playerDao().insert(newPlayer);
@@ -214,6 +216,7 @@ public class CreatePlayers extends AppCompatActivity {
                         //listOfStories[i].storyId = listOfStories[i].storyId;        // Story id is set with autoincrement
                         newStory.content = listOfPlayers[i].getStory(j);
                         newStory.status = false;
+                        newStory.guessedStatus = false;           // Set a "default value"
                         newStory.playerId = db.playerDao().getAll().get(db.playerDao().getAll().size() - 1).playerId;
 
                         // Insert a story

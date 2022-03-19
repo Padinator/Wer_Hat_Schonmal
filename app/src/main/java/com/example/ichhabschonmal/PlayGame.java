@@ -32,6 +32,7 @@ public class PlayGame extends AppCompatActivity {
     private AppDatabase db;
     private boolean solutionPressed = false;        // Before next round begins, Button solution has to be pressed
     private int idOfFirstPlayer, countOfPlayers, idOfFirstStory, countOfStories, gameId, roundNumber = 1;
+    private int actualStoryNumberInList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,8 +114,11 @@ public class PlayGame extends AppCompatActivity {
                         if (listOfPlayers.get(i).playerNumber == otherPlayer.getNumber()) {
                             Player player = listOfPlayers.get(i);
                             player.score++;
+                            player.countOfBeers++;          // Adjust later
                             listOfPlayers.set(i, player);
                             db.playerDao().updatePlayer(player);
+                            listOfStories.get(actualStoryNumberInList).guessedStatus = true;
+                            db.storyDao().updateStory(listOfStories.get(actualStoryNumberInList));
                         }
                     }
 
@@ -125,8 +129,11 @@ public class PlayGame extends AppCompatActivity {
                         if (listOfPlayers.get(i).playerNumber == chosenPlayer.getNumber()) {
                             Player player = listOfPlayers.get(i);
                             player.score++;
+                            player.countOfBeers++;          // Adjust later
                             listOfPlayers.set(i, player);
                             db.playerDao().updatePlayer(player);//////////////////////////////
+                            listOfStories.get(actualStoryNumberInList).guessedStatus = false;
+                            db.storyDao().updateStory(listOfStories.get(actualStoryNumberInList));
                         }
                     }
 
@@ -230,7 +237,7 @@ public class PlayGame extends AppCompatActivity {
 
         // Choose a story of an other player than chosenPlayer
         otherPlayer = chooseRandomPlayerToBeGuessed(chosenPlayer.getNumber());           // First choose another player
-        String chosenStory = chooseRandomStory(otherPlayer);         // Then choose randomly story of otherPlayer
+        String chosenStory = chooseRandomStory(otherPlayer, chosenPlayer.getName());         // Then choose randomly story of otherPlayer
 
         // Set TextViews
         round.setText("Runde Nr." + roundNumber);
@@ -290,7 +297,7 @@ public class PlayGame extends AppCompatActivity {
         return players[playerNumber - 1];
     }
 
-    private String chooseRandomStory(Gamer otherPlayer) {       // Choose randomly a story of otherPlayer
+    private String chooseRandomStory(Gamer otherPlayer, String guessingPerson) {       // Choose randomly a story of otherPlayer
         int storyNumber, factor = 1;        // storyNumber = storyNumber in Array listOfStories (see class Gamer), storyNumber is not an index
         int i = 0;                          // i is a counter to set stories to used
         int countOfStories = players[otherPlayer.getNumber() - 1].getCountOfStories();      // Count of stories of otherPlayer
@@ -312,14 +319,19 @@ public class PlayGame extends AppCompatActivity {
         // Save story in variable story
         story = players[otherPlayer.getNumber() - 1].getStory(storyNumber - 1);
 
-        // Set guessed story to used = true
+        // Update story in database
         for (; !(listOfStories.get(i).content.equals(players[otherPlayer.getNumber() - 1].getStory(storyNumber - 1))); i++) {}
 
         if (i >= 0 && i < listOfStories.size()) {
+
+            // Set guessed story to used = true
             listOfStories.get(i).status = true;
 
-            // Set guessed story in database to used = true
+            // Set guessing Person in story
+            listOfStories.get(i).guessingPerson = guessingPerson;
+
             db.storyDao().updateStory(listOfStories.get(i));//////////////////////////////////////
+            actualStoryNumberInList = i;
         } else        // Exception handling
             Toast.makeText(this, "Fehler, Story konnte nicht auf benutzt gesetzt werden!", Toast.LENGTH_SHORT).show();
 

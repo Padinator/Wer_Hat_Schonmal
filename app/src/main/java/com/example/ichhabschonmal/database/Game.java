@@ -24,4 +24,7 @@ public class Game {
 
     @ColumnInfo(name = "countOfStories")
     public int countOfStories;
+
+    @ColumnInfo(name = "actualDrinkOfTheGame")
+    public String drinkOfTheGame;
 }
