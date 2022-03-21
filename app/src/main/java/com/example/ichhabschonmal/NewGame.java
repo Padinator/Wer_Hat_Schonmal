@@ -6,7 +6,6 @@ import androidx.room.Room;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -61,7 +60,7 @@ public class NewGame extends AppCompatActivity {
 
         // Create database connection
         db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
-        listOfGames = db.gameDao().getAll();  //////////
+        listOfGames = db.gameDao().getAll();    // Richtig abgeschmiert, Fotos Handy
 
         // Close database connection
         db.close();
