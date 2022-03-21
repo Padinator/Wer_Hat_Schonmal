@@ -3,9 +3,9 @@ package com.example.ichhabschonmal;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.room.Room;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -60,7 +60,7 @@ public class NewGame extends AppCompatActivity {
 
         // Create database connection
         db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
-        listOfGames = db.gameDao().getAll();
+        listOfGames = db.gameDao().getAll();    // Richtig abgeschmiert, Fotos Handy
 
         // Close database connection
         db.close();
@@ -136,5 +136,22 @@ public class NewGame extends AppCompatActivity {
         }
 
         return false;       // File name exists not yet
+    }
+
+    @Override
+    public void onBackPressed() {       // Catch back button
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Spieleinstellungen")
+                .setMessage("Wenn du zur\u00fcck gehst, werden die Daten nicht gespeichert!")
+                .setPositiveButton("Zur\u00fcck", (dialog, id) -> {
+                    Intent mainActivity = new Intent(NewGame.this, MainActivity.class);
+                    startActivity(mainActivity);
+                    finish();
+                })
+                .setNegativeButton("Abbrechen", (dialogInterface, i) -> {
+
+                });
+
+        builder.create().show();
     }
 }
