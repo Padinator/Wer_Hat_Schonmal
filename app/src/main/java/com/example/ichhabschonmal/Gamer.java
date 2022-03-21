@@ -49,7 +49,10 @@ public class Gamer {        // Data entity is already named Player
     }
 
     public void deleteStory(int j) {
-        listOfStories.remove(j);
+        if (j < listOfStories.size() && j >= 0)
+            listOfStories.remove(j);
+        else
+            return; //Keine Story gefunden, falscher Indexwert Exceptionnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
     }
 
     public static boolean isEmpty(Gamer[] listOfPlayers) {        // Returns true, if listOfPlayers is empty
