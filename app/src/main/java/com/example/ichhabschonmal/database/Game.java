@@ -2,6 +2,7 @@ package com.example.ichhabschonmal.database;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.ForeignKey;
 import androidx.room.PrimaryKey;
 
 @Entity
@@ -23,4 +24,10 @@ public class Game {
 
     @ColumnInfo(name = "countOfStories")
     public int countOfStories;
+
+    @ColumnInfo(name = "roundNumber")
+    public int roundNumber;
+
+    @ColumnInfo(name = "actualDrinkOfTheGame")
+    public String actualDrinkOfTheGame;
 }

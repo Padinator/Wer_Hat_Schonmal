@@ -26,14 +26,11 @@ public class EndScoreAdapter extends RecyclerView.Adapter<EndScoreAdapter.ViewHo
         mPlayers = players;
     }
 
-
-
     @Override
     public EndScoreAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = mInflater.inflate(R.layout.end_score_item, parent, false);
         return new EndScoreAdapter.ViewHolder(view);
     }
-
 
     @Override
     public void onBindViewHolder(EndScoreAdapter.ViewHolder holder, int pos) {
@@ -41,7 +38,6 @@ public class EndScoreAdapter extends RecyclerView.Adapter<EndScoreAdapter.ViewHo
         holder.points.setText(mPlayers.get(pos).score + "");
         holder.countOfDrinks.setText((mPlayers.get(pos).score + ""));
     }
-
 
     @Override
     public int getItemCount() {
@@ -61,7 +57,5 @@ public class EndScoreAdapter extends RecyclerView.Adapter<EndScoreAdapter.ViewHo
             multiplicator = itemView.findViewById(R.id.x);
             beer = itemView.findViewById(R.id.drinkIcon);
         }
-
     }
-
 }

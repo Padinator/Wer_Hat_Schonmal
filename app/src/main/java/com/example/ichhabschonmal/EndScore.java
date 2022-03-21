@@ -1,7 +1,7 @@
 package com.example.ichhabschonmal;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.Spannable;
@@ -9,6 +9,7 @@ import android.text.SpannableStringBuilder;
 import android.text.style.ImageSpan;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -24,7 +25,8 @@ import java.util.List;
 
 public class EndScore extends AppCompatActivity {
 
-    ImageView img;
+    private ImageView img;
+    private int gameId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,26 +36,32 @@ public class EndScore extends AppCompatActivity {
         // Definitions
         RecyclerView recyclerView;
         EndScoreAdapter endScoreAdapter;
-        TextView drinksDrunks;
+        TextView drinksDrunks; // Reeeeeeeechtschreibfehler
+        Button exitGame;
         AppDatabase db;
-        List<Player> players;
+        Game actualGame;
+        List<Player> listOfPlayers;
         int[] playerIds;
-        int gameId, idOfFirstPlayer, countOfPlayers, idOfFirstStory, countOfStories;
+        int idOfFirstPlayer, countOfPlayers;
+
+        // Buttons
+        exitGame = findViewById(R.id.exitGame);
 
         // Get from last intent
         gameId = getIntent().getExtras().getInt("GameId");
 
         // Create database connection
         db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
-        Game game = db.gamesDao().loadAllByGameIds(new int[] {gameId}).get(0);
+        actualGame = db.gameDao().loadAllByGameIds(new int[] {gameId}).get(0);
 
         // Used variables
-        idOfFirstPlayer = game.idOfFirstPlayer;
-        countOfPlayers = game.countOfPlayers;
-        idOfFirstStory = game.idOfFirstStory;
-        countOfStories = game.countOfStories;
+        idOfFirstPlayer = actualGame.idOfFirstPlayer;
+        countOfPlayers = actualGame.countOfPlayers;
         playerIds = PlayGame.findSomethingOfActualGame(idOfFirstPlayer, countOfPlayers);
-        players = db.userDao().loadAllByPlayerIds(playerIds);
+        listOfPlayers = db.playerDao().loadAllByPlayerIds(playerIds);
+
+        // Close database connection
+        db.close();
 
         //drinksDrunks = (TextView) findViewById(R.id.beersDrunk);
         ImageView img = findViewById(R.id.drinkIcon);
@@ -66,10 +74,10 @@ public class EndScore extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         // EndScoreAdapter
-        endScoreAdapter = new EndScoreAdapter(this, players);
+        endScoreAdapter = new EndScoreAdapter(this, listOfPlayers);
         recyclerView.setAdapter(endScoreAdapter);
 
-
+        exitGame.setOnClickListener(view -> onBackPressed());
     }
 
     @Override
@@ -77,19 +85,21 @@ public class EndScore extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Spiel beenden")
                 .setMessage("Das Spiel wird gel\u00f6scht")
-                .setPositiveButton("Verlassen und l\u00f6schen", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // Delete game and its players and their stories
-                        //ManageGame.deleteGame(gameId);
-                        finish();
-                    }
-                })
-                .setNegativeButton("Abbrechen", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
+                .setPositiveButton("Verlassen und l\u00f6schen", (dialog, which) -> {
+                    Intent mainActivity = new Intent(EndScore.this, MainActivity.class);
+                    AppDatabase db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
 
-                    }
+                    // Delete game and its players and their stories
+                    db.gameDao().delete(db.gameDao().loadAllByGameIds(new int[] {gameId}).get(0));
+
+                    // Close database connection
+                    db.close();
+
+                    startActivity(mainActivity);
+                    finish();
+                })
+                .setNegativeButton("Abbrechen", (dialogInterface, i) -> {
+
                 });
 
         builder.create().show();

@@ -1,12 +1,10 @@
 package com.example.ichhabschonmal;
 
-import android.widget.Toast;
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class Gamer {        // Data entity is already named Player
-    private List<String> listOfStories = new ArrayList<>();     // Stories are saved temporary in listOfStories
+    private final List<String> listOfStories = new ArrayList<>();     // Stories are saved temporary in listOfStories
     private final int number;
     private String name;
 
@@ -42,12 +40,19 @@ public class Gamer {        // Data entity is already named Player
         return "Keine Story gefunden, falscher Indexwert";//Exceptionnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
     }
 
+    public List<String> getAllStories() {
+        return listOfStories;
+    }
+
     public void addStory(String story) {        // Add a story to the story list of a player
         listOfStories.add(story);
     }
 
     public void deleteStory(int j) {
-        listOfStories.remove(j);
+        if (j < listOfStories.size() && j >= 0)
+            listOfStories.remove(j);
+        else
+            return; //Keine Story gefunden, falscher Indexwert Exceptionnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
     }
 
     public static boolean isEmpty(Gamer[] listOfPlayers) {        // Returns true, if listOfPlayers is empty

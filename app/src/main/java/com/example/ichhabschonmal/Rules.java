@@ -1,10 +1,8 @@
 package com.example.ichhabschonmal;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -12,32 +10,28 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.room.Room;
-
-import com.example.ichhabschonmal.database.AppDatabase;
 
 import java.util.ArrayList;
 
 public class Rules extends AppCompatActivity {
 
-    ListView listView;
-    int gameId;
+    private int gameId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+       super.onCreate(savedInstanceState);
         setContentView(R.layout.rules);
 
         // Definitions
+        ListView listView;
         Button start;
-        ArrayAdapter adapter;
-        AppDatabase db;
+        ArrayAdapter<String> adapter;
 
         // Buttons
         start = findViewById(R.id.start);
 
         // ListView
-        listView = (ListView) findViewById(R.id.listView);
+        listView = findViewById(R.id.listView);
 
         // ArrayList for all Game Rules
         ArrayList<String> rules = new ArrayList<>();
@@ -51,25 +45,19 @@ public class Rules extends AppCompatActivity {
         rules.add("8. Eine Aulf\u00f6sung gibts am Ende.");
 
         // Adapter
-        adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, rules);
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, rules);
         listView.setAdapter(adapter);
-
-        // Create database connection
-        db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
 
         // Get from last intent
         gameId = getIntent().getExtras().getInt("GameId");
 
-        start.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent startGame = new Intent(Rules.this, PlayGame.class);
+        start.setOnClickListener(v -> {
+            Intent startGame = new Intent(Rules.this, PlayGame.class);
 
-                startGame.putExtra("GameId", gameId);
+            startGame.putExtra("GameId", gameId);
 
-                startActivity(startGame);
-                finish();
-            }
+            startActivity(startGame);
+            finish();
         });
     }
 
@@ -77,20 +65,14 @@ public class Rules extends AppCompatActivity {
     public void onBackPressed() {       // Catch back button
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Spiel verlassen")
-                .setMessage("Wenn du zur\u00fcck gehst, werden die Daten gel\u00f6scht!")
-                .setPositiveButton("Zur\u00fcck", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // Delete game and its players and their stories
-                        //ManageGame.deleteGame(gameId);
-                        finish();
-                    }
+                .setMessage("Wenn du zur\u00fcck gehst, wird das Spiel gespeichert und beendet!")
+                .setPositiveButton("Zur\u00fcck", (dialog, which) -> {
+                    Intent mainActivity = new Intent(Rules.this, MainActivity.class);
+                    startActivity(mainActivity);
+                    finish();
                 })
-                .setNegativeButton("Abbrechen", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
+                .setNegativeButton("Abbrechen", (dialogInterface, i) -> {
 
-                    }
                 });
 
         builder.create().show();

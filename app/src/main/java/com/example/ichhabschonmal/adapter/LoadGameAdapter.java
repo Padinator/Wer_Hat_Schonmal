@@ -3,27 +3,27 @@ package com.example.ichhabschonmal.adapter;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.ichhabschonmal.LoadGame;
+import com.example.ichhabschonmal.PlayGame;
 import com.example.ichhabschonmal.R;
 import com.example.ichhabschonmal.database.AppDatabase;
 import com.example.ichhabschonmal.database.Game;
 
 public class LoadGameAdapter extends RecyclerView.Adapter<LoadGameAdapter.ViewHolder> {
 
-    private LayoutInflater mInflater;
-    private AppDatabase mDatabase;
-    private Context mContext;
+    private final LayoutInflater mInflater;
+    private final AppDatabase mDatabase;
+    private final Context mContext;
 
 
     public LoadGameAdapter(Context context, AppDatabase database) {
@@ -32,21 +32,21 @@ public class LoadGameAdapter extends RecyclerView.Adapter<LoadGameAdapter.ViewHo
         mContext = context;
     }
 
+    @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = mInflater.inflate(R.layout.load_game_item, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        //String game = mData.get(position);
-        holder.name.setText(mDatabase.gamesDao().getAll().get(position).gameName);
+        holder.name.setText(mDatabase.gameDao().getAll().get(position).gameName);
     }
 
     @Override
     public int getItemCount() {
-        return mDatabase.gamesDao().getAll().size();
+        return mDatabase.gameDao().getAll().size();//////////////////
     }
 
 
@@ -61,61 +61,55 @@ public class LoadGameAdapter extends RecyclerView.Adapter<LoadGameAdapter.ViewHo
             load = itemView.findViewById(R.id.load);
             delete = itemView.findViewById(R.id.delete);
 
+            load.setOnClickListener(view -> {
+                Game game = mDatabase.gameDao().getAll().get(getAbsoluteAdapterPosition());
 
-            load.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
-                    builder.setTitle("Test").setMessage("TETETETST " + String.valueOf(getAbsoluteAdapterPosition()))
-                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    Game game = mDatabase.gamesDao().getAll().get(getAbsoluteAdapterPosition());
+                AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+                builder.setTitle("Spiel laden")
+                        .setMessage("Soll das Spiel " + game.gameName + " geladen werden?")
+                        .setPositiveButton("Laden", (dialog, which) -> {
+                            Intent playGame = new Intent(view.getContext().getApplicationContext(), PlayGame.class);
 
-                                }
-                            })
-                            .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
+                            playGame.putExtra("GameId", game.gameId);
 
-                                }
-                            });
-                    builder.create().show();
+                            // Close database connection
+                            mDatabase.close();
+
+                            // Start PlayGame activity
+                            mContext.startActivity(playGame);
+                            ((Activity) mContext).finish();
+                        })
+                        .setNegativeButton("Abbrechen", (dialogInterface, i) -> {
+
+                        });
+                builder.create().show();
 
 
-                }
             });
 
-            delete.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
-                    builder.setTitle("Test").setMessage("TETETETST " + String.valueOf(getAbsoluteAdapterPosition()))
-                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    Game game = mDatabase.gamesDao().getAll().get(getAbsoluteAdapterPosition());
-                                    Log.e("POS", String.valueOf(getAbsoluteAdapterPosition()));
-                                    mDatabase.gamesDao().delete(game);
+            delete.setOnClickListener(view -> {
+                Game game = mDatabase.gameDao().getAll().get(getAbsoluteAdapterPosition());
 
-                                    int gameId = game.gameId;
+                AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+                builder.setTitle("Spiel l\u00f6schen")
+                        .setMessage("Soll das Spiel " + game.gameName + " gel\u00f6scht werden?")
+                        .setPositiveButton("L\u00f6schen", (dialog, which) -> {
+                            Intent intent = new Intent(view.getContext().getApplicationContext(), LoadGame.class);
 
-                                    Intent intent = new Intent(view.getContext().getApplicationContext(), LoadGame.class);
+                            // Delete a game
+                            mDatabase.gameDao().delete(game);
 
-                                    intent.putExtra("GameName", gameId);
+                            // Close database connection
+                            mDatabase.close();
 
-                                    view.getContext().startActivity(intent);
-                                    ((Activity) mContext).finish();
-                                }
-                            })
-                            .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
+                            // Start this activity and stop it to refresh content
+                            mContext.startActivity(intent);
+                            ((Activity) mContext).finish();
+                        })
+                        .setNegativeButton("Abbrechen", (dialogInterface, i) -> {
 
-                                }
-                            });
-                    builder.create().show();
-                }
+                        });
+                builder.create().show();
             });
         }
     }
