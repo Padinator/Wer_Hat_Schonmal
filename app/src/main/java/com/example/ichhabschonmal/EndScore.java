@@ -3,10 +3,7 @@ package com.example.ichhabschonmal;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.text.Html;
-import android.text.Spannable;
-import android.text.SpannableStringBuilder;
-import android.text.style.ImageSpan;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -35,10 +32,14 @@ public class EndScore extends AppCompatActivity {
         RecyclerView recyclerView;
         EndScoreAdapter endScoreAdapter;
         TextView drinksDrunks;
+        Button exitGame;
         AppDatabase db;
         List<Player> players;
         int[] playerIds;
         int gameId, idOfFirstPlayer, countOfPlayers, idOfFirstStory, countOfStories;
+
+        // Buttons
+        exitGame = findViewById(R.id.exitGame);
 
         // Get from last intent
         gameId = getIntent().getExtras().getInt("GameId");
@@ -69,6 +70,7 @@ public class EndScore extends AppCompatActivity {
         endScoreAdapter = new EndScoreAdapter(this, players);
         recyclerView.setAdapter(endScoreAdapter);
 
+        exitGame.setOnClickListener(view -> onBackPressed());
 
     }
 
@@ -80,8 +82,6 @@ public class EndScore extends AppCompatActivity {
                 .setPositiveButton("Verlassen und l\u00f6schen", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        // Delete game and its players and their stories
-                        //ManageGame.deleteGame(gameId);
                         finish();
                     }
                 })
