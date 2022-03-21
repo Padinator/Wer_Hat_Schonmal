@@ -136,7 +136,19 @@ public class PlayGame extends AppCompatActivity {
                             updateAStory(actualStoryNumberInList, true, true, chosenPlayer.getName());
                         }
                     }
+                   
+                    AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+                    builder.setTitle("ERGEBNIS")
+                            // TODO: set text for who has to drink
+                            .setMessage(winner)
+                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
 
+                                }
+                            });
+                    builder.create().show();
+  
                     winner = "Spieler " + chosenPlayer.getNumber() + ", " + chosenPlayer.getName() + " hat diese Runde gewonnen";
                     loser = "Spieler " + otherPlayer.getNumber() + ", " + otherPlayer.getName() + " hat diese Runde verloren!";
                 } else {        // chosenPlayer has not guessed correctly

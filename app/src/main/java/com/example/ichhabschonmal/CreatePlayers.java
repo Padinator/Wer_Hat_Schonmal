@@ -114,9 +114,7 @@ public class CreatePlayers extends AppCompatActivity {
                 alreadySad = false;
             }
         });
-
         nextPerson.setOnClickListener(v -> {
-
             // Check inserting a new player
             if (listOfPlayers.length == maxPlayerNumber)
                 Toast.makeText(CreatePlayers.this, "Es k\u00f6nnen nicht weitere Spieler teilnehmen!",

@@ -102,7 +102,7 @@
             android:layout_marginRight="30dp"
             android:layout_marginBottom="15dp"
             android:text="Maximale Storyzahl pro Person:"
-            android:textSize="20dp"/>
+            android:textSize="20dp" />
 
         <EditText
             android:id="@+id/storyMaxCount"
@@ -116,12 +116,34 @@
             android:paddingHorizontal="10dp"
             android:inputType="numberDecimal"/>
 
+        <TextView
+            android:id="@+id/chooseDrink"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/storyMaxCountOption"
+            android:text="Drink auswaehlen fuer die Runde: "
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            android:layout_marginBottom="15dp"
+            android:textSize="20dp"/>
+
+        <Spinner
+            android:id="@+id/dropdown"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/chooseDrink"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            android:layout_marginBottom="15dp"
+            android:background="@android:drawable/btn_dropdown"
+            android:spinnerMode="dropdown" />
+
+
         <Button
             android:id="@+id/nextMenu"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/storyMaxCountOption"
-            android:layout_marginTop="20dp"
+            android:layout_below="@+id/dropdown"
             android:layout_centerHorizontal="true"
             android:text="Weiter"
             android:backgroundTint="@color/orange_one"/>
