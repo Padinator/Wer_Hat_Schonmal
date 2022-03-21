@@ -3,6 +3,12 @@ package com.example.ichhabschonmal;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.text.Html;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.style.ImageSpan;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -18,6 +24,8 @@ import java.util.List;
 
 public class EndScore extends AppCompatActivity {
 
+    ImageView img;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,6 +34,7 @@ public class EndScore extends AppCompatActivity {
         // Definitions
         RecyclerView recyclerView;
         EndScoreAdapter endScoreAdapter;
+        TextView drinksDrunks;
         AppDatabase db;
         List<Player> players;
         int[] playerIds;
@@ -46,6 +55,12 @@ public class EndScore extends AppCompatActivity {
         playerIds = PlayGame.findSomethingOfActualGame(idOfFirstPlayer, countOfPlayers);
         players = db.userDao().loadAllByPlayerIds(playerIds);
 
+        //drinksDrunks = (TextView) findViewById(R.id.beersDrunk);
+        ImageView img = findViewById(R.id.drinkIcon);
+        // img.setImageResource(R.drawable.beericon);
+
+
+
         // RecyclerView
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -53,6 +68,8 @@ public class EndScore extends AppCompatActivity {
         // EndScoreAdapter
         endScoreAdapter = new EndScoreAdapter(this, players);
         recyclerView.setAdapter(endScoreAdapter);
+
+
     }
 
     @Override

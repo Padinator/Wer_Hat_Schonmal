@@ -1,9 +1,12 @@
 package com.example.ichhabschonmal.adapter;
 
 import android.content.Context;
+import android.media.Image;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
@@ -36,6 +39,7 @@ public class EndScoreAdapter extends RecyclerView.Adapter<EndScoreAdapter.ViewHo
     public void onBindViewHolder(EndScoreAdapter.ViewHolder holder, int pos) {
         holder.player.setText(mPlayers.get(pos).name + "");
         holder.points.setText(mPlayers.get(pos).score + "");
+        holder.countOfDrinks.setText((mPlayers.get(pos).score + ""));
     }
 
 
@@ -46,13 +50,16 @@ public class EndScoreAdapter extends RecyclerView.Adapter<EndScoreAdapter.ViewHo
 
     // stores and recycles views as they are scrolled off screen
     public class ViewHolder extends RecyclerView.ViewHolder {
-        TextView player, points, countOfBeer;
+         TextView player, points, countOfDrinks;
+         ImageView beer, multiplicator;
 
         ViewHolder(View itemView) {
             super(itemView);
             player = itemView.findViewById(R.id.playerName);
             points = itemView.findViewById(R.id.totalPoints);
-            countOfBeer = itemView.findViewById(R.id.beersDrunk);
+            countOfDrinks = itemView.findViewById(R.id.countOfDrinks);
+            multiplicator = itemView.findViewById(R.id.x);
+            beer = itemView.findViewById(R.id.drinkIcon);
         }
 
     }

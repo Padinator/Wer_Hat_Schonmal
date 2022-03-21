@@ -31,10 +31,17 @@
         <entry key="..\:/Users/Nutzer/AndroidStudioProjects/Ichhabschonmal/app/src/main/res/layout/textview_border.xml" value="0.1796875" />
         <entry key="..\:/Users/Nutzer/AndroidStudioProjects/Ichhabschonmal/app/src/main/res/layout/view_all_your_stories.xml" value="0.22" />
         <entry key="app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/beericon.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/ic_google_noto_emoji_food_drink_32439_beer_mug.xml" value="0.1065" />
+        <entry key="app/src/main/res/drawable/ic_google_noto_emoji_food_drink_32439_beer_mug_5_.xml" value="0.1065" />
+        <entry key="app/src/main/res/drawable/multipilcator.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/newbeericon.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/textview_border_explanation.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/textview_story_border.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.2760416666666667" />
         <entry key="app/src/main/res/layout/create_players.xml" value="0.2760416666666667" />
+        <entry key="app/src/main/res/layout/end_score.xml" value="0.1979443585431134" />
+        <entry key="app/src/main/res/layout/end_score_item.xml" value="0.2498055979691816" />
         <entry key="app/src/main/res/layout/load_game.xml" value="0.2760416666666667" />
         <entry key="app/src/main/res/layout/load_game_item.xml" value="0.2760416666666667" />
         <entry key="app/src/main/res/layout/new_game.xml" value="0.2760416666666667" />
