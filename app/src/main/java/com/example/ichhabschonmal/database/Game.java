@@ -29,5 +29,5 @@ public class Game {
     public int roundNumber;
 
     @ColumnInfo(name = "actualDrinkOfTheGame")
-    public String drinkOfTheGame;
+    public String actualDrinkOfTheGame;
 }

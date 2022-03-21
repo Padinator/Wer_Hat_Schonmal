@@ -27,7 +27,7 @@ public class CreatePlayers extends AppCompatActivity {
     private Gamer[] listOfPlayers = new Gamer[]{new Gamer(1)};
     private int actualPlayer = 0, minStoryNumber, maxStoryNumber, maxPlayerNumber;
     private int idOfFirstPlayer = -1, countOfPlayers = 0, idOfFirstStory = -1, countOfStories = 0;
-    private boolean alreadySad = false;
+    private boolean alreadySad = false;         // Check, if a player has saved his last story
 
     private AppDatabase db;
     private ListView listView;
@@ -209,7 +209,7 @@ public class CreatePlayers extends AppCompatActivity {
                 // newGame.gameId = newGame.gameId;         // Game id are set with autoincrement
                 newGame.gameName = getIntent().getStringExtra("GameName");
                 newGame.roundNumber = 1;
-                newGame.drinkOfTheGame = getIntent().getStringExtra("DrinkOfTheGame");
+                newGame.actualDrinkOfTheGame = getIntent().getStringExtra("DrinkOfTheGame");
                 db.gameDao().insert(newGame);
 
                 // Set used variable
