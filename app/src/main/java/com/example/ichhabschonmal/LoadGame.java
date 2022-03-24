@@ -48,7 +48,6 @@ public class LoadGame extends AppCompatActivity {
         // showing the back button in action bar
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-
     }
 
     @Override
