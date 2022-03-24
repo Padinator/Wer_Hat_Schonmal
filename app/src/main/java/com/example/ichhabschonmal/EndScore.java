@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,6 +23,7 @@ import java.util.List;
 
 public class EndScore extends AppCompatActivity {
 
+    private ImageView img;
     private int gameId;
 
     @Override
@@ -31,6 +34,7 @@ public class EndScore extends AppCompatActivity {
         // Definitions
         RecyclerView recyclerView;
         EndScoreAdapter endScoreAdapter;
+        TextView drinksDrunks;
         Button exitGame;
         AppDatabase db;
         List<Player> players;
@@ -53,8 +57,9 @@ public class EndScore extends AppCompatActivity {
         playerIds = PlayGame.findSomethingOfActualGame(idOfFirstPlayer, countOfPlayers);
         players = db.playerDao().loadAllByPlayerIds(playerIds);
 
-        // Close database connection
-        db.close();
+        //drinksDrunks = (TextView) findViewById(R.id.beersDrunk);
+        ImageView img = findViewById(R.id.drinkIcon);
+        // img.setImageResource(R.drawable.beericon);
 
         // RecyclerView
         recyclerView = findViewById(R.id.recyclerView);

@@ -8,12 +8,11 @@
         android:id="@+id/playerName"
         android:layout_width="160dp"
         android:layout_height="30dp"
-        android:background="@drawable/textview_story_border"
         android:layout_marginLeft="20dp"
         android:layout_marginTop="20dp"
+        android:background="@drawable/textview_story_border"
         android:gravity="center"
-        android:text="Spielername">
-    </TextView>
+        android:text="Spielername"></TextView>
 
     <TextView
         android:id="@+id/totalPoints"
@@ -24,20 +23,59 @@
         android:layout_marginLeft="20dp"
         android:background="@drawable/textview_story_border"
         android:gravity="center"
-        android:text="Gesamtpunktzahl"></TextView>
-
-    <TextView
-        android:id="@+id/beersDrunk"
-        android:layout_width="300dp"
-        android:layout_height="30dp"
-        android:layout_below="@id/playerName"
-        android:layout_marginLeft="20dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="30dp"
-        android:background="@drawable/textview_story_border"
-        android:gravity="center"
-        android:text="Anzahl Bier getrunken">
+        android:text="Gesamtpunktzahl">
     </TextView>
+
+    <RelativeLayout
+        android:id="@+id/drinks"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/playerName"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="20dp">
+
+        <TextView
+            android:id="@+id/countOfDrinks"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="22dp"
+            android:text="2"
+            />
+
+        <!--
+        <TextView
+            android:id="@+id/x"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="4dp"
+            android:layout_centerVertical="true"
+            android:text="X"
+            android:textSize="20dp"
+            android:textStyle="bold"
+            android:layout_toRightOf="@id/countOfDrinks"
+            />
+            -->
+
+        <ImageView
+            android:id="@+id/x"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="2dp"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@id/countOfDrinks"
+            android:src="@drawable/multipilcator" />
+
+        <ImageView
+            android:id="@+id/drinkIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/playerName"
+            android:layout_marginLeft="2dp"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@id/x"
+            android:src="@drawable/beericon" />
+
+    </RelativeLayout>
 
 
 </RelativeLayout>

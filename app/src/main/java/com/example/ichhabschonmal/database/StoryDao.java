@@ -17,8 +17,10 @@ public interface StoryDao {
     List<Story> loadAllByStoryIds(int[] storyIds);
 
     @Query("SELECT * FROM Story WHERE content LIKE :content AND status LIKE :status AND " +
-            " playerId LIKE :playerId LIMIT 1")
-    Story findByName(String content, boolean status, int playerId);
+            " playerId LIKE :playerId AND guessingPerson LIKE :guessingPerson AND " +
+            "guessedStatus LIKE :guessedStatus LIMIT 1")
+    Story findByName(String content, String guessingPerson, boolean status, boolean guessedStatus,
+                     int playerId);
 
     @Update
     void updateStory(Story story);
