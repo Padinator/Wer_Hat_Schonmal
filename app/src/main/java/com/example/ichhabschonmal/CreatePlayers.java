@@ -225,6 +225,7 @@ public class CreatePlayers extends AppCompatActivity {
                     newPlayer.score = 0;
                     newPlayer.countOfBeers = 0;
                     newPlayer.countOfVodka = 0;
+                    newPlayer.countOfTequila = 0;
 
                     // Insert the player
                     db.playerDao().insert(newPlayer);
