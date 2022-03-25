@@ -28,4 +28,10 @@ public class Player {
 
     @ColumnInfo(name = "countOfBeers")
     public int countOfBeers;
+
+    @ColumnInfo(name = "countOfVodka")
+    public int countOfVodka;
+
+    @ColumnInfo(name = "countOfTequila")
+    public int countOfTequila;
 }

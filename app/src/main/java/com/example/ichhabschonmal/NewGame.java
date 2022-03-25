@@ -68,10 +68,12 @@ public class NewGame extends AppCompatActivity {
         nextMenu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String fileName = gameName.getText().toString();
-                String playerNumber = playerCount.getText().toString();
-                String storyMinNumber = storyMinCount.getText().toString();
-                String storyMaxNumber = storyMaxCount.getText().toString();
+                String fileName, playerNumber, storyMinNumber, storyMaxNumber, drinkOfTheGame;
+                fileName = gameName.getText().toString();
+                playerNumber = playerCount.getText().toString();
+                storyMinNumber = storyMinCount.getText().toString();
+                storyMaxNumber = storyMaxCount.getText().toString();
+                drinkOfTheGame = spin.getSelectedItem().toString();
 
                 if (fileName.isEmpty())            // Check only if gameName is valid, creating starts later
                     Toast.makeText(NewGame.this, "Dateiname darf nicht leer sein!", Toast.LENGTH_SHORT).show();
@@ -118,7 +120,7 @@ public class NewGame extends AppCompatActivity {
                          newGameIntent.putExtra("MaxStoryNumber", Integer.parseInt(storyMaxNumber));     // Give storyMaxNumber
                          newGameIntent.putExtra("playerNumber", Integer.parseInt(playerNumber));     // Give number of players
                          newGameIntent.putExtra("GameName", gameName.getText().toString());     // Give the name of the game
-                         newGameIntent.putExtra("DrinkOfTheGame", spin.getSelectedItem().toString());
+                         newGameIntent.putExtra("DrinkOfTheGame", drinkOfTheGame);
                          startActivity(newGameIntent);
                      } /*else {
                         Intent newGameMultipleDevicesIntent = new Intent(getApplicationContext(), NewGameMultipleDevices.class);

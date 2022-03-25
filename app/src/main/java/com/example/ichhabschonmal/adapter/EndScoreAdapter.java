@@ -10,8 +10,11 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.room.Room;
 
 import com.example.ichhabschonmal.R;
+import com.example.ichhabschonmal.database.AppDatabase;
+import com.example.ichhabschonmal.database.Game;
 import com.example.ichhabschonmal.database.Player;
 
 import java.util.List;
@@ -20,10 +23,15 @@ public class EndScoreAdapter extends RecyclerView.Adapter<EndScoreAdapter.ViewHo
 
     private LayoutInflater mInflater;
     private List<Player> mPlayers;
+    private AppDatabase db;
+    private Context mContext;
+    private int mGameId;
 
-    public EndScoreAdapter(Context context, List<Player> players) {
+    public EndScoreAdapter(Context context, List<Player> players, int gameId) {
         mInflater = LayoutInflater.from(context);
         mPlayers = players;
+        mContext = context;
+        mGameId = gameId;
     }
 
     @Override
@@ -34,9 +42,19 @@ public class EndScoreAdapter extends RecyclerView.Adapter<EndScoreAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(EndScoreAdapter.ViewHolder holder, int pos) {
+        db = Room.databaseBuilder(mContext, AppDatabase.class, "database").allowMainThreadQueries().build();
+        Game actualGame = db.gameDao().loadAllByGameIds(new int[] {mGameId}).get(0);
         holder.player.setText(mPlayers.get(pos).name + "");
         holder.points.setText(mPlayers.get(pos).score + "");
         holder.countOfDrinks.setText((mPlayers.get(pos).score + ""));
+        if (actualGame.actualDrinkOfTheGame.equals("Bier")) {
+            holder.beer.setImageResource(R.drawable.beericon);
+        } else if (actualGame.actualDrinkOfTheGame.equals("Vodka Shots")) {
+            holder.beer.setImageResource(R.drawable.vodkashot);
+        } else if (actualGame.actualDrinkOfTheGame.equals("Tequila")) {
+            holder.beer.setImageResource(R.drawable.tequila);
+        }
+        db.close();
     }
 
     @Override
