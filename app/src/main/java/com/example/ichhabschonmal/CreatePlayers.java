@@ -290,7 +290,7 @@ public class CreatePlayers extends AppCompatActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
-                builder.setTitle("Wollen Sie diese Story editieren?")
+                builder.setTitle("Wollen Sie diese Story l\u00f6schen?")
                         .setMessage(listView.getItemAtPosition(i).toString())
                         .setPositiveButton("L\u00f6schen", new DialogInterface.OnClickListener() {
                             @Override
