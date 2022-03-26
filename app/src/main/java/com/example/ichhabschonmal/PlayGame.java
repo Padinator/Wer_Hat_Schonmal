@@ -130,7 +130,13 @@ public class PlayGame extends AppCompatActivity {
                         if (listOfPlayers.get(i).playerNumber == otherPlayer.getNumber()) {
 
                             // Update a player in the database
-                            updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers + 1);
+                            if (actualGame.actualDrinkOfTheGame.equals("Bier")) {
+                                updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers + 1, listOfPlayers.get(i).countOfVodka, listOfPlayers.get(i).countOfTequila);
+                            } else if (actualGame.actualDrinkOfTheGame.equals("Vodka Shots")) {
+                                updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers, listOfPlayers.get(i).countOfVodka + 1, listOfPlayers.get(i).countOfTequila);
+                            } else if (actualGame.actualDrinkOfTheGame.equals("Tequila")) {
+                                updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers, listOfPlayers.get(i).countOfVodka, listOfPlayers.get(i).countOfTequila + 1);
+                            }
 
                             // Update a story in the database
                             updateAStory(actualStoryNumberInList, true, true, chosenPlayer.getName());
@@ -144,7 +150,13 @@ public class PlayGame extends AppCompatActivity {
                         if (listOfPlayers.get(i).playerNumber == chosenPlayer.getNumber()) {
 
                             // Update a player in the database
-                            updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers + 1);
+                            if (actualGame.actualDrinkOfTheGame.equals("Bier")) {
+                                updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers + 1, listOfPlayers.get(i).countOfVodka, listOfPlayers.get(i).countOfTequila);
+                            } else if (actualGame.actualDrinkOfTheGame.equals("Vodka Shots")) {
+                                updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers, listOfPlayers.get(i).countOfVodka + 1, listOfPlayers.get(i).countOfTequila);
+                            } else if (actualGame.actualDrinkOfTheGame.equals("Tequila")) {
+                                updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers, listOfPlayers.get(i).countOfVodka, listOfPlayers.get(i).countOfTequila + 1);
+                            }
 
                             // Update a story in the database
                             updateAStory(actualStoryNumberInList, true, false, chosenPlayer.getName());
@@ -394,13 +406,15 @@ public class PlayGame extends AppCompatActivity {
     }
 
     // Adjust later
-    private void updateAPlayer(int playerNumber, int score, int countOfBeers) {     // Add later: "int typeOfDrink
+    private void updateAPlayer(int playerNumber, int score, int countOfBeers, int countOfVodka, int countOfTequila) {     // Add later: "int typeOfDrink
 
         // Create database connection
         db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
 
         listOfPlayers.get(playerNumber).score = score;
         listOfPlayers.get(playerNumber).countOfBeers = countOfBeers;          // Adjust later
+        listOfPlayers.get(playerNumber).countOfVodka = countOfVodka;
+        listOfPlayers.get(playerNumber).countOfTequila = countOfTequila;
         db.playerDao().updatePlayer(listOfPlayers.get(playerNumber));
 
         // Close database connection

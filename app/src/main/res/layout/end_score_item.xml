@@ -27,7 +27,7 @@
     </TextView>
 
     <RelativeLayout
-        android:id="@+id/drinks"
+        android:id="@+id/drinkOne"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/playerName"
@@ -35,30 +35,98 @@
         android:layout_marginLeft="20dp">
 
         <TextView
-            android:id="@+id/countOfDrinks"
+            android:id="@+id/countOfDrinksOne"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="22dp"
-            android:text="2"
-            />
+            android:textSize="22dp" />
 
         <ImageView
-            android:id="@+id/x"
+            android:id="@+id/xOne"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="2dp"
             android:layout_centerVertical="true"
-            android:layout_toRightOf="@id/countOfDrinks"
+            android:layout_toRightOf="@id/countOfDrinksOne"
             android:src="@drawable/multipilcator"/>
 
         <ImageView
-            android:id="@+id/drinkIcon"
+            android:id="@+id/drinkIconOne"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/playerName"
             android:layout_centerVertical="true"
             android:layout_marginLeft="2dp"
-            android:layout_toRightOf="@id/x"/>
+            android:layout_toRightOf="@id/xOne"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/drinkTwo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/playerName"
+        android:layout_toRightOf="@id/drinkOne"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="20dp">
+
+        <TextView
+            android:id="@+id/countOfDrinksTwo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="22dp" />
+
+        <ImageView
+            android:id="@+id/xTwo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="2dp"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@id/countOfDrinksTwo"
+            android:src="@drawable/multipilcator"/>
+
+        <ImageView
+            android:id="@+id/drinkIconTwo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/playerName"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="2dp"
+            android:layout_toRightOf="@id/xTwo"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/drinkThree"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/playerName"
+        android:layout_toRightOf="@id/drinkTwo"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="20dp">
+
+        <TextView
+            android:id="@+id/countOfDrinksThree"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="22dp" />
+
+        <ImageView
+            android:id="@+id/xThree"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="2dp"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@id/countOfDrinksThree"
+            android:src="@drawable/multipilcator"/>
+
+        <ImageView
+            android:id="@+id/drinkIconThree"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/playerName"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="2dp"
+            android:layout_toRightOf="@id/xThree"/>
 
     </RelativeLayout>
 
