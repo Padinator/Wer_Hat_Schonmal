@@ -139,7 +139,7 @@ public class CreatePlayers extends AppCompatActivity {
             else if (playerName.getText().toString().isEmpty()) {
                 Toast.makeText(CreatePlayers.this, "Spielername darf nicht leer sein", Toast.LENGTH_SHORT).show();
             } else if (playerName.getText().toString().length() < 2)
-                Toast.makeText(CreatePlayers.this, "Spielername muss aus mindestens 5 Zeichen bestehen", Toast.LENGTH_SHORT).show();
+                Toast.makeText(CreatePlayers.this, "Spielername muss aus mindestens 2 Zeichen bestehen", Toast.LENGTH_SHORT).show();
             else {
 
                 // Set name of a player
@@ -188,8 +188,8 @@ public class CreatePlayers extends AppCompatActivity {
             }
             else if (playerName.getText().toString().isEmpty())     // Check last player's name
                 Toast.makeText(CreatePlayers.this, "Spielername darf nicht leer sein", Toast.LENGTH_SHORT).show();
-            else if (playerName.getText().toString().length() < 5)      // Check last player's name
-                Toast.makeText(CreatePlayers.this, "Spielername muss aus mindestens 5 Zeichen bestehen", Toast.LENGTH_SHORT).show();
+            else if (playerName.getText().toString().length() < 2)      // Check last player's name
+                Toast.makeText(CreatePlayers.this, "Spielername muss aus mindestens 2 Zeichen bestehen", Toast.LENGTH_SHORT).show();
             else {
 
                 // Definitions
