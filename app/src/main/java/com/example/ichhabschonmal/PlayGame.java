@@ -185,14 +185,18 @@ public class PlayGame extends AppCompatActivity {
                 Intent next = new Intent(PlayGame.this, Score.class);
                 Intent end = new Intent(PlayGame.this, EndScore.class);
 
-                // Create database connection
-                updateAGame(++roundNumber);
-
                 if (checkRound()) {         // Show score and then play next round
+
+                    // Update a game
+                    updateAGame(++roundNumber);
+
+                    // Start Score-intent
                     next.putExtra("GameId", gameId);
                     startActivity(next);
                     playRound();
                 } else {            // New intent with end score
+
+                    // Start EndScore-intent
                     end.putExtra("GameId", gameId);
                     startActivity(end);
                     finish();       // Game is over
