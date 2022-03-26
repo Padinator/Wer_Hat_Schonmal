@@ -174,6 +174,10 @@ public class PlayGame extends AppCompatActivity {
                 solutionPressed = true;
             } else
                 Toast.makeText(PlayGame.this, "Starte zuerst die nächste Runde!", Toast.LENGTH_SHORT).show();
+            /*
+            if (!checkRound())
+                nextRound.setText("Spielende");
+             */
         });
 
         nextRound.setOnClickListener(view -> {
@@ -381,7 +385,7 @@ public class PlayGame extends AppCompatActivity {
 
         if (actualStoryNumber >= 0 && actualStoryNumber < listOfStories.size()) {
             actualStoryNumberInList = actualStoryNumber;
-        } else        // Exception handling
+        } else        // Exception handling, value of actualStoryNumber is false
             Toast.makeText(this, "Fehler, Story konnte nicht auf benutzt gesetzt werden!", Toast.LENGTH_SHORT).show();
 
         this.actualStoryNumber = storyNumber;
@@ -427,6 +431,9 @@ public class PlayGame extends AppCompatActivity {
 
         // Close database connection
         db.close();
+
+        // Delete story from list listOfStories
+        listOfStories.remove(actualStoryNumberInList);
     }
 
     private boolean checkRound() {      // Checks if at least one player has an unused story
@@ -458,17 +465,17 @@ public class PlayGame extends AppCompatActivity {
             Log.e("checkRound", "EditedPlayers: " + editedPlayers.length);
 
             while (!proofCheckPlayer && i < editedPlayers.length) {       // nextRound have to be true, if this line is accessed
-                Log.e("checkRound", editedPlayers[i] + ", " + editedPlayers[i].getNumber() + ", " + checkPlayer.getNumber());
+                //Log.e("checkRound", editedPlayers[i] + ", " + editedPlayers[i].getNumber() + ", " + checkPlayer.getNumber());
                 if (editedPlayers[i] != null && editedPlayers[i].getNumber() == checkPlayer.getNumber())        // Searches checkPlayer in editedPlayers
                     proofCheckPlayer = true;
                 else
                     i++;
-                Log.e("checkRound", "PlayerNumber: " + editedPlayers[i].getNumber() + ", i: " + i + ", proofCheckPlayer: " + proofCheckPlayer);
+                //Log.e("checkRound", "PlayerNumber: " + editedPlayers[i].getNumber() + ", i: " + i + ", proofCheckPlayer: " + proofCheckPlayer);
             }
 
-            Log.e("checkRound", editedPlayers[0].getNumber() + ", " + editedPlayers[1].getNumber() + ", " + editedPlayers[2].getNumber() + ", " + editedPlayers[i].getNumber());
+            //Log.e("checkRound", editedPlayers[0].getNumber() + ", " + editedPlayers[1].getNumber() + ", " + editedPlayers[2].getNumber() + ", " + editedPlayers[i].getNumber());
 
-            Log.e("checkRound", "proofCheckPlayer: " + proofCheckPlayer);
+            //Log.e("checkRound", "proofCheckPlayer: " + proofCheckPlayer);
 
             if (proofCheckPlayer && i != editedPlayers.length) {        // case: editedPlayers[i].getNumber() == checkPlayer.getNumber()
                 editedPlayers = Gamer.copyPlayers(players);
