@@ -47,7 +47,7 @@ public class NewGame extends AppCompatActivity {
         nextMenu = findViewById(R.id.nextMenu);
 
         // Create drop down menu for choosing a drink
-        spin = findViewById(R.id.dropdown);
+        spin = findViewById(R.id.drinkVariants);
         ArrayList<String> drinks = new ArrayList<>();
         drinks.add("Bier");
         drinks.add("Vodka Shots");

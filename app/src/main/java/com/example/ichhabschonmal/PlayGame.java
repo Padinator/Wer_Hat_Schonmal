@@ -102,7 +102,7 @@ public class PlayGame extends AppCompatActivity {
             editedPlayers = saveInNewDataStructure(listOfPlayers, listOfStories);
 
             // Create drop down menu for choosing a player
-            spin = findViewById(R.id.dropdown);
+            spin = findViewById(R.id.drinkVariants);
             adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, listOfPlayersForSpinner);
             spin.setAdapter(adapter);
 

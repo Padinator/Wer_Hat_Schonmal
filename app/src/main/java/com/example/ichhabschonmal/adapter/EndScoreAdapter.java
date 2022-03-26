@@ -91,7 +91,7 @@ public class EndScoreAdapter extends RecyclerView.Adapter<EndScoreAdapter.ViewHo
             }
 
             for (; counterPos < playerScores.length; counterPos++) {
-                allRelativeLayouts[counterPos].setVisibility(View.INVISIBLE);
+                allRelativeLayouts[counterPos].setVisibility(View.GONE);
             }
         }
 
