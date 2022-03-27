@@ -4,6 +4,8 @@ import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -45,7 +47,7 @@ public class CreatePlayers extends AppCompatActivity {
         // Definitions
         Button saveAndNextStory, nextPerson, viewYourStories, next;
         EditText writeStories, playerName;
-        TextView playerID;
+        TextView playerID, charsLeft;
 
         // Buttons:
         saveAndNextStory = findViewById(R.id.saveAndNextStory);
@@ -60,6 +62,7 @@ public class CreatePlayers extends AppCompatActivity {
         //TextViews:
         playerID = findViewById(R.id.playerID);
         storyNumber = findViewById(R.id.storyNumber);
+        charsLeft = findViewById(R.id.charsLeft);
 
         // Exception handling
         // Set minimum and maximum of story per player
@@ -92,6 +95,26 @@ public class CreatePlayers extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 openDialog(v);
+            }
+        });
+
+        writeStories.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                if (editable.toString().length() <= 250) {
+                    charsLeft.setText(editable.toString().length() + "/250");
+                }
+
             }
         });
 
@@ -143,8 +166,7 @@ public class CreatePlayers extends AppCompatActivity {
                     !writeStories.getText().toString().equals("Schreibe in dieses Feld deine n\u00e4chste Story rein.")) {
                 Toast.makeText(this, "Die letzte Story wurde noch nicht gespeichert, einmaliger Hinweis!", Toast.LENGTH_SHORT).show();
                 alreadySad = true;
-            }
-            else if (playerName.getText().toString().isEmpty()) {
+            } else if (playerName.getText().toString().isEmpty()) {
                 Toast.makeText(CreatePlayers.this, "Spielername darf nicht leer sein", Toast.LENGTH_SHORT).show();
             } else if (playerName.getText().toString().length() < 2)
                 Toast.makeText(CreatePlayers.this, "Spielername muss aus mindestens 5 Zeichen bestehen", Toast.LENGTH_SHORT).show();
@@ -187,14 +209,13 @@ public class CreatePlayers extends AppCompatActivity {
                     Toast.makeText(this, "Die letzte Story wurde noch nicht gespeichert, einmaliger Hinweis!", Toast.LENGTH_SHORT).show();
                     alreadySad = true;
                 }
-            }else if (maxStoryNumber < listOfPlayers[listOfPlayers.length - 1].getCountOfStories())
+            } else if (maxStoryNumber < listOfPlayers[listOfPlayers.length - 1].getCountOfStories())
                 Toast.makeText(CreatePlayers.this, "Spieler " + listOfPlayers.length + " besitzt zu viele Storys!", Toast.LENGTH_SHORT).show();
             else if (!alreadySad && !writeStories.getText().toString().equals("Schreibe in dieses Feld deine Story rein.") &&
                     !writeStories.getText().toString().equals("Schreibe in dieses Feld deine n\u00e4chste Story rein.")) {
                 Toast.makeText(this, "Die letzte Story wurde noch nicht gespeichert, einmaliger Hinweis!", Toast.LENGTH_SHORT).show();
                 alreadySad = true;
-            }
-            else if (playerName.getText().toString().isEmpty())     // Check last player's name
+            } else if (playerName.getText().toString().isEmpty())     // Check last player's name
                 Toast.makeText(CreatePlayers.this, "Spielername darf nicht leer sein", Toast.LENGTH_SHORT).show();
             else if (playerName.getText().toString().length() < 5)      // Check last player's name
                 Toast.makeText(CreatePlayers.this, "Spielername muss aus mindestens 5 Zeichen bestehen", Toast.LENGTH_SHORT).show();
