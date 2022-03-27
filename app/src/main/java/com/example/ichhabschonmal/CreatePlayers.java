@@ -5,11 +5,16 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.WindowManager.LayoutParams;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -306,18 +311,22 @@ public class CreatePlayers extends AppCompatActivity {
             // Set story text in the listview-item
             storyText.setText(newListOfStories.get(position));
 
-            /*storyText.requestFocus();
-            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.showSoftInput(storyText, InputMethodManager.SHOW_IMPLICIT);
-            showKeyboard();*/
-
-            /*storyText.setOnTouchListener(new View.OnTouchListener() {
+            storyText.setOnTouchListener(new View.OnTouchListener() {
                 @SuppressLint("ClickableViewAccessibility")
                 @Override
                 public boolean onTouch(View view, MotionEvent motionEvent) {
+                    if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                        if (view.requestFocus()) {
+                            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                            imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
+                        }
+
+                        return true;
+                    }
+
                     return false;
                 }
-            });*/
+            });
 
             deleteStory.setOnClickListener(new View.OnClickListener() {     // Give delete button a function
                 @SuppressLint("SetTextI18n")
@@ -356,16 +365,22 @@ public class CreatePlayers extends AppCompatActivity {
         builder = new AlertDialog.Builder(this);
         row = getLayoutInflater().inflate(R.layout.view_your_stories, null);
         listView = row.findViewById(R.id.myStories);
-        //adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, listOfPlayers[actualPlayer].getAllStories());
+        listView.setDescendantFocusability(ViewGroup.FOCUS_AFTER_DESCENDANTS);      // First step
+        listView.setItemsCanFocus(true);                                            // Second step
         adapter = new ViewYourStoriesListAdapter(CreatePlayers.this);
         listView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
         builder.setView(row);
         dialog = builder.create();
+
+        dialog.getWindow().clearFlags(LayoutParams.FLAG_NOT_FOCUSABLE | LayoutParams.FLAG_ALT_FOCUSABLE_IM);
         dialog.getWindow().setSoftInputMode(LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+
         dialog.show();
         saveEditedStories = row.findViewById(R.id.saveEditedStories);
         backButton = row.findViewById(R.id.backButton);
+
+        //showKeyboard();
 
         saveEditedStories.setOnClickListener(new View.OnClickListener() {
             @Override
