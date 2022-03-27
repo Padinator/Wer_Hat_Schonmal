@@ -128,7 +128,7 @@
             android:textSize="20dp"/>
 
         <Spinner
-            android:id="@+id/dropdown"
+            android:id="@+id/drinkVariants"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/chooseDrink"
@@ -143,7 +143,7 @@
             android:id="@+id/nextMenu"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/dropdown"
+            android:layout_below="@+id/drinkVariants"
             android:layout_centerHorizontal="true"
             android:text="Weiter"
             android:backgroundTint="@color/orange_one"/>
