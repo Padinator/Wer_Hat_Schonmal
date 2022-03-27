@@ -37,7 +37,7 @@
                     android:layout_toRightOf="@+id/playerID"
                     android:background="@drawable/textview_story_border"
                     android:paddingHorizontal="10dp"
-                    android:text="Dein Name" />
+                    android:hint="Dein Name" />
 
             </RelativeLayout>
 
@@ -62,9 +62,18 @@
                 android:text="Story 1:"
                 android:textSize="20dp" />
 
+            <TextView
+                android:id="@+id/charsLeft"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/explanation"
+                android:layout_marginLeft="50dp"
+                android:layout_toRightOf="@+id/storyNumber"
+                android:textSize="20dp" />
+
             <EditText
                 android:id="@+id/writeStories"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/storyNumber"
                 android:layout_centerHorizontal="true"
@@ -73,8 +82,9 @@
                 android:layout_marginRight="50dp"
                 android:layout_marginBottom="30dp"
                 android:background="@drawable/textview_story_border"
-                android:padding="50dp"
-                android:text="Schreibe in dieses Feld deine Story rein."/>
+                android:hint="Ich hab schon mal..."
+                android:maxLength="250"
+                android:padding="6dp" />
 
             <RelativeLayout
                 android:id="@+id/buttons"

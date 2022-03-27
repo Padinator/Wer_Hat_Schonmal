@@ -8,6 +8,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -23,6 +26,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.room.Room;
@@ -63,7 +67,7 @@ public class CreatePlayers extends AppCompatActivity {
         // Definitions
         Button saveAndNextStory, nextPerson, viewYourStories, next;
         EditText writeStories, playerName;
-        TextView playerID;
+        TextView playerID, charsLeft;
 
         // Buttons:
         saveAndNextStory = findViewById(R.id.saveAndNextStory);
@@ -78,6 +82,7 @@ public class CreatePlayers extends AppCompatActivity {
         //TextViews:
         playerID = findViewById(R.id.playerID);
         storyNumber = findViewById(R.id.storyNumber);
+        charsLeft = findViewById(R.id.charsLeft);
 
         // Exception handling
         // Set minimum and maximum of story per player
@@ -100,10 +105,36 @@ public class CreatePlayers extends AppCompatActivity {
         db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
 
 
+        // calling the action bar
+        ActionBar actionBar = getSupportActionBar();
+
+        // showing the back button in action bar
+        actionBar.setDisplayHomeAsUpEnabled(true);
+
         viewYourStories.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 openDialog(v);
+            }
+        });
+
+        writeStories.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                if (editable.toString().length() <= 250) {
+                    charsLeft.setText(editable.toString().length() + "/250");
+                }
+
             }
         });
 
@@ -199,14 +230,13 @@ public class CreatePlayers extends AppCompatActivity {
                     Toast.makeText(this, "Die letzte Story wurde noch nicht gespeichert, einmaliger Hinweis!", Toast.LENGTH_SHORT).show();
                     alreadySadOne = true;
                 }
-            }else if (maxStoryNumber < listOfPlayers[listOfPlayers.length - 1].getCountOfStories())
+            } else if (maxStoryNumber < listOfPlayers[listOfPlayers.length - 1].getCountOfStories())
                 Toast.makeText(CreatePlayers.this, "Spieler " + listOfPlayers.length + " besitzt zu viele Storys!", Toast.LENGTH_SHORT).show();
             else if (!alreadySadOne && !writeStories.getText().toString().equals("Schreibe in dieses Feld deine Story rein.") &&
                     !writeStories.getText().toString().equals("Schreibe in dieses Feld deine n\u00e4chste Story rein.")) {
                 Toast.makeText(this, "Die letzte Story wurde noch nicht gespeichert, einmaliger Hinweis!", Toast.LENGTH_SHORT).show();
                 alreadySadOne = true;
-            }
-            else if (playerName.getText().toString().isEmpty())     // Check last player's name
+            } else if (playerName.getText().toString().isEmpty())     // Check last player's name
                 Toast.makeText(CreatePlayers.this, "Spielername darf nicht leer sein", Toast.LENGTH_SHORT).show();
             else if (playerName.getText().toString().length() < 2)      // Check last player's name
                 Toast.makeText(CreatePlayers.this, "Spielername muss aus mindestens 2 Zeichen bestehen", Toast.LENGTH_SHORT).show();
@@ -244,6 +274,8 @@ public class CreatePlayers extends AppCompatActivity {
                     newPlayer.gameId = actualGameId;
                     newPlayer.score = 0;
                     newPlayer.countOfBeers = 0;
+                    newPlayer.countOfVodka = 0;
+                    newPlayer.countOfTequila = 0;
 
                     // Insert the player
                     db.playerDao().insert(newPlayer);
@@ -509,5 +541,16 @@ public class CreatePlayers extends AppCompatActivity {
                 });
 
         builder.create().show();
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

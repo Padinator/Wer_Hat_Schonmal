@@ -46,7 +46,7 @@ public class NewGame extends AppCompatActivity {
         nextMenu = findViewById(R.id.nextMenu);
 
         // Create drop down menu for choosing a drink
-        spin = findViewById(R.id.dropdown);
+        spin = findViewById(R.id.drinkVariants);
         ArrayList<String> drinks = new ArrayList<>();
         drinks.add("Bier");
         drinks.add("Vodka Shots");
@@ -65,10 +65,12 @@ public class NewGame extends AppCompatActivity {
         db.close();
 
         nextMenu.setOnClickListener(view -> {
-            String fileName = gameName.getText().toString();
-            String playerNumber = playerCount.getText().toString();
-            String storyMinNumber = storyMinCount.getText().toString();
-            String storyMaxNumber = storyMaxCount.getText().toString();
+            String fileName, playerNumber, storyMinNumber, storyMaxNumber, drinkOfTheGame;
+            fileName = gameName.getText().toString();
+            playerNumber = playerCount.getText().toString();
+            storyMinNumber = storyMinCount.getText().toString();
+            storyMaxNumber = storyMaxCount.getText().toString();
+            drinkOfTheGame = spin.getSelectedItem().toString();
 
             if (fileName.isEmpty())            // Check only if gameName is valid, creating starts later
                 Toast.makeText(NewGame.this, "Dateiname darf nicht leer sein!", Toast.LENGTH_SHORT).show();
@@ -147,7 +149,6 @@ public class NewGame extends AppCompatActivity {
                 .setNegativeButton("Abbrechen", (dialogInterface, i) -> {
 
                 });
-
         builder.create().show();
     }
 }

@@ -3,10 +3,11 @@ package com.example.ichhabschonmal;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.TextView;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -29,10 +30,10 @@ public class EndScore extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.end_score);
 
+
         // Definitions
         RecyclerView recyclerView;
         EndScoreAdapter endScoreAdapter;
-        TextView drinksDrunks;
         Button exitGame;
         AppDatabase db;
         List<Player> players;
@@ -55,19 +56,31 @@ public class EndScore extends AppCompatActivity {
         playerIds = PlayGame.findSomethingOfActualGame(idOfFirstPlayer, countOfPlayers);
         players = db.playerDao().loadAllByPlayerIds(playerIds);
 
-        //drinksDrunks = (TextView) findViewById(R.id.beersDrunk);
-        ImageView img = findViewById(R.id.drinkIcon);
-        // img.setImageResource(R.drawable.beericon);
-
         // RecyclerView
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         // EndScoreAdapter
-        endScoreAdapter = new EndScoreAdapter(this, players);
+        endScoreAdapter = new EndScoreAdapter(this, players, gameId);
         recyclerView.setAdapter(endScoreAdapter);
 
         exitGame.setOnClickListener(view -> onBackPressed());
+
+        // calling the action bar
+        ActionBar actionBar = getSupportActionBar();
+
+        // showing the back button in action bar
+        actionBar.setDisplayHomeAsUpEnabled(true);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
