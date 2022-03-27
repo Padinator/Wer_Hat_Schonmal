@@ -1,8 +1,10 @@
 package com.example.ichhabschonmal;
 
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.widget.Button;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -60,12 +62,30 @@ public class Score extends AppCompatActivity {
         recyclerView.setAdapter(scoreAdapter);
 
         confirm.setOnClickListener(view -> onBackPressed());
+
+        // calling the action bar
+        ActionBar actionBar = getSupportActionBar();
+
+        // showing the back button in action bar
+        actionBar.setDisplayHomeAsUpEnabled(true);
+
     }
 
     @Override
     public void onBackPressed() {       // Catch back button
         // Go back to last intent
         finish();
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
 }
