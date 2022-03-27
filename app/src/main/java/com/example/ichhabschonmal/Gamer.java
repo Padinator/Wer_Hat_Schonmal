@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Gamer {        // Data entity is already named Player
-    private final List<String> listOfStories = new ArrayList<>();     // Stories are saved temporary in listOfStories
+    private List<String> listOfStories = new ArrayList<>();     // Stories are saved temporary in listOfStories
     private final int number;
     private String name;
 
@@ -41,11 +41,19 @@ public class Gamer {        // Data entity is already named Player
     }
 
     public List<String> getAllStories() {
-        return listOfStories;
+        List<String> copiedListOfStories = new ArrayList<>();
+
+        copiedListOfStories.addAll(listOfStories);
+
+        return copiedListOfStories;
     }
 
     public void addStory(String story) {        // Add a story to the story list of a player
         listOfStories.add(story);
+    }
+
+    public void replaceAllStories(List<String> newListOfStories) {
+        this.listOfStories = newListOfStories;          // Flat copy
     }
 
     public void deleteStory(int j) {

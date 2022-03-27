@@ -1,14 +1,19 @@
 package com.example.ichhabschonmal;
 
 import android.annotation.SuppressLint;
-import android.content.DialogInterface;
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.AdapterView;
+import android.view.ViewGroup;
+import android.view.WindowManager.LayoutParams;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,15 +27,22 @@ import com.example.ichhabschonmal.database.Game;
 import com.example.ichhabschonmal.database.Player;
 import com.example.ichhabschonmal.database.Story;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class CreatePlayers extends AppCompatActivity {
 
     private Gamer[] listOfPlayers = new Gamer[]{new Gamer(1)};
     private int actualPlayer = 0, minStoryNumber, maxStoryNumber, maxPlayerNumber;
     private int idOfFirstPlayer = -1, countOfPlayers = 0, idOfFirstStory = -1, countOfStories = 0;
-    private boolean alreadySad = false;         // Check, if a player has saved his last story
+    private boolean alreadySadOne = false;          // Check, if a player has saved his last story
+    private boolean alreadySadTwo = false;          // Check, if a player has saved changes of all stories
+
+    private List<String> newListOfStories = new ArrayList<>();          // Is used for deleting/replacing stories in viewYourStories
 
     private AppDatabase db;
     private ListView listView;
+    private Button backButton, saveEditedStories;
     private ArrayAdapter<String> adapter;
     private TextView storyNumber;
 
@@ -111,7 +123,7 @@ public class CreatePlayers extends AppCompatActivity {
                         Toast.LENGTH_LONG).show();
 
                 // Set used variable
-                alreadySad = false;
+                alreadySadOne = false;
             }
         });
         nextPerson.setOnClickListener(v -> {
@@ -122,19 +134,19 @@ public class CreatePlayers extends AppCompatActivity {
             else if (listOfPlayers[actualPlayer].getCountOfStories() < minStoryNumber) {
                 Toast.makeText(CreatePlayers.this, "Spieler muss mindestens " + minStoryNumber + " Stories besitzen!",
                         Toast.LENGTH_LONG).show();
-                if (!alreadySad && !writeStories.getText().toString().equals("Schreibe in dieses Feld deine Story rein.") &&
+                if (!alreadySadOne && !writeStories.getText().toString().equals("Schreibe in dieses Feld deine Story rein.") &&
                         !writeStories.getText().toString().equals("Schreibe in dieses Feld deine n\u00e4chste Story rein.")) {
                     Toast.makeText(this, "Die letzte Story wurde noch nicht gespeichert, einmaliger Hinweis!", Toast.LENGTH_SHORT).show();
-                    alreadySad = true;
+                    alreadySadOne = true;
                 }
             } else if (listOfPlayers.length > maxPlayerNumber) {
                 Toast.makeText(CreatePlayers.this, "Zu viele eingeloggte Spieler!",
                         Toast.LENGTH_LONG).show();
                 // Exception has to be added hereeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
-            } else if (!alreadySad && !writeStories.getText().toString().equals("Schreibe in dieses Feld deine Story rein.") &&
+            } else if (!alreadySadOne && !writeStories.getText().toString().equals("Schreibe in dieses Feld deine Story rein.") &&
                     !writeStories.getText().toString().equals("Schreibe in dieses Feld deine n\u00e4chste Story rein.")) {
                 Toast.makeText(this, "Die letzte Story wurde noch nicht gespeichert, einmaliger Hinweis!", Toast.LENGTH_SHORT).show();
-                alreadySad = true;
+                alreadySadOne = true;
             }
             else if (playerName.getText().toString().isEmpty()) {
                 Toast.makeText(CreatePlayers.this, "Spielername darf nicht leer sein", Toast.LENGTH_SHORT).show();
@@ -174,17 +186,17 @@ public class CreatePlayers extends AppCompatActivity {
                 Toast.makeText(CreatePlayers.this, "Zu viele eingeloggte Spieler", Toast.LENGTH_SHORT).show();
             else if (listOfPlayers[listOfPlayers.length - 1].getCountOfStories() < minStoryNumber) {
                 Toast.makeText(CreatePlayers.this, "Spieler " + listOfPlayers.length + " besitzt zu wenig Storys!", Toast.LENGTH_SHORT).show();
-                if (!alreadySad && !writeStories.getText().toString().equals("Schreibe in dieses Feld deine Story rein.") &&
+                if (!alreadySadOne && !writeStories.getText().toString().equals("Schreibe in dieses Feld deine Story rein.") &&
                         !writeStories.getText().toString().equals("Schreibe in dieses Feld deine n\u00e4chste Story rein.")) {
                     Toast.makeText(this, "Die letzte Story wurde noch nicht gespeichert, einmaliger Hinweis!", Toast.LENGTH_SHORT).show();
-                    alreadySad = true;
+                    alreadySadOne = true;
                 }
             }else if (maxStoryNumber < listOfPlayers[listOfPlayers.length - 1].getCountOfStories())
                 Toast.makeText(CreatePlayers.this, "Spieler " + listOfPlayers.length + " besitzt zu viele Storys!", Toast.LENGTH_SHORT).show();
-            else if (!alreadySad && !writeStories.getText().toString().equals("Schreibe in dieses Feld deine Story rein.") &&
+            else if (!alreadySadOne && !writeStories.getText().toString().equals("Schreibe in dieses Feld deine Story rein.") &&
                     !writeStories.getText().toString().equals("Schreibe in dieses Feld deine n\u00e4chste Story rein.")) {
                 Toast.makeText(this, "Die letzte Story wurde noch nicht gespeichert, einmaliger Hinweis!", Toast.LENGTH_SHORT).show();
-                alreadySad = true;
+                alreadySadOne = true;
             }
             else if (playerName.getText().toString().isEmpty())     // Check last player's name
                 Toast.makeText(CreatePlayers.this, "Spielername darf nicht leer sein", Toast.LENGTH_SHORT).show();
@@ -254,7 +266,6 @@ public class CreatePlayers extends AppCompatActivity {
                     }
                 }
 
-
                 // Update newGame
                 newGame.gameId = actualGameId;
                 newGame.idOfFirstPlayer = idOfFirstPlayer;
@@ -275,16 +286,122 @@ public class CreatePlayers extends AppCompatActivity {
         });
     }
 
+    public class ViewYourStoriesListAdapter extends ArrayAdapter<String> {
+        private final Activity activity;
+
+        public ViewYourStoriesListAdapter(Activity activity) {
+            super(activity, R.layout.view_your_stories_list_item, newListOfStories);
+            this.activity = activity;
+        }
+
+        @Override
+        public View getView(int position, View view, ViewGroup parent) {
+
+            // Definitions and initializations
+            LayoutInflater inflater = activity.getLayoutInflater();
+            @SuppressLint("ViewHolder") View rowView= inflater.inflate(R.layout.view_your_stories_list_item, null, true);
+            EditText storyText = rowView.findViewById(R.id.storyText);
+            ImageButton deleteStory = rowView.findViewById(R.id.deleteStory);
+
+            // Set story text in the listview-item
+            storyText.setText(newListOfStories.get(position));
+
+            /*storyText.requestFocus();
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.showSoftInput(storyText, InputMethodManager.SHOW_IMPLICIT);
+            showKeyboard();*/
+
+            /*storyText.setOnTouchListener(new View.OnTouchListener() {
+                @SuppressLint("ClickableViewAccessibility")
+                @Override
+                public boolean onTouch(View view, MotionEvent motionEvent) {
+                    return false;
+                }
+            });*/
+
+            deleteStory.setOnClickListener(new View.OnClickListener() {     // Give delete button a function
+                @SuppressLint("SetTextI18n")
+                @Override
+                public void onClick(View view) {
+
+                    // Delete story
+                    newListOfStories.remove(position);
+                    listView.invalidateViews();
+                }
+            });
+
+            return rowView;
+        }
+    }
+
+    public void showKeyboard(){
+        InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+    }
+
+    public void closeKeyboard(){
+        InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputMethodManager.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+    }
+
     public void openDialog(View v) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        View row = getLayoutInflater().inflate(R.layout.view_all_stories, null);
+
+        // Definitions
+        AlertDialog.Builder builder;
+        AlertDialog dialog;
+        View row;
+
+        // Initializations
+        newListOfStories = listOfPlayers[actualPlayer].getAllStories();
+        builder = new AlertDialog.Builder(this);
+        row = getLayoutInflater().inflate(R.layout.view_your_stories, null);
         listView = row.findViewById(R.id.myStories);
-        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, listOfPlayers[actualPlayer].getAllStories());
+        //adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, listOfPlayers[actualPlayer].getAllStories());
+        adapter = new ViewYourStoriesListAdapter(CreatePlayers.this);
         listView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
         builder.setView(row);
-        AlertDialog dialog = builder.create();
+        dialog = builder.create();
+        dialog.getWindow().setSoftInputMode(LayoutParams.SOFT_INPUT_STATE_VISIBLE);
         dialog.show();
+        saveEditedStories = row.findViewById(R.id.saveEditedStories);
+        backButton = row.findViewById(R.id.backButton);
+
+        saveEditedStories.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                List<String> newListOfStories = new ArrayList<>();
+
+                // Get all stories
+                for (int i = 0; i < listView.getAdapter().getCount(); i++) {
+                    newListOfStories.add(String.valueOf(listView.getItemAtPosition(i)));
+                }
+
+                // Replace all stories
+                listOfPlayers[actualPlayer].replaceAllStories(newListOfStories);
+
+                // Actualize layout
+                storyNumber.setText("Story " + (listOfPlayers[actualPlayer].getCountOfStories() + 1) + ":");
+                listView.invalidateViews();
+
+                Toast.makeText(CreatePlayers.this, "Stories wurden erfolgreich \u00fcberarbeitet", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!alreadySadTwo) {
+                    Toast.makeText(CreatePlayers.this, "Nicht gespeicherte \u00c4nderungen gehen verloren!", Toast.LENGTH_SHORT).show();
+                    alreadySadTwo = true;
+                } else {
+                    dialog.cancel();
+                    alreadySadTwo = false;
+                }
+            }
+        });
+
+        /*
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -311,11 +428,11 @@ public class CreatePlayers extends AppCompatActivity {
                             }
                         });
                 builder.create().show();
-
-
             }
         });
+         */
     }
+
 
     @Override
     public void onBackPressed() {       // Catch back button
