@@ -174,10 +174,10 @@ public class PlayGame extends AppCompatActivity {
                 solutionPressed = true;
             } else
                 Toast.makeText(PlayGame.this, "Starte zuerst die nächste Runde!", Toast.LENGTH_SHORT).show();
-            /*
-            if (!checkRound())
+
+            if (!checkRound())      // Set text of button nextRound, if there is no round left
                 nextRound.setText("Spielende");
-             */
+
         });
 
         nextRound.setOnClickListener(view -> {
@@ -338,12 +338,13 @@ public class PlayGame extends AppCompatActivity {
         // Choose randomly a player
         do {
             playerNumber = (int) (Math.random() * factor);
+            checkAll();
             if (playerNumber > 0 && playerNumber <= players.length && playerNumber != chosenPlayer.getNumber())
                 Log.e("endlosschleife", "Endlosschleife2, Bedingung passt: " + "Spieler: " + playerNumber + ", " + players[playerNumber - 1].getCountOfStories());
             else if (chosenPlayer.getNumber() == playerNumber)
                 Log.e("endlosschleife", "Endlosschleife2, playerNumber == chosenPlayer.getNumber(): " + "playerNumber: " + playerNumber + ", chosenPlayerNumber " + chosenPlayer.getNumber() + ", Storyzahl" + players[chosenPlayer.getNumber() - 1].getCountOfStories());
-            else
-                Log.e("endlosschleife", "Endlosschleife2, Bedingungen passen nicht, zufaellige Spielerauswahl will nicht mehr: " + playerNumber);
+            //else
+                //Log.e("endlosschleife", "Endlosschleife2, Bedingungen passen nicht, zufaellige Spielerauswahl will nicht mehr: " + playerNumber);
         } while (playerNumber == chosenPlayer.getNumber() || playerNumber <= 0 || playerNumber > players.length
                 || players[playerNumber - 1].getCountOfStories() == 0);     // If a player has no stories, he can not be chosen to be guessed
 
@@ -509,7 +510,7 @@ public class PlayGame extends AppCompatActivity {
         builder.create().show();
     }
 
-    /*
+
     private void checkAll() {
         for (int i = 0; i < listOfPlayers.size(); i++) {
             Log.e("checkAllPlayers", "PlayerId: " + listOfPlayers.get(i).playerId + ", Spieler" +
@@ -531,5 +532,5 @@ public class PlayGame extends AppCompatActivity {
         for (Gamer gamer :players) {
             Log.e("checkPlayers", "Spieler" + gamer.getNumber() + ", " + gamer.getName() + ", " + gamer.getCountOfStories());
         }
-    }*/
+    }
 }

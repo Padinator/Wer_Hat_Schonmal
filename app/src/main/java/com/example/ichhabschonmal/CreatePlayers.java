@@ -44,6 +44,7 @@ public class CreatePlayers extends AppCompatActivity {
     private boolean alreadySadTwo = false;          // Check, if a player has saved changes of all stories
 
     private List<String> newListOfStories = new ArrayList<>();          // Is used for deleting/replacing stories in viewYourStories
+    private boolean mItemsCanFocus;
 
     private AppDatabase db;
     private ListView listView;
@@ -56,6 +57,8 @@ public class CreatePlayers extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.create_players);
+
+        setItemsCanFocus(true);////////////////////////////////////////////////////
 
         // Definitions
         Button saveAndNextStory, nextPerson, viewYourStories, next;
@@ -299,6 +302,7 @@ public class CreatePlayers extends AppCompatActivity {
             this.activity = activity;
         }
 
+        @SuppressLint("ClickableViewAccessibility")
         @Override
         public View getView(int position, View view, ViewGroup parent) {
 
@@ -319,6 +323,7 @@ public class CreatePlayers extends AppCompatActivity {
                         if (view.requestFocus()) {
                             InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                             imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
+                            //showKeyboard();
                         }
 
                         return true;
@@ -327,6 +332,39 @@ public class CreatePlayers extends AppCompatActivity {
                     return false;
                 }
             });
+
+            storyText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View view, boolean b) {
+                    view.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            view.requestFocus();
+                            view.requestFocusFromTouch();
+                        }
+                    });
+                }
+            });
+
+            if (position == 1)
+            {
+                listView.setItemsCanFocus(true);
+
+                // Use afterDescendants, because I don't want the ListView to steal focus
+                listView.setDescendantFocusability(ViewGroup.FOCUS_AFTER_DESCENDANTS);
+                storyText.requestFocus();
+            }
+            else
+            {
+                if (!listView.isFocused())
+                {
+                    listView.setItemsCanFocus(false);
+
+                    // Use beforeDescendants so that the EditText doesn't re-take focus
+                    listView.setDescendantFocusability(ViewGroup.FOCUS_BEFORE_DESCENDANTS);
+                    listView.requestFocus();
+                }
+            }
 
             deleteStory.setOnClickListener(new View.OnClickListener() {     // Give delete button a function
                 @SuppressLint("SetTextI18n")
@@ -340,6 +378,13 @@ public class CreatePlayers extends AppCompatActivity {
             });
 
             return rowView;
+        }
+    }
+
+    public void setItemsCanFocus(boolean itemsCanFocus) {
+        mItemsCanFocus = itemsCanFocus;
+        if (!itemsCanFocus) {
+            listView.setDescendantFocusability(ViewGroup.FOCUS_BLOCK_DESCENDANTS);
         }
     }
 
