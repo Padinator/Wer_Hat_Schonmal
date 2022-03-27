@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="16dp">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:verticalScrollbarPosition="right"
+        android:fadeScrollbars="false">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <ListView
+                    android:id="@+id/myStories"
+                    android:layout_width="match_parent"
+                    android:layout_height="250dp"
+                    android:descendantFocusability="afterDescendants"/>
+
+                <TextView
+                    android:id="@+id/middleOne"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:visibility="invisible"
+                    android:layout_marginLeft="40dp"
+                    android:layout_marginRight="5dp"/>
+
+                <Button
+                    android:id="@+id/saveEditedStories"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Bestätigen"
+                    android:layout_below="@+id/myStories"
+                    android:layout_toRightOf="@+id/middleOne"/>
+
+                <Button
+                    android:id="@+id/backButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/myStories"
+                    android:layout_toLeftOf="@+id/middleOne"
+                    android:text="Zurück"/>
+
+        </RelativeLayout>
+
+    </ScrollView>
+
+</RelativeLayout>

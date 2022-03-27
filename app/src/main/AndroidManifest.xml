@@ -20,11 +20,10 @@
             </intent-filter>
         </activity>
         <activity android:name=".NewGame"/>
-        <activity android:name=".CreatePlayers"/>
+        <activity android:name=".CreatePlayers" android:windowSoftInputMode="adjustPan"/>
         <activity android:name=".PlayGame"/>
         <activity android:name=".LoadGame"/>
         <activity android:name=".Rules"/>
-        <activity android:name=".ViewAllStories"/>
         <activity android:name=".Score"/>
         <activity android:name=".EndScore"/>
 
