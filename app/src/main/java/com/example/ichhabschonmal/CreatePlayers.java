@@ -131,10 +131,7 @@ public class CreatePlayers extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable editable) {
-                if (editable.toString().length() <= 250) {
-                    charsLeft.setText(editable.toString().length() + "/250");
-                }
-
+                charsLeft.setText(editable.toString().length() + "/250");
             }
         });
 
@@ -186,8 +183,7 @@ public class CreatePlayers extends AppCompatActivity {
                     !writeStories.getText().toString().equals("Schreibe in dieses Feld deine n\u00e4chste Story rein.")) {
                 Toast.makeText(this, "Die letzte Story wurde noch nicht gespeichert, einmaliger Hinweis!", Toast.LENGTH_SHORT).show();
                 alreadySadOne = true;
-            }
-            else if (playerName.getText().toString().isEmpty()) {
+            } else if (playerName.getText().toString().isEmpty()) {
                 Toast.makeText(CreatePlayers.this, "Spielername darf nicht leer sein", Toast.LENGTH_SHORT).show();
             } else if (playerName.getText().toString().length() < 2)
                 Toast.makeText(CreatePlayers.this, "Spielername muss aus mindestens 2 Zeichen bestehen", Toast.LENGTH_SHORT).show();
@@ -340,7 +336,7 @@ public class CreatePlayers extends AppCompatActivity {
 
             // Definitions and initializations
             LayoutInflater inflater = activity.getLayoutInflater();
-            @SuppressLint("ViewHolder") View rowView= inflater.inflate(R.layout.view_your_stories_list_item, null, true);
+            @SuppressLint("ViewHolder") View rowView = inflater.inflate(R.layout.view_your_stories_list_item, null, true);
             EditText storyText = rowView.findViewById(R.id.storyText);
             ImageButton deleteStory = rowView.findViewById(R.id.deleteStory);
 
@@ -378,18 +374,14 @@ public class CreatePlayers extends AppCompatActivity {
                 }
             });
 
-            if (position == 1)
-            {
+            if (position == 1) {
                 listView.setItemsCanFocus(true);
 
                 // Use afterDescendants, because I don't want the ListView to steal focus
                 listView.setDescendantFocusability(ViewGroup.FOCUS_AFTER_DESCENDANTS);
                 storyText.requestFocus();
-            }
-            else
-            {
-                if (!listView.isFocused())
-                {
+            } else {
+                if (!listView.isFocused()) {
                     listView.setItemsCanFocus(false);
 
                     // Use beforeDescendants so that the EditText doesn't re-take focus
@@ -420,12 +412,12 @@ public class CreatePlayers extends AppCompatActivity {
         }
     }
 
-    public void showKeyboard(){
+    public void showKeyboard() {
         InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         inputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
     }
 
-    public void closeKeyboard(){
+    public void closeKeyboard() {
         InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         inputMethodManager.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
     }
