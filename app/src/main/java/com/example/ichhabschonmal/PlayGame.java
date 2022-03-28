@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
@@ -33,7 +34,9 @@ public class PlayGame extends AppCompatActivity {
     private Spinner chooseAPlayer, drinkVariantsTwo;                           // spin is used to select a player
     private AppDatabase db;
     private int[] playerIds, storyIds;
-    private boolean solutionPressed = false;        // Before next round begins, Button solution has to be pressed
+    private boolean solutionPressed = false, allPlayersGuessed = false;
+                    // solutionPressed: before next round begins, Button solution may not been pressed
+                    // allPlayersGuessed: true means that all players guessed one time
     private int idOfFirstPlayer, countOfPlayers, idOfFirstStory, countOfStories, gameId, roundNumber;
     private int actualStoryNumberInList, actualStoryNumber;     // actualStoryNumber is a counter to set stories to used
 
@@ -48,6 +51,7 @@ public class PlayGame extends AppCompatActivity {
         List<String> listOfPlayersForSpinner;
         ArrayAdapter<String> adapter;
         ArrayList<String> drinks = new ArrayList<>();
+        int checkStoryIds;
 
         // Buttons
         solution = findViewById(R.id.solution);
@@ -65,7 +69,7 @@ public class PlayGame extends AppCompatActivity {
         db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
         actualGame = db.gameDao().loadAllByGameIds(new int[] {gameId}).get(0);////////////////////////
 
-        // Used variables
+        // Set used variables
         idOfFirstPlayer = actualGame.idOfFirstPlayer;
         countOfPlayers = actualGame.countOfPlayers;
         idOfFirstStory = actualGame.idOfFirstStory;
@@ -76,6 +80,9 @@ public class PlayGame extends AppCompatActivity {
         playerIds = findSomethingOfActualGame(idOfFirstPlayer, countOfPlayers);
         storyIds = findSomethingOfActualGame(idOfFirstStory, countOfStories);
 
+        // Set used variables
+        checkStoryIds = storyIds.length;
+
         // Get players playing the actual game
         listOfPlayers = db.playerDao().loadAllByPlayerIds(playerIds);
         listOfStories = db.storyDao().loadAllByStoryIds(storyIds);
@@ -85,6 +92,13 @@ public class PlayGame extends AppCompatActivity {
 
         // Case if a game is loaded, only use unused stories
         storyIds = findUnusedStories();
+
+        if (checkStoryIds > storyIds.length) {
+
+            // Request to change drink
+            requestToChangeDrink();
+            allPlayersGuessed = true;
+        }
 
         if (storyIds.length > 0) {      // Continue/start playing game
             listOfStories = db.storyDao().loadAllByStoryIds(storyIds);
@@ -131,10 +145,12 @@ public class PlayGame extends AppCompatActivity {
 
 
         solution.setOnClickListener(view -> {
+            boolean checkARound;         // Check if another round can be played
+
             if (!solutionPressed) {     // Solution may not been pressed
                 String correctInput = "Spieler " + otherPlayer.getNumber() + ", " + otherPlayer.getName();
-                int i = 0;
                 String winner, loser = "";
+                int i = 0;
 
                 // Korrekturbedarfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
                 if (chooseAPlayer.getSelectedItem().toString().equals(correctInput)) {       // chosenPlayer has guessed correctly
@@ -195,9 +211,12 @@ public class PlayGame extends AppCompatActivity {
             } else
                 Toast.makeText(PlayGame.this, "Starte zuerst die nächste Runde!", Toast.LENGTH_SHORT).show();
 
-            if (!checkRound())      // Set text of button nextRound, if there is no round left
-                nextRound.setText("Spielende");
+            checkARound = checkRound();
 
+            if (!checkARound)      // Set text of button nextRound, if there is no round left
+                nextRound.setText("Spielende");
+            else if (checkARound && allPlayersGuessed)      // Change actual drink of the game, if there are still rounds left and if all players guessed one time
+                changeDrink();
         });
 
         nextRound.setOnClickListener(view -> {
@@ -208,7 +227,7 @@ public class PlayGame extends AppCompatActivity {
                 if (checkRound()) {         // Show score and then play next round
 
                     // Update a game
-                    updateAGame(++roundNumber);
+                    updateAGame(++roundNumber, actualGame.actualDrinkOfTheGame);
 
                     // Start Score-intent
                     next.putExtra("GameId", gameId);
@@ -298,7 +317,11 @@ public class PlayGame extends AppCompatActivity {
         if (Gamer.isEmpty(editedPlayers)) {      // Enter, if each player has guessed one time
             editedPlayers = Gamer.copyPlayers(players);
 
-
+            // Request to change drink
+            /*if (requestToChangeDrink()) {       // Change visibility of the spinner drinkVariantsTwo, if request is true
+                drinkVariantsTwo.setVisibility(View.VISIBLE);
+                checkAnswer = false;
+            }*/
         }
 
         // Choose randomly a player to guess someone's story
@@ -330,6 +353,25 @@ public class PlayGame extends AppCompatActivity {
 
         // chosenPlayer may guess again, when all players have guessed
         editedPlayers[chosenPlayer.getNumber() - 1] = null;
+    }
+
+    private void requestToChangeDrink() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Getr\u00e4nk wechseln")
+                .setMessage("Soll der Drink des Spiels gewechselt werden?\nBei Aufl\u00f6sung der n\u00e4chsten Story wird der Drink gewechselt.")
+                .setPositiveButton("Ja", (dialog, which) -> {
+                    drinkVariantsTwo.setVisibility(View.VISIBLE);
+                })
+                .setNegativeButton("Nein", (dialogInterface, i) -> {
+
+                });
+        builder.create().show();
+    }
+
+    private void changeDrink() {
+        actualGame.actualDrinkOfTheGame = drinkVariantsTwo.getSelectedItem().toString();
+        updateAGame(actualGame.roundNumber, actualGame.actualDrinkOfTheGame);
+        drinkVariantsTwo.setVisibility(View.GONE);
     }
 
     private Gamer chooseRandomPlayerWhoGuesses() {
@@ -420,12 +462,13 @@ public class PlayGame extends AppCompatActivity {
         return story;
     }
 
-    private void updateAGame(int roundNumber) {
+    private void updateAGame(int roundNumber, String actualDrinkOfTheGame) {
 
         // Create database connection
         db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
 
         actualGame.roundNumber = roundNumber;
+        actualGame.actualDrinkOfTheGame = actualDrinkOfTheGame;
         db.gameDao().updateGame(actualGame);
 
         // Close database connection
