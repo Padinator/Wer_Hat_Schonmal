@@ -31,7 +31,7 @@
                 android:textSize="23dp" />
 
             <Spinner
-                android:id="@+id/drinkVariants"
+                android:id="@+id/chooseAPlayer"
                 android:layout_width="260dp"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/story"

@@ -30,7 +30,7 @@ public class PlayGame extends AppCompatActivity {
     private List<Player> listOfPlayers;             // Contains all players of the actual game, listOfPlayers has access to the database
     private List<Story> listOfStories;              // Contains lal stories of the actual game, listOfStories has access to the database
     private TextView player, story, round;
-    private Spinner spin;                           // spin is used to select a player
+    private Spinner chooseAPlayer, drinkVariantsTwo;                           // spin is used to select a player
     private AppDatabase db;
     private int[] playerIds, storyIds;
     private boolean solutionPressed = false;        // Before next round begins, Button solution has to be pressed
@@ -47,6 +47,7 @@ public class PlayGame extends AppCompatActivity {
         Button solution, nextRound;
         List<String> listOfPlayersForSpinner;
         ArrayAdapter<String> adapter;
+        ArrayList<String> drinks = new ArrayList<>();
 
         // Buttons
         solution = findViewById(R.id.solution);
@@ -102,9 +103,16 @@ public class PlayGame extends AppCompatActivity {
             editedPlayers = saveInNewDataStructure(listOfPlayers, listOfStories);
 
             // Create drop down menu for choosing a player
-            spin = findViewById(R.id.drinkVariants);
+            chooseAPlayer = findViewById(R.id.chooseAPlayer);
             adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, listOfPlayersForSpinner);
-            spin.setAdapter(adapter);
+            chooseAPlayer.setAdapter(adapter);
+
+            drinkVariantsTwo = findViewById(R.id.drinkVariantsTwo);
+            drinks.add("Bier");
+            drinks.add("Vodka Shots");
+            drinks.add("Tequila");
+            adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, drinks);
+            drinkVariantsTwo.setAdapter(adapter);
 
             if (checkRound()) {             // Play a game
                 playGame();
@@ -129,7 +137,7 @@ public class PlayGame extends AppCompatActivity {
                 String winner, loser = "";
 
                 // Korrekturbedarfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
-                if (spin.getSelectedItem().toString().equals(correctInput)) {       // chosenPlayer has guessed correctly
+                if (chooseAPlayer.getSelectedItem().toString().equals(correctInput)) {       // chosenPlayer has guessed correctly
                     for (; i < listOfPlayers.size(); i++) {     // Wenn kein Spieler gefunden wird -> Exception
                         if (listOfPlayers.get(i).playerNumber == otherPlayer.getNumber()) {
 
@@ -289,6 +297,8 @@ public class PlayGame extends AppCompatActivity {
     private void playRound() {
         if (Gamer.isEmpty(editedPlayers)) {      // Enter, if each player has guessed one time
             editedPlayers = Gamer.copyPlayers(players);
+
+
         }
 
         // Choose randomly a player to guess someone's story
@@ -316,7 +326,7 @@ public class PlayGame extends AppCompatActivity {
 
         // Set Spinner
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, listOfPlayersForSpinner);
-        spin.setAdapter(adapter);
+        chooseAPlayer.setAdapter(adapter);
 
         // chosenPlayer may guess again, when all players have guessed
         editedPlayers[chosenPlayer.getNumber() - 1] = null;

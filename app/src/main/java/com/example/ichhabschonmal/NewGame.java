@@ -21,7 +21,7 @@ import java.util.List;
 
 public class NewGame extends AppCompatActivity {
 
-    private Spinner spin;
+    private Spinner drinkVariantsOne;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,13 +46,13 @@ public class NewGame extends AppCompatActivity {
         nextMenu = findViewById(R.id.nextMenu);
 
         // Create drop down menu for choosing a drink
-        spin = findViewById(R.id.drinkVariants);
+        drinkVariantsOne = findViewById(R.id.drinkVariantsOne);
         ArrayList<String> drinks = new ArrayList<>();
         drinks.add("Bier");
         drinks.add("Vodka Shots");
         drinks.add("Tequila");
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, drinks);
-        spin.setAdapter(adapter);
+        drinkVariantsOne.setAdapter(adapter);
 
         // Switches
         playMode = findViewById(R.id.playMode);
@@ -70,7 +70,7 @@ public class NewGame extends AppCompatActivity {
             playerNumber = playerCount.getText().toString();
             storyMinNumber = storyMinCount.getText().toString();
             storyMaxNumber = storyMaxCount.getText().toString();
-            drinkOfTheGame = spin.getSelectedItem().toString();
+            drinkOfTheGame = drinkVariantsOne.getSelectedItem().toString();
 
             if (fileName.isEmpty())            // Check only if gameName is valid, creating starts later
                 Toast.makeText(NewGame.this, "Dateiname darf nicht leer sein!", Toast.LENGTH_SHORT).show();
@@ -117,7 +117,7 @@ public class NewGame extends AppCompatActivity {
                      newGameIntent.putExtra("MaxStoryNumber", Integer.parseInt(storyMaxNumber));     // Give storyMaxNumber
                      newGameIntent.putExtra("playerNumber", Integer.parseInt(playerNumber));     // Give number of players
                      newGameIntent.putExtra("GameName", gameName.getText().toString());     // Give the name of the game
-                     newGameIntent.putExtra("DrinkOfTheGame", spin.getSelectedItem().toString());
+                     newGameIntent.putExtra("DrinkOfTheGame", drinkOfTheGame);
                      startActivity(newGameIntent);
                  } /*else {
                     Intent newGameMultipleDevicesIntent = new Intent(getApplicationContext(), NewGameMultipleDevices.class);
