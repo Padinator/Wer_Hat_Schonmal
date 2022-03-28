@@ -41,7 +41,9 @@ public class LoadGameAdapter extends RecyclerView.Adapter<LoadGameAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        holder.name.setText(mDatabase.gameDao().getAll().get(position).gameName);
+        int countOfGames = mDatabase.gameDao().getAll().size() -1;
+
+        holder.name.setText(mDatabase.gameDao().getAll().get(countOfGames-position).gameName);
     }
 
     @Override
@@ -62,6 +64,7 @@ public class LoadGameAdapter extends RecyclerView.Adapter<LoadGameAdapter.ViewHo
             delete = itemView.findViewById(R.id.delete);
 
             load.setOnClickListener(view -> {
+
                 Game game = mDatabase.gameDao().getAll().get(getAbsoluteAdapterPosition());
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());

@@ -36,8 +36,8 @@
                     android:layout_height="wrap_content"
                     android:layout_toRightOf="@+id/playerID"
                     android:background="@drawable/textview_story_border"
-                    android:paddingHorizontal="10dp"
-                    android:hint="Dein Name" />
+                    android:hint="Dein Name"
+                    android:paddingHorizontal="10dp" />
 
             </RelativeLayout>
 
