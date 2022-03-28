@@ -26,6 +26,7 @@ public class Rules extends AppCompatActivity {
         ListView listView;
         Button start;
         ArrayAdapter<String> adapter;
+        boolean gameIsLoaded;
 
         // Buttons
         start = findViewById(R.id.start);
@@ -50,12 +51,13 @@ public class Rules extends AppCompatActivity {
 
         // Get from last intent
         gameId = getIntent().getExtras().getInt("GameId");
+        gameIsLoaded = getIntent().getExtras().getBoolean("GameIsLoaded");
 
         start.setOnClickListener(v -> {
             Intent startGame = new Intent(Rules.this, PlayGame.class);
 
             startGame.putExtra("GameId", gameId);
-
+            startGame.putExtra("GameIsLoaded", gameIsLoaded);
             startActivity(startGame);
             finish();
         });
@@ -65,7 +67,6 @@ public class Rules extends AppCompatActivity {
 
         // showing the back button in action bar
         actionBar.setDisplayHomeAsUpEnabled(true);
-
     }
 
 
