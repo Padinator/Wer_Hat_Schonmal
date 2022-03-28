@@ -309,6 +309,7 @@ public class CreatePlayers extends AppCompatActivity {
                 // Start new activity
                 rules = new Intent(CreatePlayers.this, Rules.class);
                 rules.putExtra("GameId", actualGameId);
+                rules.putExtra("GameIsLoaded", false);
                 startActivity(rules);
                 finish();
             }
