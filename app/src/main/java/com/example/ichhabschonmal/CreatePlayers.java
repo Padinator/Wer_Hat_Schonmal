@@ -35,6 +35,7 @@ import com.example.ichhabschonmal.database.AppDatabase;
 import com.example.ichhabschonmal.database.Game;
 import com.example.ichhabschonmal.database.Player;
 import com.example.ichhabschonmal.database.Story;
+import com.example.ichhabschonmal.exceptions.GamerException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -84,22 +85,10 @@ public class CreatePlayers extends AppCompatActivity {
         storyNumber = findViewById(R.id.storyNumber);
         charsLeft = findViewById(R.id.charsLeft);
 
-        // Exception handling
-        // Set minimum and maximum of story per player
-        if (getIntent().hasExtra("MinStoryNumber"))
-            minStoryNumber = getIntent().getExtras().getInt("MinStoryNumber");
-        else
-            minStoryNumber = 3;
-        if (getIntent().hasExtra("MaxStoryNumber"))
-            maxStoryNumber = getIntent().getExtras().getInt("MaxStoryNumber");
-        else
-            maxStoryNumber = 5;
-
-        // Set number of players
-        if (getIntent().hasExtra("playerNumber"))
-            maxPlayerNumber = getIntent().getExtras().getInt("playerNumber");
-        else
-            maxPlayerNumber = 5;
+        // Set used variables
+        minStoryNumber = getIntent().getExtras().getInt("MinStoryNumber");
+        maxStoryNumber = getIntent().getExtras().getInt("MaxStoryNumber");
+        maxPlayerNumber = getIntent().getExtras().getInt("playerNumber");
 
         // Calling the action bar
         ActionBar actionBar = getSupportActionBar();
@@ -168,11 +157,9 @@ public class CreatePlayers extends AppCompatActivity {
                         Toast.LENGTH_LONG).show();
                 if (!writeStories.getText().toString().equals(""))
                     Toast.makeText(this, "Die letzte Story wurde noch nicht gespeichert!", Toast.LENGTH_SHORT).show();
-            } else if (listOfPlayers.length > maxPlayerNumber) {
-                Toast.makeText(CreatePlayers.this, "Zu viele eingeloggte Spieler!",
-                        Toast.LENGTH_LONG).show();
-                // Exception has to be added hereeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
-            } else if (!alreadySadOne && !writeStories.getText().toString().equals("")) {
+            } else if (listOfPlayers.length > maxPlayerNumber)
+                Toast.makeText(CreatePlayers.this, "Zu viele eingeloggte Spieler!", Toast.LENGTH_LONG).show();
+            else if (!alreadySadOne && !writeStories.getText().toString().equals("")) {
                 Toast.makeText(this, "Die letzte Story wurde noch nicht gespeichert, einmaliger Hinweis!", Toast.LENGTH_SHORT).show();
                 alreadySadOne = true;
             }
@@ -206,7 +193,6 @@ public class CreatePlayers extends AppCompatActivity {
 
         next.setOnClickListener(view -> {
 
-            // Exception handling
             // Check, if all players meet all conditions
             if (listOfPlayers.length < maxPlayerNumber)
                 Toast.makeText(CreatePlayers.this, "Zu wenig eingeloggte Spieler", Toast.LENGTH_SHORT).show();
@@ -278,7 +264,12 @@ public class CreatePlayers extends AppCompatActivity {
                         // Create a player's story
                         Story newStory = new Story();
                         //listOfStories[i].storyId = listOfStories[i].storyId;        // Story id is set with autoincrement
-                        newStory.content = listOfPlayers[i].getStory(j);
+                        try {
+                            newStory.content = listOfPlayers[i].getStory(j);
+                        } catch (GamerException ge) {
+                            ge.printStackTrace();
+                            newStory.content = ge.toString();
+                        }
                         newStory.status = false;
                         newStory.guessedStatus = false;         // Set a "default value"
                         newStory.playerId = db.playerDao().getAll().get(db.playerDao().getAll().size() - 1).playerId;
