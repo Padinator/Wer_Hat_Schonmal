@@ -101,14 +101,10 @@ public class CreatePlayers extends AppCompatActivity {
         else
             maxPlayerNumber = 5;
 
-        // Create database connection:
-        db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
-
-
-        // calling the action bar
+        // Calling the action bar
         ActionBar actionBar = getSupportActionBar();
 
-        // showing the back button in action bar
+        // Showing the back button in action bar
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         viewYourStories.setOnClickListener(new View.OnClickListener() {
@@ -240,6 +236,9 @@ public class CreatePlayers extends AppCompatActivity {
 
                 Toast.makeText(CreatePlayers.this, "Spieler " + listOfPlayers[actualPlayer].getNumber() + " erfolgreich gespeichert",
                         Toast.LENGTH_LONG).show();
+
+                // Create database connection:
+                db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
 
                 // Create new game
                 Game newGame = new Game();
@@ -482,37 +481,6 @@ public class CreatePlayers extends AppCompatActivity {
                 }
             }
         });
-
-        /*
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
-                builder.setTitle("Wollen Sie diese Story l\u00f6schen?")
-                        .setMessage(listView.getItemAtPosition(i).toString())
-                        .setPositiveButton("L\u00f6schen", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-
-                                // Delete story
-                                listOfPlayers[actualPlayer].deleteStory(i);
-
-                                // Actualize layout
-                                storyNumber.setText("Story " + (listOfPlayers[actualPlayer].getCountOfStories() + 1) + ":");
-                                listView.invalidateViews();
-                            }
-                        })
-                        .setNegativeButton("Abbrechen", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-
-                            }
-                        });
-                builder.create().show();
-            }
-        });
-         */
     }
 
 
