@@ -17,27 +17,42 @@
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
                 android:textColor="#8ab6de"
                 android:textSize="20dp"
                 android:text="Runde Nr.0"/>
+
+            <TextView
+                android:id="@+id/drinkOfTheGameText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/round"
+                android:layout_marginLeft="20dp"
+                android:layout_centerHorizontal="true"
+                android:textStyle="bold"
+                android:text="Das Getränk des Spiels ist:"
+                android:textSize="23dp"/>
+
+            <TextView
+                android:id="@+id/drinkOfTheGame"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/drinkOfTheGameText"
+                android:layout_marginLeft="20dp"
+                android:layout_centerHorizontal="true"
+                android:textStyle="bold"
+                android:text="Bier"
+                android:textSize="23dp"/>
 
             <TextView
                 android:id="@+id/player"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="20dp"
-                android:layout_marginTop="50dp"
+                android:layout_marginTop="30dp"
+                android:layout_below="@+id/drinkOfTheGame"
                 android:text="Spieler 1: Name ist an der Reihe"
-                android:textSize="23dp" />
-
-            <Spinner
-                android:id="@+id/drinkVariants"
-                android:layout_width="260dp"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/story"
-                android:layout_centerHorizontal="true"
-                android:background="@android:drawable/btn_dropdown"
-                android:spinnerMode="dropdown" />
+                android:textSize="23dp"/>
 
             <TextView
                 android:id="@+id/story"
@@ -53,7 +68,16 @@
                               Hier sollte eine Story drin stehen.
                               Hier sollte eine Story drin stehen.
                               Hier sollte eine Story drin stehen."
-                android:textSize="23dp" />
+                android:textSize="23dp"/>
+
+            <Spinner
+                android:id="@+id/chooseAPlayer"
+                android:layout_width="260dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/story"
+                android:layout_centerHorizontal="true"
+                android:background="@android:drawable/btn_dropdown"
+                android:spinnerMode="dropdown" />
 
             <Button
                 android:id="@+id/solution"
@@ -65,24 +89,25 @@
                 android:layout_marginBottom="15dp"
                 android:text="Auflösung" />
 
-            <Spinner
-                android:id="@+id/drinkVariantsTwo"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/solution"
-                android:layout_marginBottom="15dp"
-                android:background="@android:drawable/btn_dropdown"
-                android:layout_centerHorizontal="true"
-                android:spinnerMode="dropdown"
-                android:visibility="gone"/>
-
             <Button
                 android:id="@+id/nextRound"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/drinkVariantsTwo"
+                android:layout_below="@+id/solution"
                 android:layout_centerHorizontal="true"
-                android:text="Nächste Runde" />
+                android:text="Nächste Runde"
+                android:layout_marginBottom="30dp"/>
+
+            <Spinner
+                android:id="@+id/drinkVariantsTwo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/nextRound"
+                android:layout_marginBottom="15dp"
+                android:background="@android:drawable/btn_dropdown"
+                android:layout_centerHorizontal="true"
+                android:spinnerMode="dropdown"
+                android:visibility="invisible"/>
 
         </RelativeLayout>
 
