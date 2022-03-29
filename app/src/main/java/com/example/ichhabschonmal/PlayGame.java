@@ -53,7 +53,6 @@ public class PlayGame extends AppCompatActivity {
         ArrayAdapter<String> adapter;
         ArrayList<String> drinks = new ArrayList<>();
         boolean gameIsLoaded;
-        int checkStoryIds;
 
         // Buttons
         solution = findViewById(R.id.solution);
@@ -83,9 +82,6 @@ public class PlayGame extends AppCompatActivity {
         // Find the players' ids belonging to the actual game and their stories
         playerIds = findSomethingOfActualGame(idOfFirstPlayer, countOfPlayers);
         storyIds = findSomethingOfActualGame(idOfFirstStory, countOfStories);
-
-        // Set used variables
-        checkStoryIds = storyIds.length;
 
         // Get players playing the actual game
         listOfPlayers = db.playerDao().loadAllByPlayerIds(playerIds);
