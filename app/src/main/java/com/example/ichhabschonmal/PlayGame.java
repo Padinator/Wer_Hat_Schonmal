@@ -200,6 +200,9 @@ public class PlayGame extends AppCompatActivity {
                     loser = "Spieler " + chosenPlayer.getNumber() + ", " + chosenPlayer.getName() + " hat diese Runde verloren und muss " + actualDrinkOfTheGame + " trinken!";
                 }
 
+                // Update a game
+                updateAGame(++roundNumber, actualGame.actualDrinkOfTheGame);
+
                 // Delete story in the List "players"
                 try {
                     players[otherPlayer.getNumber() - 1].deleteStory(actualStoryNumber - 1);
@@ -231,9 +234,6 @@ public class PlayGame extends AppCompatActivity {
                 Intent end = new Intent(PlayGame.this, EndScore.class);
 
                 if (checkRound()) {         // Show score and then play next round
-
-                    // Update a game
-                    updateAGame(++roundNumber, actualGame.actualDrinkOfTheGame);
 
                     // Start Score-intent
                     next.putExtra("GameId", gameId);
