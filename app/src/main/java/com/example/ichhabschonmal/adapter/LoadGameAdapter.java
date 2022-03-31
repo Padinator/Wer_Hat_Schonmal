@@ -14,8 +14,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.ichhabschonmal.LoadGame;
-import com.example.ichhabschonmal.PlayGame;
 import com.example.ichhabschonmal.R;
+import com.example.ichhabschonmal.Rules;
 import com.example.ichhabschonmal.database.AppDatabase;
 import com.example.ichhabschonmal.database.Game;
 
@@ -71,15 +71,16 @@ public class LoadGameAdapter extends RecyclerView.Adapter<LoadGameAdapter.ViewHo
                 builder.setTitle("Spiel laden")
                         .setMessage("Soll das Spiel " + game.gameName + " geladen werden?")
                         .setPositiveButton("Laden", (dialog, which) -> {
-                            Intent playGame = new Intent(view.getContext().getApplicationContext(), PlayGame.class);
+                            Intent rules = new Intent(view.getContext().getApplicationContext(), Rules.class);
 
-                            playGame.putExtra("GameId", game.gameId);
+                            rules.putExtra("GameId", game.gameId);
+                            rules.putExtra("GameIsLoaded", true);
 
                             // Close database connection
                             mDatabase.close();
 
                             // Start PlayGame activity
-                            mContext.startActivity(playGame);
+                            mContext.startActivity(rules);
                             ((Activity) mContext).finish();
                         })
                         .setNegativeButton("Abbrechen", (dialogInterface, i) -> {
