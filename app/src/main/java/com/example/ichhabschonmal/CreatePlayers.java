@@ -54,7 +54,7 @@ public class CreatePlayers extends AppCompatActivity {
     private AppDatabase db;
     private ListView listView;
     private Button backButton, saveEditedStories;
-    private ArrayAdapter<String> adapter;
+    private ViewYourStoriesListAdapter adapter;
     private TextView storyNumber;
 
     @SuppressLint("SetTextI18n")
@@ -62,8 +62,6 @@ public class CreatePlayers extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.create_players);
-
-        setItemsCanFocus(true);////////////////////////////////////////////////////
 
         // Definitions
         Button saveAndNextStory, nextPerson, viewYourStories, next;
@@ -89,6 +87,7 @@ public class CreatePlayers extends AppCompatActivity {
         minStoryNumber = getIntent().getExtras().getInt("MinStoryNumber");
         maxStoryNumber = getIntent().getExtras().getInt("MaxStoryNumber");
         maxPlayerNumber = getIntent().getExtras().getInt("playerNumber");
+        //setItemsCanFocus(true);
 
         // Calling the action bar
         ActionBar actionBar = getSupportActionBar();
@@ -308,6 +307,7 @@ public class CreatePlayers extends AppCompatActivity {
 
     public class ViewYourStoriesListAdapter extends ArrayAdapter<String> {
         private final Activity activity;
+        private final List<EditText> editTexts = new ArrayList<>();
 
         public ViewYourStoriesListAdapter(Activity activity) {
             super(activity, R.layout.view_your_stories_list_item, newListOfStories);
@@ -320,9 +320,11 @@ public class CreatePlayers extends AppCompatActivity {
 
             // Definitions and initializations
             LayoutInflater inflater = activity.getLayoutInflater();
-            @SuppressLint("ViewHolder") View rowView= inflater.inflate(R.layout.view_your_stories_list_item, null, true);
+            @SuppressLint({"ViewHolder", "InflateParams"}) View rowView= inflater.inflate(R.layout.view_your_stories_list_item, null, true);
             EditText storyText = rowView.findViewById(R.id.storyText);
             ImageButton deleteStory = rowView.findViewById(R.id.deleteStory);
+
+            editTexts.add(storyText);
 
             // Set story text in the listview-item
             storyText.setText(newListOfStories.get(position));
@@ -334,8 +336,7 @@ public class CreatePlayers extends AppCompatActivity {
                     if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
                         if (view.requestFocus()) {
                             InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                            imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
-                            //showKeyboard();
+                            imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
                         }
 
                         return true;
@@ -345,39 +346,6 @@ public class CreatePlayers extends AppCompatActivity {
                 }
             });
 
-            storyText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-                @Override
-                public void onFocusChange(View view, boolean b) {
-                    view.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            view.requestFocus();
-                            view.requestFocusFromTouch();
-                        }
-                    });
-                }
-            });
-
-            if (position == 1)
-            {
-                listView.setItemsCanFocus(true);
-
-                // Use afterDescendants, because I don't want the ListView to steal focus
-                listView.setDescendantFocusability(ViewGroup.FOCUS_AFTER_DESCENDANTS);
-                storyText.requestFocus();
-            }
-            else
-            {
-                if (!listView.isFocused())
-                {
-                    listView.setItemsCanFocus(false);
-
-                    // Use beforeDescendants so that the EditText doesn't re-take focus
-                    listView.setDescendantFocusability(ViewGroup.FOCUS_BEFORE_DESCENDANTS);
-                    listView.requestFocus();
-                }
-            }
-
             deleteStory.setOnClickListener(new View.OnClickListener() {     // Give delete button a function
                 @SuppressLint("SetTextI18n")
                 @Override
@@ -385,6 +353,7 @@ public class CreatePlayers extends AppCompatActivity {
 
                     // Delete story
                     newListOfStories.remove(position);
+                    editTexts.remove(position);
                     listView.invalidateViews();
                 }
             });
@@ -393,22 +362,6 @@ public class CreatePlayers extends AppCompatActivity {
         }
     }
 
-    public void setItemsCanFocus(boolean itemsCanFocus) {
-        mItemsCanFocus = itemsCanFocus;
-        if (!itemsCanFocus) {
-            listView.setDescendantFocusability(ViewGroup.FOCUS_BLOCK_DESCENDANTS);
-        }
-    }
-
-    public void showKeyboard(){
-        InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        inputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
-    }
-
-    public void closeKeyboard(){
-        InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        inputMethodManager.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
-    }
 
     public void openDialog(View v) {
 
@@ -422,22 +375,19 @@ public class CreatePlayers extends AppCompatActivity {
         builder = new AlertDialog.Builder(this);
         row = getLayoutInflater().inflate(R.layout.view_your_stories, null);
         listView = row.findViewById(R.id.myStories);
-        listView.setDescendantFocusability(ViewGroup.FOCUS_AFTER_DESCENDANTS);      // First step
-        listView.setItemsCanFocus(true);                                            // Second step
         adapter = new ViewYourStoriesListAdapter(CreatePlayers.this);
         listView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
         builder.setView(row);
         dialog = builder.create();
+        dialog.show();      // Statement have to be exactly here at thus line
 
-        dialog.getWindow().clearFlags(LayoutParams.FLAG_NOT_FOCUSABLE | LayoutParams.FLAG_ALT_FOCUSABLE_IM);
-        dialog.getWindow().setSoftInputMode(LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+        // First show dialog and then set the rest, then keyboard will be displayed
+        dialog.getWindow().clearFlags(LayoutParams.FLAG_NOT_FOCUSABLE | LayoutParams.FLAG_ALT_FOCUSABLE_IM);    // First step
+        dialog.getWindow().setSoftInputMode(LayoutParams.SOFT_INPUT_STATE_VISIBLE);     // Second step
 
-        dialog.show();
         saveEditedStories = row.findViewById(R.id.saveEditedStories);
         backButton = row.findViewById(R.id.backButton);
-
-        //showKeyboard();
 
         saveEditedStories.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -446,7 +396,7 @@ public class CreatePlayers extends AppCompatActivity {
 
                 // Get all stories
                 for (int i = 0; i < listView.getAdapter().getCount(); i++) {
-                    newListOfStories.add(String.valueOf(listView.getItemAtPosition(i)));
+                    newListOfStories.add(adapter.editTexts.get(i).getText().toString());
                 }
 
                 // Replace all stories
@@ -454,7 +404,7 @@ public class CreatePlayers extends AppCompatActivity {
 
                 // Actualize layout
                 storyNumber.setText("Story " + (listOfPlayers[actualPlayer].getCountOfStories() + 1) + ":");
-                listView.invalidateViews();
+                //listView.invalidateViews();
 
                 Toast.makeText(CreatePlayers.this, "Stories wurden erfolgreich \u00fcberarbeitet", Toast.LENGTH_SHORT).show();
             }
