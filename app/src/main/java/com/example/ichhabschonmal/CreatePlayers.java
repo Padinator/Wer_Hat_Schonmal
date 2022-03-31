@@ -131,7 +131,10 @@ public class CreatePlayers extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable editable) {
-                charsLeft.setText(editable.toString().length() + "/250");
+                if (editable.toString().length() <= 250) {
+                    charsLeft.setText(editable.toString().length() + "/250");
+                }
+
             }
         });
 
@@ -147,12 +150,9 @@ public class CreatePlayers extends AppCompatActivity {
             else if (writeStories.getText().toString().length() < 25)
                 Toast.makeText(CreatePlayers.this, "Story muss aus mindestens 25 zeichen " +
                         "bestehen.", Toast.LENGTH_SHORT).show();
-            else if (writeStories.getText().toString().equals("Schreibe in dieses Feld deine Story rein.") ||
-                    writeStories.getText().toString().equals("Schreibe in dieses Feld deine n\u00e4chste Story rein.")) {
-                Toast.makeText(this, "Standardtext kann nicht als Story gespeichert werden!", Toast.LENGTH_SHORT).show();
-            } else {            // Text field is okay
+            else {          // Text field is okay
                 listOfPlayers[actualPlayer].addStory(writeStories.getText().toString());
-                writeStories.setText("Schreibe in dieses Feld deine n\u00e4chste Story rein.");
+                writeStories.setText("");
                 storyNumber.setText("Story " + (listOfPlayers[actualPlayer].getCountOfStories() + 1) + ":");
 
                 Toast.makeText(CreatePlayers.this, "Story " + listOfPlayers[actualPlayer].getCountOfStories() + " gespeichert",
@@ -165,28 +165,25 @@ public class CreatePlayers extends AppCompatActivity {
         nextPerson.setOnClickListener(v -> {
             // Check inserting a new player
             if (listOfPlayers.length == maxPlayerNumber)
-                Toast.makeText(CreatePlayers.this, "Es k\u00f6nnen nicht weitere Spieler teilnehmen!",
+                Toast.makeText(CreatePlayers.this, "Es k\u00f6nnen keine weiteren Spieler teilnehmen!",
                         Toast.LENGTH_LONG).show();
             else if (listOfPlayers[actualPlayer].getCountOfStories() < minStoryNumber) {
                 Toast.makeText(CreatePlayers.this, "Spieler muss mindestens " + minStoryNumber + " Stories besitzen!",
                         Toast.LENGTH_LONG).show();
-                if (!alreadySadOne && !writeStories.getText().toString().equals("Schreibe in dieses Feld deine Story rein.") &&
-                        !writeStories.getText().toString().equals("Schreibe in dieses Feld deine n\u00e4chste Story rein.")) {
-                    Toast.makeText(this, "Die letzte Story wurde noch nicht gespeichert, einmaliger Hinweis!", Toast.LENGTH_SHORT).show();
-                    alreadySadOne = true;
-                }
+                if (!writeStories.getText().toString().equals(""))
+                    Toast.makeText(this, "Die letzte Story wurde noch nicht gespeichert!", Toast.LENGTH_SHORT).show();
             } else if (listOfPlayers.length > maxPlayerNumber) {
                 Toast.makeText(CreatePlayers.this, "Zu viele eingeloggte Spieler!",
                         Toast.LENGTH_LONG).show();
                 // Exception has to be added hereeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
-            } else if (!alreadySadOne && !writeStories.getText().toString().equals("Schreibe in dieses Feld deine Story rein.") &&
-                    !writeStories.getText().toString().equals("Schreibe in dieses Feld deine n\u00e4chste Story rein.")) {
+            } else if (!alreadySadOne && !writeStories.getText().toString().equals("")) {
                 Toast.makeText(this, "Die letzte Story wurde noch nicht gespeichert, einmaliger Hinweis!", Toast.LENGTH_SHORT).show();
                 alreadySadOne = true;
-            } else if (playerName.getText().toString().isEmpty()) {
-                Toast.makeText(CreatePlayers.this, "Spielername darf nicht leer sein", Toast.LENGTH_SHORT).show();
+            }
+            else if (playerName.getText().toString().isEmpty()) {
+                Toast.makeText(CreatePlayers.this, "Spielername darf nicht leer sein!", Toast.LENGTH_SHORT).show();
             } else if (playerName.getText().toString().length() < 2)
-                Toast.makeText(CreatePlayers.this, "Spielername muss aus mindestens 2 Zeichen bestehen", Toast.LENGTH_SHORT).show();
+                Toast.makeText(CreatePlayers.this, "Spielername muss aus mindestens 2 Zeichen bestehen!", Toast.LENGTH_SHORT).show();
             else {
 
                 // Set name of a player
@@ -205,9 +202,9 @@ public class CreatePlayers extends AppCompatActivity {
 
                 // Reset Text fields in new_game.xml
                 playerID.setText("Du bist Spieler " + (actualPlayer + 1) + ":");
-                playerName.setText("Dein Name");
+                playerName.setText("");
                 storyNumber.setText("Story 1:");
-                writeStories.setText("Schreibe in dieses Feld deine Story rein.");
+                writeStories.setText("");
             }
         });
 
@@ -221,15 +218,11 @@ public class CreatePlayers extends AppCompatActivity {
                 Toast.makeText(CreatePlayers.this, "Zu viele eingeloggte Spieler", Toast.LENGTH_SHORT).show();
             else if (listOfPlayers[listOfPlayers.length - 1].getCountOfStories() < minStoryNumber) {
                 Toast.makeText(CreatePlayers.this, "Spieler " + listOfPlayers.length + " besitzt zu wenig Storys!", Toast.LENGTH_SHORT).show();
-                if (!alreadySadOne && !writeStories.getText().toString().equals("Schreibe in dieses Feld deine Story rein.") &&
-                        !writeStories.getText().toString().equals("Schreibe in dieses Feld deine n\u00e4chste Story rein.")) {
-                    Toast.makeText(this, "Die letzte Story wurde noch nicht gespeichert, einmaliger Hinweis!", Toast.LENGTH_SHORT).show();
-                    alreadySadOne = true;
-                }
+                if (!writeStories.getText().toString().equals(""))
+                    Toast.makeText(this, "Die letzte Story wurde noch nicht gespeichert!", Toast.LENGTH_SHORT).show();
             } else if (maxStoryNumber < listOfPlayers[listOfPlayers.length - 1].getCountOfStories())
                 Toast.makeText(CreatePlayers.this, "Spieler " + listOfPlayers.length + " besitzt zu viele Storys!", Toast.LENGTH_SHORT).show();
-            else if (!alreadySadOne && !writeStories.getText().toString().equals("Schreibe in dieses Feld deine Story rein.") &&
-                    !writeStories.getText().toString().equals("Schreibe in dieses Feld deine n\u00e4chste Story rein.")) {
+            else if (!alreadySadOne && !writeStories.getText().toString().equals("")) {
                 Toast.makeText(this, "Die letzte Story wurde noch nicht gespeichert, einmaliger Hinweis!", Toast.LENGTH_SHORT).show();
                 alreadySadOne = true;
             } else if (playerName.getText().toString().isEmpty())     // Check last player's name
@@ -316,6 +309,7 @@ public class CreatePlayers extends AppCompatActivity {
                 // Start new activity
                 rules = new Intent(CreatePlayers.this, Rules.class);
                 rules.putExtra("GameId", actualGameId);
+                rules.putExtra("GameIsLoaded", false);
                 startActivity(rules);
                 finish();
             }
@@ -336,7 +330,7 @@ public class CreatePlayers extends AppCompatActivity {
 
             // Definitions and initializations
             LayoutInflater inflater = activity.getLayoutInflater();
-            @SuppressLint("ViewHolder") View rowView = inflater.inflate(R.layout.view_your_stories_list_item, null, true);
+            @SuppressLint("ViewHolder") View rowView= inflater.inflate(R.layout.view_your_stories_list_item, null, true);
             EditText storyText = rowView.findViewById(R.id.storyText);
             ImageButton deleteStory = rowView.findViewById(R.id.deleteStory);
 
@@ -374,14 +368,18 @@ public class CreatePlayers extends AppCompatActivity {
                 }
             });
 
-            if (position == 1) {
+            if (position == 1)
+            {
                 listView.setItemsCanFocus(true);
 
                 // Use afterDescendants, because I don't want the ListView to steal focus
                 listView.setDescendantFocusability(ViewGroup.FOCUS_AFTER_DESCENDANTS);
                 storyText.requestFocus();
-            } else {
-                if (!listView.isFocused()) {
+            }
+            else
+            {
+                if (!listView.isFocused())
+                {
                     listView.setItemsCanFocus(false);
 
                     // Use beforeDescendants so that the EditText doesn't re-take focus
@@ -412,12 +410,12 @@ public class CreatePlayers extends AppCompatActivity {
         }
     }
 
-    public void showKeyboard() {
+    public void showKeyboard(){
         InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         inputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
     }
 
-    public void closeKeyboard() {
+    public void closeKeyboard(){
         InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         inputMethodManager.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
     }
