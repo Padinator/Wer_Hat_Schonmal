@@ -1,5 +1,7 @@
 package com.example.ichhabschonmal;
 
+import com.example.ichhabschonmal.exceptions.GamerException;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,10 +36,10 @@ public class Gamer {        // Data entity is already named Player
         return listOfStories.size();
     }
 
-    public String getStory(int j) {
-        if (j >= 0 && j < listOfStories.size())
-            return listOfStories.get(j);
-        return "Keine Story gefunden, falscher Indexwert";//Exceptionnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
+    public String getStory(int j) throws GamerException {
+        if (j < 0 || j >= listOfStories.size())
+            throw new GamerException("No story found to read, invalid index: " + j);
+        return listOfStories.get(j);
     }
 
     public List<String> getAllStories() {
@@ -56,11 +58,10 @@ public class Gamer {        // Data entity is already named Player
         this.listOfStories = newListOfStories;          // Flat copy
     }
 
-    public void deleteStory(int j) {
-        if (j < listOfStories.size() && j >= 0)
-            listOfStories.remove(j);
-        else
-            return; //Keine Story gefunden, falscher Indexwert Exceptionnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
+    public void deleteStory(int j) throws GamerException {
+        if (j < 0 || j >= listOfStories.size())
+            throw new GamerException("No story found to delete, invalid index: " + j);
+        listOfStories.remove(j);
     }
 
     public static boolean isEmpty(Gamer[] listOfPlayers) {        // Returns true, if listOfPlayers is empty
