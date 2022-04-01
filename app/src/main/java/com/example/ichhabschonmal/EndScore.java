@@ -34,7 +34,7 @@ public class EndScore extends AppCompatActivity {
         // Definitions
         RecyclerView recyclerView;
         EndScoreAdapter endScoreAdapter;
-        Button exitGame;
+        Button exitGame, viewAllStories;
         AppDatabase db;
         List<Player> players;
         int[] playerIds;
@@ -42,6 +42,7 @@ public class EndScore extends AppCompatActivity {
 
         // Buttons
         exitGame = findViewById(R.id.exitGame);
+        viewAllStories = findViewById(R.id.viewAllStories);
 
         // Get from last intent
         gameId = getIntent().getExtras().getInt("GameId");
@@ -65,12 +66,14 @@ public class EndScore extends AppCompatActivity {
         recyclerView.setAdapter(endScoreAdapter);
 
         exitGame.setOnClickListener(view -> onBackPressed());
+        viewAllStories.setOnClickListener(view -> onViewAllStories());
 
         // calling the action bar
         ActionBar actionBar = getSupportActionBar();
 
         // showing the back button in action bar
         actionBar.setDisplayHomeAsUpEnabled(true);
+
     }
 
     @Override
@@ -106,5 +109,11 @@ public class EndScore extends AppCompatActivity {
                 });
 
         builder.create().show();
+    }
+
+    public void onViewAllStories() {
+        Intent endScoreViewAllStories = new Intent(EndScore.this, EndScoreViewAllStories.class);
+        endScoreViewAllStories.putExtra("GameId", gameId);
+        startActivity(endScoreViewAllStories);
     }
 }
