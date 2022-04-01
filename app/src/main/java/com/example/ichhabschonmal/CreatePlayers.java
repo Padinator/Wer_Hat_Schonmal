@@ -35,6 +35,7 @@ import com.example.ichhabschonmal.database.AppDatabase;
 import com.example.ichhabschonmal.database.Game;
 import com.example.ichhabschonmal.database.Player;
 import com.example.ichhabschonmal.database.Story;
+import com.example.ichhabschonmal.exceptions.GamerException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,7 +54,7 @@ public class CreatePlayers extends AppCompatActivity {
     private AppDatabase db;
     private ListView listView;
     private Button backButton, saveEditedStories;
-    private ArrayAdapter<String> adapter;
+    private ViewYourStoriesListAdapter adapter;
     private TextView storyNumber;
 
     @SuppressLint("SetTextI18n")
@@ -61,8 +62,6 @@ public class CreatePlayers extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.create_players);
-
-        setItemsCanFocus(true);////////////////////////////////////////////////////
 
         // Definitions
         Button saveAndNextStory, nextPerson, viewYourStories, next;
@@ -84,31 +83,16 @@ public class CreatePlayers extends AppCompatActivity {
         storyNumber = findViewById(R.id.storyNumber);
         charsLeft = findViewById(R.id.charsLeft);
 
-        // Exception handling
-        // Set minimum and maximum of story per player
-        if (getIntent().hasExtra("MinStoryNumber"))
-            minStoryNumber = getIntent().getExtras().getInt("MinStoryNumber");
-        else
-            minStoryNumber = 3;
-        if (getIntent().hasExtra("MaxStoryNumber"))
-            maxStoryNumber = getIntent().getExtras().getInt("MaxStoryNumber");
-        else
-            maxStoryNumber = 5;
+        // Set used variables
+        minStoryNumber = getIntent().getExtras().getInt("MinStoryNumber");
+        maxStoryNumber = getIntent().getExtras().getInt("MaxStoryNumber");
+        maxPlayerNumber = getIntent().getExtras().getInt("playerNumber");
+        //setItemsCanFocus(true);
 
-        // Set number of players
-        if (getIntent().hasExtra("playerNumber"))
-            maxPlayerNumber = getIntent().getExtras().getInt("playerNumber");
-        else
-            maxPlayerNumber = 5;
-
-        // Create database connection:
-        db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
-
-
-        // calling the action bar
+        // Calling the action bar
         ActionBar actionBar = getSupportActionBar();
 
-        // showing the back button in action bar
+        // Showing the back button in action bar
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         viewYourStories.setOnClickListener(new View.OnClickListener() {
@@ -172,11 +156,9 @@ public class CreatePlayers extends AppCompatActivity {
                         Toast.LENGTH_LONG).show();
                 if (!writeStories.getText().toString().equals(""))
                     Toast.makeText(this, "Die letzte Story wurde noch nicht gespeichert!", Toast.LENGTH_SHORT).show();
-            } else if (listOfPlayers.length > maxPlayerNumber) {
-                Toast.makeText(CreatePlayers.this, "Zu viele eingeloggte Spieler!",
-                        Toast.LENGTH_LONG).show();
-                // Exception has to be added hereeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
-            } else if (!alreadySadOne && !writeStories.getText().toString().equals("")) {
+            } else if (listOfPlayers.length > maxPlayerNumber)
+                Toast.makeText(CreatePlayers.this, "Zu viele eingeloggte Spieler!", Toast.LENGTH_LONG).show();
+            else if (!alreadySadOne && !writeStories.getText().toString().equals("")) {
                 Toast.makeText(this, "Die letzte Story wurde noch nicht gespeichert, einmaliger Hinweis!", Toast.LENGTH_SHORT).show();
                 alreadySadOne = true;
             }
@@ -210,7 +192,6 @@ public class CreatePlayers extends AppCompatActivity {
 
         next.setOnClickListener(view -> {
 
-            // Exception handling
             // Check, if all players meet all conditions
             if (listOfPlayers.length < maxPlayerNumber)
                 Toast.makeText(CreatePlayers.this, "Zu wenig eingeloggte Spieler", Toast.LENGTH_SHORT).show();
@@ -240,6 +221,9 @@ public class CreatePlayers extends AppCompatActivity {
 
                 Toast.makeText(CreatePlayers.this, "Spieler " + listOfPlayers[actualPlayer].getNumber() + " erfolgreich gespeichert",
                         Toast.LENGTH_LONG).show();
+
+                // Create database connection:
+                db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
 
                 // Create new game
                 Game newGame = new Game();
@@ -279,7 +263,12 @@ public class CreatePlayers extends AppCompatActivity {
                         // Create a player's story
                         Story newStory = new Story();
                         //listOfStories[i].storyId = listOfStories[i].storyId;        // Story id is set with autoincrement
-                        newStory.content = listOfPlayers[i].getStory(j);
+                        try {
+                            newStory.content = listOfPlayers[i].getStory(j);
+                        } catch (GamerException ge) {
+                            ge.printStackTrace();
+                            newStory.content = ge.toString();
+                        }
                         newStory.status = false;
                         newStory.guessedStatus = false;         // Set a "default value"
                         newStory.playerId = db.playerDao().getAll().get(db.playerDao().getAll().size() - 1).playerId;
@@ -318,6 +307,7 @@ public class CreatePlayers extends AppCompatActivity {
 
     public class ViewYourStoriesListAdapter extends ArrayAdapter<String> {
         private final Activity activity;
+        private final List<EditText> editTexts = new ArrayList<>();
 
         public ViewYourStoriesListAdapter(Activity activity) {
             super(activity, R.layout.view_your_stories_list_item, newListOfStories);
@@ -330,9 +320,11 @@ public class CreatePlayers extends AppCompatActivity {
 
             // Definitions and initializations
             LayoutInflater inflater = activity.getLayoutInflater();
-            @SuppressLint("ViewHolder") View rowView= inflater.inflate(R.layout.view_your_stories_list_item, null, true);
+            @SuppressLint({"ViewHolder", "InflateParams"}) View rowView= inflater.inflate(R.layout.view_your_stories_list_item, null, true);
             EditText storyText = rowView.findViewById(R.id.storyText);
             ImageButton deleteStory = rowView.findViewById(R.id.deleteStory);
+
+            editTexts.add(storyText);
 
             // Set story text in the listview-item
             storyText.setText(newListOfStories.get(position));
@@ -344,8 +336,7 @@ public class CreatePlayers extends AppCompatActivity {
                     if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
                         if (view.requestFocus()) {
                             InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                            imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
-                            //showKeyboard();
+                            imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
                         }
 
                         return true;
@@ -355,39 +346,6 @@ public class CreatePlayers extends AppCompatActivity {
                 }
             });
 
-            storyText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-                @Override
-                public void onFocusChange(View view, boolean b) {
-                    view.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            view.requestFocus();
-                            view.requestFocusFromTouch();
-                        }
-                    });
-                }
-            });
-
-            if (position == 1)
-            {
-                listView.setItemsCanFocus(true);
-
-                // Use afterDescendants, because I don't want the ListView to steal focus
-                listView.setDescendantFocusability(ViewGroup.FOCUS_AFTER_DESCENDANTS);
-                storyText.requestFocus();
-            }
-            else
-            {
-                if (!listView.isFocused())
-                {
-                    listView.setItemsCanFocus(false);
-
-                    // Use beforeDescendants so that the EditText doesn't re-take focus
-                    listView.setDescendantFocusability(ViewGroup.FOCUS_BEFORE_DESCENDANTS);
-                    listView.requestFocus();
-                }
-            }
-
             deleteStory.setOnClickListener(new View.OnClickListener() {     // Give delete button a function
                 @SuppressLint("SetTextI18n")
                 @Override
@@ -395,6 +353,7 @@ public class CreatePlayers extends AppCompatActivity {
 
                     // Delete story
                     newListOfStories.remove(position);
+                    editTexts.remove(position);
                     listView.invalidateViews();
                 }
             });
@@ -403,22 +362,6 @@ public class CreatePlayers extends AppCompatActivity {
         }
     }
 
-    public void setItemsCanFocus(boolean itemsCanFocus) {
-        mItemsCanFocus = itemsCanFocus;
-        if (!itemsCanFocus) {
-            listView.setDescendantFocusability(ViewGroup.FOCUS_BLOCK_DESCENDANTS);
-        }
-    }
-
-    public void showKeyboard(){
-        InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        inputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
-    }
-
-    public void closeKeyboard(){
-        InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        inputMethodManager.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
-    }
 
     public void openDialog(View v) {
 
@@ -432,22 +375,19 @@ public class CreatePlayers extends AppCompatActivity {
         builder = new AlertDialog.Builder(this);
         row = getLayoutInflater().inflate(R.layout.view_your_stories, null);
         listView = row.findViewById(R.id.myStories);
-        listView.setDescendantFocusability(ViewGroup.FOCUS_AFTER_DESCENDANTS);      // First step
-        listView.setItemsCanFocus(true);                                            // Second step
         adapter = new ViewYourStoriesListAdapter(CreatePlayers.this);
         listView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
         builder.setView(row);
         dialog = builder.create();
+        dialog.show();      // Statement have to be exactly here at thus line
 
-        dialog.getWindow().clearFlags(LayoutParams.FLAG_NOT_FOCUSABLE | LayoutParams.FLAG_ALT_FOCUSABLE_IM);
-        dialog.getWindow().setSoftInputMode(LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+        // First show dialog and then set the rest, then keyboard will be displayed
+        dialog.getWindow().clearFlags(LayoutParams.FLAG_NOT_FOCUSABLE | LayoutParams.FLAG_ALT_FOCUSABLE_IM);    // First step
+        dialog.getWindow().setSoftInputMode(LayoutParams.SOFT_INPUT_STATE_VISIBLE);     // Second step
 
-        dialog.show();
         saveEditedStories = row.findViewById(R.id.saveEditedStories);
         backButton = row.findViewById(R.id.backButton);
-
-        //showKeyboard();
 
         saveEditedStories.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -456,7 +396,7 @@ public class CreatePlayers extends AppCompatActivity {
 
                 // Get all stories
                 for (int i = 0; i < listView.getAdapter().getCount(); i++) {
-                    newListOfStories.add(String.valueOf(listView.getItemAtPosition(i)));
+                    newListOfStories.add(adapter.editTexts.get(i).getText().toString());
                 }
 
                 // Replace all stories
@@ -464,7 +404,7 @@ public class CreatePlayers extends AppCompatActivity {
 
                 // Actualize layout
                 storyNumber.setText("Story " + (listOfPlayers[actualPlayer].getCountOfStories() + 1) + ":");
-                listView.invalidateViews();
+                //listView.invalidateViews();
 
                 Toast.makeText(CreatePlayers.this, "Stories wurden erfolgreich \u00fcberarbeitet", Toast.LENGTH_SHORT).show();
             }
@@ -482,37 +422,6 @@ public class CreatePlayers extends AppCompatActivity {
                 }
             }
         });
-
-        /*
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
-                builder.setTitle("Wollen Sie diese Story l\u00f6schen?")
-                        .setMessage(listView.getItemAtPosition(i).toString())
-                        .setPositiveButton("L\u00f6schen", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-
-                                // Delete story
-                                listOfPlayers[actualPlayer].deleteStory(i);
-
-                                // Actualize layout
-                                storyNumber.setText("Story " + (listOfPlayers[actualPlayer].getCountOfStories() + 1) + ":");
-                                listView.invalidateViews();
-                            }
-                        })
-                        .setNegativeButton("Abbrechen", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-
-                            }
-                        });
-                builder.create().show();
-            }
-        });
-         */
     }
 
 
