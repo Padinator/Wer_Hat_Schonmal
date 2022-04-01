@@ -5,6 +5,8 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
+
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -12,6 +14,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.room.Room;
 
@@ -19,6 +22,7 @@ import com.example.ichhabschonmal.database.AppDatabase;
 import com.example.ichhabschonmal.database.Game;
 import com.example.ichhabschonmal.database.Player;
 import com.example.ichhabschonmal.database.Story;
+import com.example.ichhabschonmal.exceptions.GamerException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,7 +57,6 @@ public class PlayGame extends AppCompatActivity {
         ArrayAdapter<String> adapter;
         ArrayList<String> drinks = new ArrayList<>();
         boolean gameIsLoaded;
-        int checkStoryIds;
 
         // Buttons
         solution = findViewById(R.id.solution);
@@ -83,9 +86,6 @@ public class PlayGame extends AppCompatActivity {
         // Find the players' ids belonging to the actual game and their stories
         playerIds = findSomethingOfActualGame(idOfFirstPlayer, countOfPlayers);
         storyIds = findSomethingOfActualGame(idOfFirstStory, countOfStories);
-
-        // Set used variables
-        checkStoryIds = storyIds.length;
 
         // Get players playing the actual game
         listOfPlayers = db.playerDao().loadAllByPlayerIds(playerIds);
@@ -161,9 +161,8 @@ public class PlayGame extends AppCompatActivity {
                     allPlayersGuessed = false;
                 }
 
-                // Korrekturbedarfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
                 if (chooseAPlayer.getSelectedItem().toString().equals(correctInput)) {       // chosenPlayer has guessed correctly
-                    for (; i < listOfPlayers.size(); i++) {     // Wenn kein Spieler gefunden wird -> Exception
+                    for (; i < listOfPlayers.size(); i++) {
                         if (listOfPlayers.get(i).playerNumber == otherPlayer.getNumber()) {
 
                             // Update a player in the database
@@ -183,7 +182,7 @@ public class PlayGame extends AppCompatActivity {
                     //winner = "Spieler " + chosenPlayer.getNumber() + ", " + chosenPlayer.getName() + " hat diese Runde gewonnen";
                     loser = "Spieler " + otherPlayer.getNumber() + ", " + otherPlayer.getName() + " hat diese Runde verloren und muss " + actualDrinkOfTheGame + " trinken!";
                 } else {        // chosenPlayer has not guessed correctly
-                    for (; i < listOfPlayers.size(); i++) {     // Wenn kein Spieler gefunden wird -> Exception
+                    for (; i < listOfPlayers.size(); i++) {
                         if (listOfPlayers.get(i).playerNumber == chosenPlayer.getNumber()) {
 
                             // Update a player in the database
@@ -204,8 +203,16 @@ public class PlayGame extends AppCompatActivity {
                     loser = "Spieler " + chosenPlayer.getNumber() + ", " + chosenPlayer.getName() + " hat diese Runde verloren und muss " + actualDrinkOfTheGame + " trinken!";
                 }
 
+                // Update a game
+                updateAGame(++roundNumber, actualGame.actualDrinkOfTheGame);
+
                 // Delete story in the List "players"
-                players[otherPlayer.getNumber() - 1].deleteStory(actualStoryNumber - 1);
+                try {
+                    players[otherPlayer.getNumber() - 1].deleteStory(actualStoryNumber - 1);
+                } catch (GamerException ge) {
+                    ge.printStackTrace();
+                    // There is no story to delete
+                }
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
                 builder.setTitle("ERGEBNIS")
@@ -231,9 +238,6 @@ public class PlayGame extends AppCompatActivity {
 
                 if (checkRound()) {         // Show score and then play next round
 
-                    // Update a game
-                    updateAGame(++roundNumber, actualGame.actualDrinkOfTheGame);
-
                     // Start Score-intent
                     next.putExtra("GameId", gameId);
                     startActivity(next);
@@ -251,9 +255,25 @@ public class PlayGame extends AppCompatActivity {
             } else
                 Toast.makeText(PlayGame.this, "Du musst zuerst auflösen!", Toast.LENGTH_SHORT).show();
         });
+        // calling the action bar
+        ActionBar actionBar = getSupportActionBar();
+
+        // showing the back button in action bar
+        actionBar.setDisplayHomeAsUpEnabled(true);
+
     }
 
-    public static int[] findSomethingOfActualGame(int idOfFirstSomething, int countOfSomething) {     // Something can be "Player" or "Story"
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    public static int[] findSomethingOfActualGame(int idOfFirstSomething, int countOfSomething) {     // Something can be a "Player" or a "Story"
         int[] idsOfSomething = new int[countOfSomething];
 
         for (int i = 0; i < countOfSomething; i++) {
@@ -430,14 +450,19 @@ public class PlayGame extends AppCompatActivity {
         } while (storyNumber <= 0 || storyNumber > countOfStories || listOfStories.get(actualStoryNumber + storyNumber - 1).status);
 
         // Save story in variable story
-        story = players[otherPlayer.getNumber() - 1].getStory(storyNumber - 1);
+        try {
+            story = players[otherPlayer.getNumber() - 1].getStory(storyNumber - 1);
+        } catch (GamerException ge) {
+            ge.printStackTrace();
+            story = ge.toString();
+        }
 
         // Set used variable
         actualStoryNumber += storyNumber - 1;       // Has now the value of the actual story in the List "players[otherPlayer.getNumber() - 1]"
 
         if (actualStoryNumber >= 0 && actualStoryNumber < listOfStories.size()) {
             actualStoryNumberInList = actualStoryNumber;
-        } else        // Exception handling, value of actualStoryNumber is false
+        } else
             Toast.makeText(this, "Fehler, Story konnte nicht auf benutzt gesetzt werden!", Toast.LENGTH_SHORT).show();
 
         this.actualStoryNumber = storyNumber;

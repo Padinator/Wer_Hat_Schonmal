@@ -53,21 +53,6 @@ public class EndScoreAdapter extends RecyclerView.Adapter<EndScoreAdapter.ViewHo
 
         holder.player.setText(mPlayers.get(pos).name + "");
         holder.points.setText(mPlayers.get(pos).score + "");
-        // holder.countOfDrinks.setText((mPlayers.get(pos).score + ""));
-
-        /*
-        switch (actualGame.actualDrinkOfTheGame) {
-            case "Bier":
-                holder.beer.setImageResource(R.drawable.beericon);
-                break;
-            case "Vodka Shots":
-                holder.beer.setImageResource(R.drawable.vodkashot);
-                break;
-            case "Tequila":
-                holder.beer.setImageResource(R.drawable.tequila);
-                break;
-        }
-         */
 
         // Save a player scores
         int[] playerScores = new int[3]; // Change manually
@@ -102,7 +87,7 @@ public class EndScoreAdapter extends RecyclerView.Adapter<EndScoreAdapter.ViewHo
     private int convertDrink(String actualDrinkOfTheGame) {
         int drinkNumber = 0;
 
-        switch (actualDrinkOfTheGame) { // Exception handling bei default
+        switch (actualDrinkOfTheGame) {
             case "Bier":
                 drinkNumber = 0;
                 break;
@@ -112,9 +97,6 @@ public class EndScoreAdapter extends RecyclerView.Adapter<EndScoreAdapter.ViewHo
             case "Tequila":
                 drinkNumber = 2;
                 break;
-            default:
-                drinkNumber = 0;
-                break;
         }
 
         return drinkNumber;
@@ -122,7 +104,7 @@ public class EndScoreAdapter extends RecyclerView.Adapter<EndScoreAdapter.ViewHo
 
     private void setDrink(EndScoreAdapter.ViewHolder holder, int counterPos, int drinkNumber, int playerScore) {
         holder.countOfDrinks[counterPos].setText((playerScore + ""));
-        switch (drinkNumber) { // Exception handling bei default
+        switch (drinkNumber) {
             case 0:
                 holder.images[counterPos].setImageResource(R.drawable.beericon);
                 break;
@@ -131,9 +113,6 @@ public class EndScoreAdapter extends RecyclerView.Adapter<EndScoreAdapter.ViewHo
                 break;
             case 2:
                 holder.images[counterPos].setImageResource(R.drawable.tequila);
-                break;
-            default:
-                holder.images[counterPos].setImageResource(R.drawable.beericon);
                 break;
         }
     }
