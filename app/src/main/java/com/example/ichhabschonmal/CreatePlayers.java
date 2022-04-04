@@ -265,9 +265,10 @@ public class CreatePlayers extends AppCompatActivity {
                         //listOfStories[i].storyId = listOfStories[i].storyId;        // Story id is set with autoincrement
                         try {
                             newStory.content = listOfPlayers[i].getStory(j);
-                        } catch (GamerException ge) {
-                            ge.printStackTrace();
-                            newStory.content = ge.toString();
+                        } catch (GamerException ex) {
+                            ex.printStackTrace();
+                            Log.e("SaveInDatabaseFailed", ex.getStackTrace() + ", Message: " + ex.getMessage());
+                            newStory.content = ex.toString();
                         }
                         newStory.status = false;
                         newStory.guessedStatus = false;         // Set a "default value"
