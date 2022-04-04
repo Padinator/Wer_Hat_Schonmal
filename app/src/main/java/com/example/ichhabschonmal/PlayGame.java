@@ -16,7 +16,6 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDelegate;
 import androidx.room.Room;
 
 import com.example.ichhabschonmal.database.AppDatabase;
@@ -50,9 +49,6 @@ public class PlayGame extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.play_game);
-
-        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-
 
         // Preconditions before playing, until method "playGame()" is called
         // Definitions
