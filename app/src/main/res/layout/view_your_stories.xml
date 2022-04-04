@@ -1,39 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="16dp">
 
-
-    <ListView
-        android:id="@+id/myStories"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="250dp" />
-
-    <TextView
-        android:id="@+id/middleOne"
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_marginLeft="40dp"
-        android:layout_marginRight="5dp"
-        android:visibility="invisible" />
+        android:verticalScrollbarPosition="right"
+        android:fadeScrollbars="false">
 
-    <Button
-        android:id="@+id/saveEditedStories"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/myStories"
-        android:layout_toRightOf="@+id/middleOne"
-        android:text="Bestätigen" />
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-    <Button
-        android:id="@+id/backButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/myStories"
-        android:layout_toLeftOf="@+id/middleOne"
-        android:text="Zurück" />
+                <ListView
+                    android:id="@+id/myStories"
+                    android:layout_width="match_parent"
+                    android:layout_height="250dp"/>
 
+                <TextView
+                    android:id="@+id/middleOne"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:visibility="invisible"
+                    android:layout_marginLeft="40dp"
+                    android:layout_marginRight="5dp"/>
+
+                <Button
+                    android:id="@+id/saveEditedStories"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Bestätigen"
+                    android:layout_below="@+id/myStories"
+                    android:layout_toRightOf="@+id/middleOne"/>
+
+                <Button
+                    android:id="@+id/backButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/myStories"
+                    android:layout_toLeftOf="@+id/middleOne"
+                    android:text="Zurück"/>
+
+        </RelativeLayout>
+
+    </ScrollView>
 
 </RelativeLayout>
