@@ -50,7 +50,6 @@ public class CreatePlayers extends AppCompatActivity {
     private boolean alreadySadTwo = false;          // Check, if a player has saved changes of all stories
 
     private List<String> newListOfStories = new ArrayList<>();          // Is used for deleting/replacing stories in viewYourStories
-    private boolean mItemsCanFocus;
 
     private AppDatabase db;
     private ListView listView;
