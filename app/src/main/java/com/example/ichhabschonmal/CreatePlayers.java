@@ -29,7 +29,6 @@ import android.widget.Toast;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDelegate;
 import androidx.room.Room;
 
 import com.example.ichhabschonmal.database.AppDatabase;
@@ -63,9 +62,6 @@ public class CreatePlayers extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.create_players);
-
-        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-
 
         // Definitions
         Button saveAndNextStory, nextPerson, viewYourStories, next;

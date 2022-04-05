@@ -2,7 +2,6 @@ package com.example.ichhabschonmal;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDelegate;
 import androidx.room.Room;
 
 import android.app.AlertDialog;
@@ -30,8 +29,6 @@ public class NewGame extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.new_game);
-        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-
 
         // Definitions
         EditText gameName, playerCount, storyMinCount, storyMaxCount;
