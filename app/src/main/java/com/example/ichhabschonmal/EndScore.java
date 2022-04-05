@@ -9,6 +9,7 @@ import android.widget.ImageView;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
@@ -22,7 +23,6 @@ import java.util.List;
 
 public class EndScore extends AppCompatActivity {
 
-    private ImageView img;
     private int gameId;
 
     @Override
@@ -30,6 +30,8 @@ public class EndScore extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.end_score);
 
+        // Set dark mode to none
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
 
         // Definitions
         RecyclerView recyclerView;
