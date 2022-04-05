@@ -30,8 +30,8 @@ public class EndScoreViewAllStories extends AppCompatActivity {
         RecyclerView recyclerView;
         EndScoreViewAllStoriesAdapter endScoreViewAllStoriesAdapter;
         AppDatabase db;
-        List<Player> players;
-        List<Story> stories;
+        List<Player> listOfPlayers;
+        List<Story> listOfStories;
         int[] playerIds, storyIds;
         int idOfFirstPlayer, countOfPlayers, idOfFirstStory, countOfStories;
 
@@ -50,18 +50,18 @@ public class EndScoreViewAllStories extends AppCompatActivity {
         playerIds = PlayGame.findSomethingOfActualGame(idOfFirstPlayer, countOfPlayers);
         storyIds = PlayGame.findSomethingOfActualGame(idOfFirstStory, countOfStories);
 
-        players = db.playerDao().loadAllByPlayerIds(playerIds);
-        stories = db.storyDao().loadAllByStoryIds(storyIds);
+        // playerIds = new int[] {playerIds[0]};
+        // storyIds = new int[] {storyIds[0]};
+
+        listOfPlayers = db.playerDao().loadAllByPlayerIds(playerIds);
+        listOfStories = db.storyDao().loadAllByStoryIds(storyIds);
 
         // recyclerView
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         // endScoreViewAllStoriesAdapter
-        endScoreViewAllStoriesAdapter = new EndScoreViewAllStoriesAdapter(EndScoreViewAllStories.this, players, stories);
+        endScoreViewAllStoriesAdapter = new EndScoreViewAllStoriesAdapter(EndScoreViewAllStories.this, listOfPlayers, listOfStories, EndScoreViewAllStories.this);
         recyclerView.setAdapter(endScoreViewAllStoriesAdapter);
-        // EndScoreViewAllStories.this.activi
-
-
     }
 }

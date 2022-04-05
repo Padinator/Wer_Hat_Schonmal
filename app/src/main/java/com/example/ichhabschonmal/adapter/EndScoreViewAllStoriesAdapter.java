@@ -4,6 +4,7 @@ package com.example.ichhabschonmal.adapter;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -24,6 +25,7 @@ import com.example.ichhabschonmal.database.Player;
 import com.example.ichhabschonmal.database.Story;
 
 import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.List;
 
 public class EndScoreViewAllStoriesAdapter extends  RecyclerView.Adapter<EndScoreViewAllStoriesAdapter.ViewHolder> {
@@ -31,13 +33,16 @@ public class EndScoreViewAllStoriesAdapter extends  RecyclerView.Adapter<EndScor
     private LayoutInflater mInflater;
     private List<Player> mPlayers;
     private List<Story> mStories;
-    private ArrayAdapter<String> adapter;
+    private Activity mActivity;
+    // private EndScoreViewAllStoriesAdapterListAdapter adapter;
 
-    public EndScoreViewAllStoriesAdapter(Context context, List<Player> players, List<Story> stories) {
+    private int storyCounter = 0;
+
+    public EndScoreViewAllStoriesAdapter(Context context, List<Player> players, List<Story> stories, Activity activity ) {
         mInflater = LayoutInflater.from(context);
         mPlayers = players;
         mStories = stories;
-
+        mActivity = activity;
     }
 
     @Override
@@ -49,23 +54,51 @@ public class EndScoreViewAllStoriesAdapter extends  RecyclerView.Adapter<EndScor
     @Override
     public void onBindViewHolder(EndScoreViewAllStoriesAdapter.ViewHolder holder, int pos) {
         holder.playerName.setText("Spieler: " + mPlayers.get(pos).name + "");
-        adapter = new EndScoreViewAllStoriesAdapterListAdapter(EndScoreViewAllStories.this);
-        holder.endScoreListView.setAdapter(adapter);
-        // holder.playerStory.setText(mStories.get(pos).content + "");
-        // holder.guessedPerson.setText("Wurde geraten von: " + mStories.get(pos).guessingPerson + "");
-        if (mStories.get(pos).guessedStatus) {
-           // holder.guessedPerson.setTextColor(ContextCompat.getColor(mInflater.getContext(), R.color.lightGreen));
-        } else {
-           // holder.guessedPerson.setTextColor(ContextCompat.getColor(mInflater.getContext(), android.R.color.holo_red_light));
+        List<Story> actualStories = getActualStories(mPlayers.get(pos).playerId);
+        for (Story story: actualStories) {
+            Log.e("Actual Stories",  pos + ", " +story.storyId + ", " + story.playerId + ", " + story.content + ", " + actualStories.size());
         }
+        String storyText = "";
+        for (int i=0; i<actualStories.size(); i++) {
+            if (i < actualStories.size() - 1) {
+                if (actualStories.get(i).guessedStatus) {
+                    storyText += actualStories.get(i).content + "\n" + "Wurde richtig geraten von: " + actualStories.get(i).guessingPerson + "\n\n";
+                } else {
+                    storyText += actualStories.get(i).content + "\n" + "Wurde falsch geraten von: " + actualStories.get(i).guessingPerson + "\n\n";
+                }
+            } else {
+                if (actualStories.get(i).guessedStatus) {
+                    storyText += actualStories.get(i).content + "\n" + "Wurde richtig geraten von: " + actualStories.get(i).guessingPerson;
+                } else {
+                    storyText += actualStories.get(i).content + "\n" + "Wurde falsch geraten von: " + actualStories.get(i).guessingPerson;
+                }
+            }
+        }
+        holder.stories.setText(storyText);
+        // adapter = new EndScoreViewAllStoriesAdapterListAdapter(mActivity, actualStories);
+        // holder.endScoreListView.setAdapter(adapter);
     }
 
-    public class EndScoreViewAllStoriesAdapterListAdapter extends ArrayAdapter<String> {
-        private final Activity activity;
+    private List<Story> getActualStories(int playerId) {
+        List<Story> actualStories = new ArrayList<>();
 
-        public EndScoreViewAllStoriesAdapterListAdapter(Activity activity) {
-            super(activity, R.layout.view_your_stories_list_item);
+        for (; storyCounter < mStories.size() && mStories.get(storyCounter).playerId == playerId; storyCounter++) {
+            actualStories.add(mStories.get(storyCounter));
+        }
+
+        return actualStories;
+    }
+
+    /*
+    public class EndScoreViewAllStoriesAdapterListAdapter extends ArrayAdapter<Story> {
+        private final Activity activity;
+        private final List<Story> actualStories;
+        private int counter = 0;
+
+        public EndScoreViewAllStoriesAdapterListAdapter(Activity activity, List<Story> actualStories) {
+            super(activity, R.layout.view_your_stories_list_item, actualStories); // giving actualStories possible because of "extends ArrayAdapter<Story>"
             this.activity = activity;
+            this.actualStories = actualStories;
         }
 
         @SuppressLint("ClickableViewAccessibility")
@@ -74,27 +107,30 @@ public class EndScoreViewAllStoriesAdapter extends  RecyclerView.Adapter<EndScor
 
             // Definitions and initializations
             LayoutInflater inflater = activity.getLayoutInflater();
-            @SuppressLint("ViewHolder") View rowView= inflater.inflate(R.layout.view_your_stories_list_item, null, true);
+            @SuppressLint("ViewHolder") View rowView= inflater.inflate(R.layout.end_score_view_all_stories_list_item, null, true);
+            Log.e("ViewAllStories", position + ", " + actualStories.get(position).storyId + ", " + actualStories.get(position).playerId + ", " + actualStories.get(position).content + ", " + actualStories.size());
+            // list item setzen
+            TextView storyNumber, storyContent, guessedStory, guessingPerson;
+            storyNumber = rowView.findViewById(R.id.storyNumber);
+            storyContent = rowView.findViewById(R.id.storyContent);
+            // guessedStory = rowView.findViewById(R.id.guessedStory);
+            guessingPerson = rowView.findViewById(R.id.guessingPerson);
 
+            // storyNumber.setText("Story " + (position+1) + ":");
+            storyNumber.setText("Story " + (++counter) + ":");
+            storyContent.setText(actualStories.get(position).content);
+            // guessedStory.setText("Wurde geraten von:"); // already defined in xml, text is always the same
+            guessingPerson.setText(actualStories.get(position).guessingPerson);
+
+            if (mStories.get(position).guessedStatus) {
+                guessingPerson.setTextColor(ContextCompat.getColor(mInflater.getContext(), R.color.lightGreen));
+            } else {
+                guessingPerson.setTextColor(ContextCompat.getColor(mInflater.getContext(), android.R.color.holo_red_light));
+            }
             return rowView;
         }
     }
-
-    /*
-     ArrayAdapter adapter = new ArrayAdapter(mInflater.getContext(), android.R.layout.simple_list_item_2, android.R.id.text1, mPlayers) {
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            View view = super.getView(position, convertView, parent);
-            TextView text1 = (TextView) view.findViewById(android.R.id.text1);
-            TextView text2 = (TextView) view.findViewById(android.R.id.text2);
-
-            text1.setText(mStories.get(position).content);
-            text2.setText(mStories.get(position).guessingPerson);
-            return view;
-        }
-    };
      */
-
 
     @Override
     public int getItemCount() {
@@ -103,14 +139,16 @@ public class EndScoreViewAllStoriesAdapter extends  RecyclerView.Adapter<EndScor
 
     // stores and recycles views as they are scrolled off screen
     public class ViewHolder extends RecyclerView.ViewHolder {
-        TextView playerName; // playerStory, guessedPerson;
-        ListView endScoreListView;
+        TextView playerName, stories; // playerStory, guessedPerson;
+        // ListView endScoreListView;
+
 
 
         ViewHolder(View itemView) {
             super(itemView);
             playerName = itemView.findViewById(R.id.endScorePlayerName);
-            endScoreListView = itemView.findViewById(R.id.endScoreListView);
+            stories = itemView.findViewById(R.id.endScoreStories);
+            // endScoreListView = itemView.findViewById(R.id.endScoreListView);
             // playerStory = itemView.findViewById(R.id.endScoreStory);
             // guessedPerson = itemView.findViewById(R.id.endScoreGuessed);
         }
