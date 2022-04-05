@@ -35,8 +35,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/scoreboard"
                 tools:layout_editor_absoluteX="1dp"
-                tools:layout_editor_absoluteY="1dp"
-                />
+                tools:layout_editor_absoluteY="1dp" />
 
             <Button
                 android:id="@+id/confirm"
