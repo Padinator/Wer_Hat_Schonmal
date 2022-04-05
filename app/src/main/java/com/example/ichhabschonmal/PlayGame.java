@@ -102,13 +102,13 @@ public class PlayGame extends AppCompatActivity {
         // Case if a game is loaded, only use unused stories
         storyIds = findUnusedStories();
 
-        if (gameIsLoaded)       // If game is loaded, aks to change drinks
-            requestToChangeDrink();
-
-        // Set used variable
-        setDrinkOfTheGame(actualGame.actualDrinkOfTheGame);
-
         if (storyIds.length > 0) {      // Continue/start playing game
+            if (gameIsLoaded)       // If game is loaded, aks to change drinks
+                requestToChangeDrink();
+
+            // Set used variable
+            setDrinkOfTheGame(actualGame.actualDrinkOfTheGame);
+
             listOfStories = db.storyDao().loadAllByStoryIds(storyIds);
             countOfStories = storyIds.length;
             idOfFirstStory = storyIds[0];
