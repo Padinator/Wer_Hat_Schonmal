@@ -16,12 +16,14 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.room.Room;
 
 import com.example.ichhabschonmal.database.AppDatabase;
 import com.example.ichhabschonmal.database.Game;
 import com.example.ichhabschonmal.database.Player;
 import com.example.ichhabschonmal.database.Story;
+import com.example.ichhabschonmal.exceptions.FalseValuesException;
 import com.example.ichhabschonmal.exceptions.GamerException;
 
 import java.util.ArrayList;
@@ -49,6 +51,9 @@ public class PlayGame extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.play_game);
+
+        // Set dark mode to none
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
 
         // Preconditions before playing, until method "playGame()" is called
         // Definitions
@@ -209,8 +214,9 @@ public class PlayGame extends AppCompatActivity {
                 // Delete story in the List "players"
                 try {
                     players[otherPlayer.getNumber() - 1].deleteStory(actualStoryNumber - 1);
-                } catch (GamerException ge) {
-                    ge.printStackTrace();
+                } catch (GamerException ex) {
+                    ex.printStackTrace();
+                    Log.e("DeleteStoryFailed", ex.getStackTrace() + ", Message: " + ex.getMessage());
                     // There is no story to delete
                 }
 
@@ -273,15 +279,29 @@ public class PlayGame extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @SuppressLint("LongLogTag")
     public static int[] findSomethingOfActualGame(int idOfFirstSomething, int countOfSomething) {     // Something can be a "Player" or a "Story"
-        int[] idsOfSomething = new int[countOfSomething];
+        try {
+            if (idOfFirstSomething > 0 && countOfSomething > 0) {
+                int[] idsOfSomething = new int[countOfSomething];
 
-        for (int i = 0; i < countOfSomething; i++) {
-            idsOfSomething[i] = idOfFirstSomething;
-            idOfFirstSomething++;
+                for (int i = 0; i < countOfSomething; i++) {
+                    idsOfSomething[i] = idOfFirstSomething;
+                    idOfFirstSomething++;
+                }
+
+                return idsOfSomething;
+            } else if (idOfFirstSomething <= 0 && countOfSomething <= 0)
+                throw new FalseValuesException("id and count of something are less or equal than zero");
+            else if (idOfFirstSomething <= 0)
+                throw new FalseValuesException("id of something is less or equal than zero");
+            else        // if (countOfSomething <= 0)
+                throw new FalseValuesException("count of something is less or equal than zero");
+        } catch (FalseValuesException ex) {
+            ex.printStackTrace();
+            Log.e("FindSomethingOfActualGame", ex.getStackTrace() + ", Message: " + ex.getMessage());
+            return new int[] {1, 2, 3, 4, 5};
         }
-      
-        return idsOfSomething;
     }
 
     private int[] findUnusedStories() {
@@ -452,9 +472,10 @@ public class PlayGame extends AppCompatActivity {
         // Save story in variable story
         try {
             story = players[otherPlayer.getNumber() - 1].getStory(storyNumber - 1);
-        } catch (GamerException ge) {
-            ge.printStackTrace();
-            story = ge.toString();
+        } catch (GamerException ex) {
+            ex.printStackTrace();
+            Log.e("ChooseRandomStory", ex.getStackTrace() + ", Message: " + ex.getMessage());
+            story = ex.toString();
         }
 
         // Set used variable

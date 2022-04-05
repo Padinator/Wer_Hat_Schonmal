@@ -29,6 +29,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.room.Room;
 
 import com.example.ichhabschonmal.database.AppDatabase;
@@ -49,7 +50,6 @@ public class CreatePlayers extends AppCompatActivity {
     private boolean alreadySadTwo = false;          // Check, if a player has saved changes of all stories
 
     private List<String> newListOfStories = new ArrayList<>();          // Is used for deleting/replacing stories in viewYourStories
-    private boolean mItemsCanFocus;
 
     private AppDatabase db;
     private ListView listView;
@@ -62,6 +62,9 @@ public class CreatePlayers extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.create_players);
+
+        // Set dark mode to none
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
 
         // Definitions
         Button saveAndNextStory, nextPerson, viewYourStories, next;
@@ -265,9 +268,10 @@ public class CreatePlayers extends AppCompatActivity {
                         //listOfStories[i].storyId = listOfStories[i].storyId;        // Story id is set with autoincrement
                         try {
                             newStory.content = listOfPlayers[i].getStory(j);
-                        } catch (GamerException ge) {
-                            ge.printStackTrace();
-                            newStory.content = ge.toString();
+                        } catch (GamerException ex) {
+                            ex.printStackTrace();
+                            Log.e("SaveInDatabaseFailed", ex.getStackTrace() + ", Message: " + ex.getMessage());
+                            newStory.content = ex.toString();
                         }
                         newStory.status = false;
                         newStory.guessedStatus = false;         // Set a "default value"
