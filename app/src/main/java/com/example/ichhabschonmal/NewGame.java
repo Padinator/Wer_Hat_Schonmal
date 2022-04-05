@@ -86,6 +86,10 @@ public class NewGame extends AppCompatActivity {
                     Toast.makeText(NewGame.this, "Spielerzahlfeld darf nicht leer sein!", Toast.LENGTH_LONG).show();
             else if (playerNumber.contains("."))
                 Toast.makeText(NewGame.this, "Spielerzahl darf keinen Punkt enthalten!", Toast.LENGTH_LONG).show();
+            else if (storyMinNumber.isEmpty())
+                Toast.makeText(this, "Mindest-Storyzahl darf nicht leer sein!", Toast.LENGTH_SHORT).show();
+            else if (storyMaxNumber.isEmpty())
+                Toast.makeText(this, "Maxmiale Storyzahl darf nicht leer sein!", Toast.LENGTH_SHORT).show();
             else if (storyMinNumber.contains("."))
                 Toast.makeText(NewGame.this, "Mindest-Storyzahl darf keinen Punkt enthalten!", Toast.LENGTH_LONG).show();
             else if (storyMaxNumber.contains("."))

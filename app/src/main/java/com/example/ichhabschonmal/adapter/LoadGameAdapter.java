@@ -41,9 +41,8 @@ public class LoadGameAdapter extends RecyclerView.Adapter<LoadGameAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        int countOfGames = mDatabase.gameDao().getAll().size() -1;
-
-        holder.name.setText(mDatabase.gameDao().getAll().get(countOfGames-position).gameName);
+        int countOfGames = mDatabase.gameDao().getAll().size() - 1;
+        holder.name.setText(mDatabase.gameDao().getAll().get(countOfGames - position).gameName);
     }
 
     @Override

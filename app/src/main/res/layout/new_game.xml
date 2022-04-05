@@ -24,7 +24,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_toRightOf="@+id/game"
-            android:text="Dateiname"
+            android:hint="Dateiname"
             android:background="@drawable/textview_story_border"
             android:paddingHorizontal="10dp"/>
 
@@ -46,7 +46,7 @@
             android:layout_below="@+id/game"
             android:layout_toRightOf="@+id/playerCountOptions"
             android:layout_marginBottom="15dp"
-            android:text="3"
+            android:hint="3"
             android:background="@drawable/textview_story_border"
             android:paddingHorizontal="10dp"
             android:inputType="numberDecimal"/>
@@ -88,7 +88,7 @@
             android:layout_below="@+id/playModeOptionns"
             android:layout_toRightOf="@+id/storyMinCountOption"
             android:layout_marginBottom="15dp"
-            android:text="2"
+            android:hint="2"
             android:background="@drawable/textview_story_border"
             android:paddingHorizontal="10dp"
             android:inputType="numberDecimal"/>
@@ -111,7 +111,7 @@
             android:layout_below="@+id/storyMinCountOption"
             android:layout_toRightOf="@+id/storyMaxCountOption"
             android:layout_marginBottom="15dp"
-            android:text="4"
+            android:hint="4"
             android:background="@drawable/textview_story_border"
             android:paddingHorizontal="10dp"
             android:inputType="numberDecimal"/>
