@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TableRow>
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/storyNumber"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="10dp"
+                android:text="Story 1:"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/storyContent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ich hab schon mal ..."
+                android:layout_below="@id/storyNumber"
+                android:layout_marginTop="10dp"/>
+
+            <TextView
+                android:id="@+id/guessedStory"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/storyContent"
+                android:layout_marginTop="10dp"
+                android:text="Wurde geraten von:"/>
+
+            <TextView
+                android:id="@+id/guessingPerson"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/storyContent"
+                android:layout_toRightOf="@id/guessedStory"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
+                android:text="Dein Name"/>
+
+        </RelativeLayout>
+
+    </TableRow>
+
+</TableLayout>

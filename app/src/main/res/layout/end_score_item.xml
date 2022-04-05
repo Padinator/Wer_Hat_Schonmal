@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="360dp"
-    android:layout_height="wrap_content"
-    >
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
 
     <TextView
         android:id="@+id/playerName"
@@ -12,7 +11,7 @@
         android:layout_marginTop="20dp"
         android:background="@drawable/textview_story_border"
         android:gravity="center"
-        android:text="Spielername"></TextView>
+        android:text="Spielername"/>
 
     <TextView
         android:id="@+id/totalPoints"
@@ -23,8 +22,7 @@
         android:layout_marginLeft="20dp"
         android:background="@drawable/textview_story_border"
         android:gravity="center"
-        android:text="Gesamtpunktzahl">
-    </TextView>
+        android:text="Gesamtpunktzahl"/>
 
     <RelativeLayout
         android:id="@+id/drinkOne"
@@ -73,7 +71,7 @@
             android:id="@+id/countOfDrinksTwo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="22dp" />
+            android:textSize="22dp"/>
 
         <ImageView
             android:id="@+id/xTwo"
