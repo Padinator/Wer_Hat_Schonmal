@@ -24,6 +24,7 @@ public class LoadGameAdapter extends RecyclerView.Adapter<LoadGameAdapter.ViewHo
     private final LayoutInflater mInflater;
     private final AppDatabase mDatabase;
     private final Context mContext;
+    private int countOfGames;
 
 
     public LoadGameAdapter(Context context, AppDatabase database) {
@@ -41,7 +42,7 @@ public class LoadGameAdapter extends RecyclerView.Adapter<LoadGameAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        int countOfGames = mDatabase.gameDao().getAll().size() - 1;
+        countOfGames = mDatabase.gameDao().getAll().size() - 1;
         holder.name.setText(mDatabase.gameDao().getAll().get(countOfGames - position).gameName);
     }
 
@@ -63,7 +64,6 @@ public class LoadGameAdapter extends RecyclerView.Adapter<LoadGameAdapter.ViewHo
             delete = itemView.findViewById(R.id.delete);
 
             load.setOnClickListener(view -> {
-                int countOfGames = mDatabase.gameDao().getAll().size() - 1;
                 Game game = mDatabase.gameDao().getAll().get(countOfGames - getAbsoluteAdapterPosition());
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
