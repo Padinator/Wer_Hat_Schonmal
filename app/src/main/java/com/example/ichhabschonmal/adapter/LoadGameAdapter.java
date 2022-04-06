@@ -63,8 +63,8 @@ public class LoadGameAdapter extends RecyclerView.Adapter<LoadGameAdapter.ViewHo
             delete = itemView.findViewById(R.id.delete);
 
             load.setOnClickListener(view -> {
-
-                Game game = mDatabase.gameDao().getAll().get(getAbsoluteAdapterPosition());
+                int countOfGames = mDatabase.gameDao().getAll().size() - 1;
+                Game game = mDatabase.gameDao().getAll().get(countOfGames - getAbsoluteAdapterPosition());
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
                 builder.setTitle("Spiel laden")
