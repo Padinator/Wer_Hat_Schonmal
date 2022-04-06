@@ -34,7 +34,7 @@ public class EndScoreViewAllStoriesAdapter extends  RecyclerView.Adapter<EndScor
     private List<Player> mPlayers;
     private List<Story> mStories;
     private Activity mActivity;
-    // private EndScoreViewAllStoriesAdapterListAdapter adapter;
+    private EndScoreViewAllStoriesAdapterListAdapter adapter;
 
     private int storyCounter = 0;
 
@@ -58,25 +58,12 @@ public class EndScoreViewAllStoriesAdapter extends  RecyclerView.Adapter<EndScor
         for (Story story: actualStories) {
             Log.e("Actual Stories",  pos + ", " +story.storyId + ", " + story.playerId + ", " + story.content + ", " + actualStories.size());
         }
-        String storyText = "";
-        for (int i=0; i<actualStories.size(); i++) {
-            if (i < actualStories.size() - 1) {
-                if (actualStories.get(i).guessedStatus) {
-                    storyText += actualStories.get(i).content + "\n" + "Wurde richtig geraten von: " + actualStories.get(i).guessingPerson + "\n\n";
-                } else {
-                    storyText += actualStories.get(i).content + "\n" + "Wurde falsch geraten von: " + actualStories.get(i).guessingPerson + "\n\n";
-                }
-            } else {
-                if (actualStories.get(i).guessedStatus) {
-                    storyText += actualStories.get(i).content + "\n" + "Wurde richtig geraten von: " + actualStories.get(i).guessingPerson;
-                } else {
-                    storyText += actualStories.get(i).content + "\n" + "Wurde falsch geraten von: " + actualStories.get(i).guessingPerson;
-                }
-            }
-        }
-        holder.stories.setText(storyText);
-        // adapter = new EndScoreViewAllStoriesAdapterListAdapter(mActivity, actualStories);
-        // holder.endScoreListView.setAdapter(adapter);
+
+        adapter = new EndScoreViewAllStoriesAdapterListAdapter(mActivity, actualStories);
+
+        holder.endScoreListView.getLayoutParams().height = actualStories.size() * 250 + 50;
+        holder.endScoreListView.setLayoutParams(holder.endScoreListView.getLayoutParams());
+        holder.endScoreListView.setAdapter(adapter);
     }
 
     private List<Story> getActualStories(int playerId) {
@@ -89,35 +76,38 @@ public class EndScoreViewAllStoriesAdapter extends  RecyclerView.Adapter<EndScor
         return actualStories;
     }
 
-    /*
+
     public class EndScoreViewAllStoriesAdapterListAdapter extends ArrayAdapter<Story> {
         private final Activity activity;
         private final List<Story> actualStories;
-        private int counter = 0;
 
         public EndScoreViewAllStoriesAdapterListAdapter(Activity activity, List<Story> actualStories) {
-            super(activity, R.layout.view_your_stories_list_item, actualStories); // giving actualStories possible because of "extends ArrayAdapter<Story>"
+            super(activity, R.layout.view_your_stories_list_item, actualStories); // Giving actualStories is possible because of "extends ArrayAdapter<Story>"
             this.activity = activity;
             this.actualStories = actualStories;
         }
 
-        @SuppressLint("ClickableViewAccessibility")
+        @SuppressLint({"ClickableViewAccessibility", "SetTextI18n"})
         @Override
         public View getView(int position, View view, ViewGroup parent) {
 
             // Definitions and initializations
             LayoutInflater inflater = activity.getLayoutInflater();
-            @SuppressLint("ViewHolder") View rowView= inflater.inflate(R.layout.end_score_view_all_stories_list_item, null, true);
+            @SuppressLint({"ViewHolder", "InflateParams"}) View rowView= inflater.inflate(R.layout.end_score_view_all_stories_list_item, null, true);
             Log.e("ViewAllStories", position + ", " + actualStories.get(position).storyId + ", " + actualStories.get(position).playerId + ", " + actualStories.get(position).content + ", " + actualStories.size());
-            // list item setzen
+
+            // Definitions
             TextView storyNumber, storyContent, guessedStory, guessingPerson;
+
+            // Initializations
             storyNumber = rowView.findViewById(R.id.storyNumber);
             storyContent = rowView.findViewById(R.id.storyContent);
             // guessedStory = rowView.findViewById(R.id.guessedStory);
             guessingPerson = rowView.findViewById(R.id.guessingPerson);
 
+            // Set texts
             // storyNumber.setText("Story " + (position+1) + ":");
-            storyNumber.setText("Story " + (++counter) + ":");
+            storyNumber.setText("Story " + (position + 1) + ":");
             storyContent.setText(actualStories.get(position).content);
             // guessedStory.setText("Wurde geraten von:"); // already defined in xml, text is always the same
             guessingPerson.setText(actualStories.get(position).guessingPerson);
@@ -127,10 +117,11 @@ public class EndScoreViewAllStoriesAdapter extends  RecyclerView.Adapter<EndScor
             } else {
                 guessingPerson.setTextColor(ContextCompat.getColor(mInflater.getContext(), android.R.color.holo_red_light));
             }
+
             return rowView;
         }
     }
-     */
+
 
     @Override
     public int getItemCount() {
@@ -139,18 +130,15 @@ public class EndScoreViewAllStoriesAdapter extends  RecyclerView.Adapter<EndScor
 
     // stores and recycles views as they are scrolled off screen
     public class ViewHolder extends RecyclerView.ViewHolder {
-        TextView playerName, stories; // playerStory, guessedPerson;
-        // ListView endScoreListView;
+        TextView playerName;
+        ListView endScoreListView;
 
 
 
         ViewHolder(View itemView) {
             super(itemView);
             playerName = itemView.findViewById(R.id.endScorePlayerName);
-            stories = itemView.findViewById(R.id.endScoreStories);
-            // endScoreListView = itemView.findViewById(R.id.endScoreListView);
-            // playerStory = itemView.findViewById(R.id.endScoreStory);
-            // guessedPerson = itemView.findViewById(R.id.endScoreGuessed);
+            endScoreListView = itemView.findViewById(R.id.endScoreListView);
         }
 
     }
