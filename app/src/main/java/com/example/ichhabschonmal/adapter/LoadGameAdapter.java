@@ -24,13 +24,14 @@ public class LoadGameAdapter extends RecyclerView.Adapter<LoadGameAdapter.ViewHo
     private final LayoutInflater mInflater;
     private final AppDatabase mDatabase;
     private final Context mContext;
-    private int countOfGames;
+    private final int countOfGames;
 
 
     public LoadGameAdapter(Context context, AppDatabase database) {
         mInflater = LayoutInflater.from(context);
         mDatabase = database;
         mContext = context;
+        countOfGames = mDatabase.gameDao().getAll().size() - 1;
     }
 
     @NonNull
@@ -42,7 +43,6 @@ public class LoadGameAdapter extends RecyclerView.Adapter<LoadGameAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        countOfGames = mDatabase.gameDao().getAll().size() - 1;
         holder.name.setText(mDatabase.gameDao().getAll().get(countOfGames - position).gameName);
     }
 
