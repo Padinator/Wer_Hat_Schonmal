@@ -56,9 +56,6 @@ public class EndScoreViewAllStories extends AppCompatActivity {
         playerIds = PlayGame.findSomethingOfActualGame(idOfFirstPlayer, countOfPlayers);
         storyIds = PlayGame.findSomethingOfActualGame(idOfFirstStory, countOfStories);
 
-        // playerIds = new int[] {playerIds[0]};
-        // storyIds = new int[] {storyIds[0]};
-
         listOfPlayers = db.playerDao().loadAllByPlayerIds(playerIds);
         listOfStories = db.storyDao().loadAllByStoryIds(storyIds);
 

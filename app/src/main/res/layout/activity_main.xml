@@ -30,7 +30,7 @@
             android:layout_marginBottom="50dp"
             android:backgroundTint="@color/black"
             android:gravity="center"
-            android:text="Lade alten Spielstand"
+            android:text="Laden"
             android:textColor="@color/white" />
 
     </RelativeLayout>

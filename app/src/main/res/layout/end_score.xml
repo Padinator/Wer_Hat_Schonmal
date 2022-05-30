@@ -39,15 +39,6 @@
                 />
 
             <Button
-                android:id="@+id/viewAllStories"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/exitGame"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="20dp"
-                android:text="Alle Stories ansehen" />
-
-            <Button
                 android:id="@+id/exitGame"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -56,6 +47,16 @@
                 android:text="BEENDEN"
                 android:layout_marginTop="0dp">
             </Button>
+
+            <Button
+                android:id="@+id/viewAllStories"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/exitGame"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="20dp"
+                android:text="Alle Stories ansehen"
+                android:layout_marginBottom="25dp"/>
 
         </RelativeLayout>
 

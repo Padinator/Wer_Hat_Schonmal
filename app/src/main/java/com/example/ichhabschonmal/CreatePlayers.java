@@ -67,15 +67,16 @@ public class CreatePlayers extends AppCompatActivity {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
 
         // Definitions
-        Button saveAndNextStory, nextPerson, viewYourStories, next;
+        Button saveAndNextStory, nextPerson, viewYourStories, next, rules;
         EditText writeStories, playerName;
         TextView playerID, charsLeft;
 
         // Buttons:
         saveAndNextStory = findViewById(R.id.saveAndNextStory);
         nextPerson = findViewById(R.id.nextPerson);
-        next = findViewById(R.id.next);
         viewYourStories = findViewById(R.id.viewYourStories);
+        rules = findViewById(R.id.rules);
+        next = findViewById(R.id.next);
 
         // EditTexts:
         writeStories = findViewById(R.id.writeStories);
@@ -122,6 +123,15 @@ public class CreatePlayers extends AppCompatActivity {
                     charsLeft.setText(editable.toString().length() + "/250");
                 }
 
+            }
+        });
+
+        rules.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent rules = new Intent(CreatePlayers.this, Rules.class);
+                rules.putExtra("GameIsLoaded", false);
+                startActivity(rules);
             }
         });
 
@@ -216,7 +226,7 @@ public class CreatePlayers extends AppCompatActivity {
             else {
 
                 // Definitions
-                Intent rules;
+                Intent playGame;
                 int actualGameId;
 
                 // Set name of the last player
@@ -300,10 +310,10 @@ public class CreatePlayers extends AppCompatActivity {
                 db.close();
 
                 // Start new activity
-                rules = new Intent(CreatePlayers.this, Rules.class);
-                rules.putExtra("GameId", actualGameId);
-                rules.putExtra("GameIsLoaded", false);
-                startActivity(rules);
+                playGame = new Intent(CreatePlayers.this, PlayGame.class);
+                playGame.putExtra("GameId", actualGameId);
+                playGame.putExtra("GameIsLoaded", false);
+                startActivity(playGame);
                 finish();
             }
         });

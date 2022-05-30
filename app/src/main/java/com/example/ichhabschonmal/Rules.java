@@ -3,6 +3,7 @@ package com.example.ichhabschonmal;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -17,6 +18,7 @@ import java.util.ArrayList;
 public class Rules extends AppCompatActivity {
 
     private int gameId;
+    private boolean gameIsLoaded;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,7 +32,6 @@ public class Rules extends AppCompatActivity {
         ListView listView;
         Button start;
         ArrayAdapter<String> adapter;
-        boolean gameIsLoaded;
 
         // Buttons
         start = findViewById(R.id.start);
@@ -46,7 +47,7 @@ public class Rules extends AppCompatActivity {
         rules.add("4. Jeder Spieler kommt irgendwann dran.");
         rules.add("5. Gib keine direkten Tips, wenn du weißt, von wem die Story ist.");
         rules.add("6. Wer falsch r\u00e4t, muss nat\u00fcrlich trinken.");
-        rules.add("7. Wird richtig geraten, dann muss der Storybesitzer einen trinken.");
+        rules.add("7. Wird richtig geraten, dann muss der Storyschreiber einen trinken.");
         rules.add("8. Eine Aulf\u00f6sung gibts am Ende.");
 
         // Adapter
@@ -54,8 +55,15 @@ public class Rules extends AppCompatActivity {
         listView.setAdapter(adapter);
 
         // Get from last intent
-        gameId = getIntent().getExtras().getInt("GameId");
         gameIsLoaded = getIntent().getExtras().getBoolean("GameIsLoaded");
+
+        // Set visibility of starting a game
+        if (gameIsLoaded) {
+            start.setVisibility(View.VISIBLE);
+
+            // Get from last intent
+            gameId = getIntent().getExtras().getInt("GameId");
+        }
 
         start.setOnClickListener(v -> {
             Intent startGame = new Intent(Rules.this, PlayGame.class);
@@ -86,18 +94,21 @@ public class Rules extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {       // Catch back button
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Spiel verlassen")
-                .setMessage("Wenn du zur\u00fcck gehst, wird das Spiel gespeichert und beendet!")
-                .setPositiveButton("Zur\u00fcck", (dialog, which) -> {
-                    Intent mainActivity = new Intent(Rules.this, MainActivity.class);
-                    startActivity(mainActivity);
-                    finish();
-                })
-                .setNegativeButton("Abbrechen", (dialogInterface, i) -> {
+        if (gameIsLoaded) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Spiel verlassen")
+                    .setMessage("Wenn du zur\u00fcck gehst, wird das Spiel gespeichert und beendet!")
+                    .setPositiveButton("Zur\u00fcck", (dialog, which) -> {
+                        Intent mainActivity = new Intent(Rules.this, MainActivity.class);
+                        startActivity(mainActivity);
+                        finish();
+                    })
+                    .setNegativeButton("Abbrechen", (dialogInterface, i) -> {
 
-                });
+                    });
 
-        builder.create().show();
+            builder.create().show();
+        } else
+            finish();
     }
 }

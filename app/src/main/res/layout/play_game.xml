@@ -23,45 +23,44 @@
                 android:text="Runde Nr.0"/>
 
             <TextView
-                android:id="@+id/drinkOfTheGameText"
-                android:layout_width="wrap_content"
+                android:id="@+id/player"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/round"
                 android:layout_marginLeft="20dp"
-                android:layout_centerHorizontal="true"
+                android:layout_marginTop="10dp"
+                android:layout_below="@+id/round"
                 android:textStyle="bold"
-                android:text="Das Getränk des Spiels ist:"
+                android:text="Gib das Gerät Spieler 1, Dein Name"
                 android:textSize="23dp"/>
 
             <TextView
                 android:id="@+id/drinkOfTheGame"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/drinkOfTheGameText"
+                android:layout_below="@id/player"
+                android:layout_marginTop="5dp"
                 android:layout_marginLeft="20dp"
-                android:layout_centerHorizontal="true"
-                android:textStyle="bold"
-                android:text="Bier"
-                android:textSize="23dp"/>
+                android:text="Das Getränk des Spiels ist: Bier"
+                android:textSize="20dp"/>
 
             <TextView
-                android:id="@+id/player"
-                android:layout_width="match_parent"
+                android:id="@+id/whoHasText"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
-                android:layout_marginTop="30dp"
+                android:text="Wer hat schon mal...?"
                 android:layout_below="@+id/drinkOfTheGame"
-                android:text="Spieler 1: Name ist an der Reihe"
-                android:textSize="23dp"/>
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="40dp"
+                android:textSize="27dp"/>
 
             <TextView
                 android:id="@+id/story"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/player"
+                android:layout_below="@+id/whoHasText"
                 android:layout_marginLeft="20dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginBottom="80dp"
+                android:layout_marginTop="18dp"
+                android:layout_marginBottom="60dp"
                 android:text="Hier sollte eine Story drin stehen.
                               Hier sollte eine Story drin stehen.
                               Hier sollte eine Story drin stehen.
@@ -87,8 +86,9 @@
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="80dp"
                 android:layout_marginBottom="15dp"
-                android:text="Auflösung" />
+                android:text="Weiter" />
 
+            <!--
             <Button
                 android:id="@+id/nextRound"
                 android:layout_width="wrap_content"
@@ -97,12 +97,13 @@
                 android:layout_centerHorizontal="true"
                 android:text="Nächste Runde"
                 android:layout_marginBottom="30dp"/>
+            -->
 
             <Spinner
                 android:id="@+id/drinkVariantsTwo"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/nextRound"
+                android:layout_below="@id/solution"
                 android:layout_marginBottom="15dp"
                 android:background="@android:drawable/btn_dropdown"
                 android:layout_centerHorizontal="true"

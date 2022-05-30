@@ -93,16 +93,8 @@ public class EndScore extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Spiel beenden")
                 .setMessage("Das Spiel wird gel\u00f6scht")
-                .setPositiveButton("Verlassen und l\u00f6schen", (dialog, which) -> {
+                .setPositiveButton("Verlassen", (dialog, which) -> {
                     Intent mainActivity = new Intent(EndScore.this, MainActivity.class);
-                    AppDatabase db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
-
-                    // Delete game and its players and their stories
-                    db.gameDao().delete(db.gameDao().loadAllByGameIds(new int[] {gameId}).get(0));
-
-                    // Close database connection
-                    db.close();
-
                     startActivity(mainActivity);
                     finish();
                 })

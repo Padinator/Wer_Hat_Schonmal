@@ -4,12 +4,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:verticalScrollbarPosition="right"
-        android:fadeScrollbars="false">
-
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
@@ -26,7 +20,7 @@
                 android:text="ALLE STORIES"
                 android:textAlignment="center"
                 android:textColor="#8ab6de"
-                android:textSize="20dp"/>
+                android:textSize="20dp" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerView"
@@ -34,10 +28,11 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/allStories"
                 tools:layout_editor_absoluteX="1dp"
-                tools:layout_editor_absoluteY="1dp" />
+                tools:layout_editor_absoluteY="1dp"
+                android:layout_marginBottom="30dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginLeft="20dp" />
 
         </RelativeLayout>
-
-    </ScrollView>
 
 </LinearLayout>

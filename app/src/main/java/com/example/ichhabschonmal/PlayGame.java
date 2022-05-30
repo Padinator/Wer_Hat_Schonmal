@@ -57,7 +57,7 @@ public class PlayGame extends AppCompatActivity {
 
         // Preconditions before playing, until method "playGame()" is called
         // Definitions
-        Button solution, nextRound;
+        Button solution/*, nextRound*/;
         List<String> listOfPlayersForSpinner;
         ArrayAdapter<String> adapter;
         ArrayList<String> drinks = new ArrayList<>();
@@ -65,7 +65,7 @@ public class PlayGame extends AppCompatActivity {
 
         // Buttons
         solution = findViewById(R.id.solution);
-        nextRound = findViewById(R.id.nextRound);
+        //nextRound = findViewById(R.id.nextRound);
         drinkOfTheGameTextView = findViewById(R.id.drinkOfTheGame);
 
         // TextViews
@@ -171,12 +171,16 @@ public class PlayGame extends AppCompatActivity {
                         if (listOfPlayers.get(i).playerNumber == otherPlayer.getNumber()) {
 
                             // Update a player in the database
-                            if (actualGame.actualDrinkOfTheGame.equals("Bier")) {
-                                updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers + 1, listOfPlayers.get(i).countOfVodka, listOfPlayers.get(i).countOfTequila);
-                            } else if (actualGame.actualDrinkOfTheGame.equals("Vodka Shots")) {
-                                updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers, listOfPlayers.get(i).countOfVodka + 1, listOfPlayers.get(i).countOfTequila);
-                            } else if (actualGame.actualDrinkOfTheGame.equals("Tequila")) {
-                                updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers, listOfPlayers.get(i).countOfVodka, listOfPlayers.get(i).countOfTequila + 1);
+                            switch (actualGame.actualDrinkOfTheGame) {
+                                case "Bier":
+                                    updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers + 1, listOfPlayers.get(i).countOfVodka, listOfPlayers.get(i).countOfTequila);
+                                    break;
+                                case "Vodka Shots":
+                                    updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers, listOfPlayers.get(i).countOfVodka + 1, listOfPlayers.get(i).countOfTequila);
+                                    break;
+                                case "Tequila":
+                                    updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers, listOfPlayers.get(i).countOfVodka, listOfPlayers.get(i).countOfTequila + 1);
+                                    break;
                             }
 
                             // Update a story in the database
@@ -185,18 +189,22 @@ public class PlayGame extends AppCompatActivity {
                     }
 
                     //winner = "Spieler " + chosenPlayer.getNumber() + ", " + chosenPlayer.getName() + " hat diese Runde gewonnen";
-                    loser = "Spieler " + otherPlayer.getNumber() + ", " + otherPlayer.getName() + " hat diese Runde verloren und muss " + actualDrinkOfTheGame + " trinken!";
+                    loser = "Spieler " + otherPlayer.getNumber() + ", " + otherPlayer.getName() + " muss " + actualDrinkOfTheGame + " trinken!";
                 } else {        // chosenPlayer has not guessed correctly
                     for (; i < listOfPlayers.size(); i++) {
                         if (listOfPlayers.get(i).playerNumber == chosenPlayer.getNumber()) {
 
                             // Update a player in the database
-                            if (actualGame.actualDrinkOfTheGame.equals("Bier")) {
-                                updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers + 1, listOfPlayers.get(i).countOfVodka, listOfPlayers.get(i).countOfTequila);
-                            } else if (actualGame.actualDrinkOfTheGame.equals("Vodka Shots")) {
-                                updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers, listOfPlayers.get(i).countOfVodka + 1, listOfPlayers.get(i).countOfTequila);
-                            } else if (actualGame.actualDrinkOfTheGame.equals("Tequila")) {
-                                updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers, listOfPlayers.get(i).countOfVodka, listOfPlayers.get(i).countOfTequila + 1);
+                            switch (actualGame.actualDrinkOfTheGame) {
+                                case "Bier":
+                                    updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers + 1, listOfPlayers.get(i).countOfVodka, listOfPlayers.get(i).countOfTequila);
+                                    break;
+                                case "Vodka Shots":
+                                    updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers, listOfPlayers.get(i).countOfVodka + 1, listOfPlayers.get(i).countOfTequila);
+                                    break;
+                                case "Tequila":
+                                    updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers, listOfPlayers.get(i).countOfVodka, listOfPlayers.get(i).countOfTequila + 1);
+                                    break;
                             }
 
                             // Update a story in the database
@@ -205,7 +213,7 @@ public class PlayGame extends AppCompatActivity {
                     }
 
                     //winner = "Spieler " + otherPlayer.getNumber() + ", " + otherPlayer.getName() + " hat diese Runde gewonnen";
-                    loser = "Spieler " + chosenPlayer.getNumber() + ", " + chosenPlayer.getName() + " hat diese Runde verloren und muss " + actualDrinkOfTheGame + " trinken!";
+                    loser = "Spieler " + chosenPlayer.getNumber() + ", " + chosenPlayer.getName() + " muss " + actualDrinkOfTheGame + " trinken!";
                 }
 
                 // Update a game
@@ -232,12 +240,32 @@ public class PlayGame extends AppCompatActivity {
                 solutionPressed = true;
 
                 if (!checkRound())      // Set text of button nextRound, if there is no round left
-                    nextRound.setText("Spielende");
-            } else
-                Toast.makeText(PlayGame.this, "Starte zuerst die n\u00e4chste Runde!", Toast.LENGTH_SHORT).show();
+                    solution.setText("Spielende");
+            } else {
+                //Toast.makeText(PlayGame.this, "Starte zuerst die n\u00e4chste Runde!", Toast.LENGTH_SHORT).show();
+                Intent next = new Intent(PlayGame.this, Score.class);
+                Intent end = new Intent(PlayGame.this, EndScore.class);
+
+                if (checkRound()) {         // Show score and then play next round
+
+                    // Start Score-intent
+                    next.putExtra("GameId", gameId);
+                    startActivity(next);
+                    playRound();
+                } else {        // New intent with end score
+
+                    // Start EndScore-intent
+                    end.putExtra("GameId", gameId);
+                    startActivity(end);
+                    finish();       // Game is over
+                }
+
+                // Change value of solutionPressed
+                solutionPressed = false;
+            }
         });
 
-        nextRound.setOnClickListener(view -> {
+        /*nextRound.setOnClickListener(view -> {
             if (solutionPressed) {          // Button solution has to be pressed
                 Intent next = new Intent(PlayGame.this, Score.class);
                 Intent end = new Intent(PlayGame.this, EndScore.class);
@@ -260,7 +288,7 @@ public class PlayGame extends AppCompatActivity {
                 solutionPressed = false;
             } else
                 Toast.makeText(PlayGame.this, "Du musst zuerst auflösen!", Toast.LENGTH_SHORT).show();
-        });
+        });*/
         // calling the action bar
         ActionBar actionBar = getSupportActionBar();
 
@@ -359,7 +387,7 @@ public class PlayGame extends AppCompatActivity {
 
     @SuppressLint("SetTextI18n")
     private void playRound() {
-        if (Gamer.isEmpty(editedPlayers)) {      // Enter, if each player has guessed one time
+        if (allPlayersGuessed || Gamer.isEmpty(editedPlayers)) {      // Enter, if each player has guessed one time
             editedPlayers = Gamer.copyPlayers(players);
 
             // Request to change drink
@@ -573,6 +601,7 @@ public class PlayGame extends AppCompatActivity {
                 break;
         }
 
+        drink = "Das Getränk des Spiels ist: " + drink;
         drinkOfTheGameTextView.setText(drink);
     }
 
@@ -615,8 +644,10 @@ public class PlayGame extends AppCompatActivity {
                     checkEmptyArray = false;
             }
 
-            if (checkEmptyArray)        // Case: "checkEmptyArray == true"
+            if (checkEmptyArray) {          // Case: "checkEmptyArray == true"
                 editedPlayers = Gamer.copyPlayers(players);
+                allPlayersGuessed = true;
+            }
 
             while (!proofCheckPlayer && i < editedPlayers.length) {       // nextRound have to be true, if this line is accessed
                 //Log.e("checkRound", editedPlayers[i] + ", " + editedPlayers[i].getNumber() + ", " + checkPlayer.getNumber());
@@ -646,7 +677,7 @@ public class PlayGame extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Spiel beenden")
                 .setMessage("Das Spiel wird zwischengespeichert")
-                .setPositiveButton("Verlassen und speichern", (dialog, which) -> {
+                .setPositiveButton("Verlassen & speichern", (dialog, which) -> {
                     // No safe, which player is currently guessing and which player has already guessed
                     Intent mainActivity = new Intent(PlayGame.this, MainActivity.class);
                     startActivity(mainActivity);
