@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import com.example.ichhabschonmal.database.AppDatabase;
 import com.example.ichhabschonmal.database.Game;
+import com.example.ichhabschonmal.online.CreatePlayersOnline;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -125,10 +126,10 @@ public class NewGame extends AppCompatActivity {
                      newGameIntent.putExtra("GameName", gameName.getText().toString());     // Give the name of the game
                      newGameIntent.putExtra("DrinkOfTheGame", drinkOfTheGame);
                      startActivity(newGameIntent);
-                 } /*else {
-                    Intent newGameMultipleDevicesIntent = new Intent(getApplicationContext(), NewGameMultipleDevices.class);
+                 } else {
+                    Intent newGameMultipleDevicesIntent = new Intent(getApplicationContext(), CreatePlayersOnline.class);
                     startActivity(newGameMultipleDevicesIntent);
-                }*/
+                }
             }
         });
         // calling the action bar
