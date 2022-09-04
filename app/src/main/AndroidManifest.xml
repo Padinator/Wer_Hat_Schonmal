@@ -3,6 +3,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.ichhabschonmal">
 
+    <uses-permission
+        android:name="android.permission.POST_NOTIFICATIONS"
+        tools:node="remove" />
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -19,16 +27,24 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".NewGame"/>
-        <activity android:name=".CreatePlayers"/>
-        <activity android:name=".PlayGame"/>
-        <activity android:name=".LoadGame"/>
-        <activity android:name=".Rules"/>
-        <activity android:name=".Score"/>
-        <activity android:name=".EndScore"/>
-        <activity android:name=".EndScoreViewAllStories"/>
+        <activity android:name=".NewGame" />
+        <activity android:name=".CreatePlayers" />
+        <activity android:name=".PlayGame" />
+        <activity android:name=".LoadGame" />
+        <activity android:name=".Rules" />
+        <activity android:name=".Score" />
+        <activity android:name=".EndScore" />
+        <activity android:name=".online.CreatePlayersOnline"/>
 
-
+        <service
+            android:name=".fcmservice.FCMService"
+            android:exported="true"
+            android:permission="com.google.android.c2dm.permission.SEND">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>
