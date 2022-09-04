@@ -18,7 +18,7 @@ import android.widget.Toast;
 
 import com.example.ichhabschonmal.database.AppDatabase;
 import com.example.ichhabschonmal.database.Game;
-import com.example.ichhabschonmal.online.CreatePlayersOnline;
+import com.example.ichhabschonmal.online.HostOnlineGame;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -131,7 +131,7 @@ public class NewGame extends AppCompatActivity {
                      newGameIntent.putExtra("DrinkOfTheGame", drinkOfTheGame);
                      startActivity(newGameIntent);
                  } else {
-                    Intent newGameMultipleDevicesIntent = new Intent(getApplicationContext(), CreatePlayersOnline.class);
+                    Intent newGameMultipleDevicesIntent = new Intent(getApplicationContext(), HostOnlineGame.class);
                     startActivity(newGameMultipleDevicesIntent);
                 }
             }

@@ -9,7 +9,6 @@ import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.ichhabschonmal.R;
@@ -29,7 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class CreatePlayersOnline extends AppCompatActivity {
+public class HostOnlineGame extends AppCompatActivity {
 
 
     EditText title;
@@ -46,7 +45,7 @@ public class CreatePlayersOnline extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.create_players_online);
+        setContentView(R.layout.host_online_game);
         title = findViewById(R.id.title);
         message = findViewById(R.id.message);
         Button btnSend = findViewById(R.id.send);
@@ -87,7 +86,7 @@ public class CreatePlayersOnline extends AppCompatActivity {
                     }
                 },
                 error -> {
-                    Toast.makeText(CreatePlayersOnline.this, "Request error", Toast.LENGTH_LONG).show();
+                    Toast.makeText(HostOnlineGame.this, "Request error", Toast.LENGTH_LONG).show();
                     Log.i(TAG, "onErrorResponse: Didn't work");
                 }) {
             @Override

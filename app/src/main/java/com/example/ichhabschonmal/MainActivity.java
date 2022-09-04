@@ -18,13 +18,20 @@ public class MainActivity extends AppCompatActivity {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
 
         // Definitions
-        Button newGame, loadGame;
+        Button newGame, loadGame, joinGame;
 
         // Buttons:
         newGame = findViewById(R.id.newGame);
         loadGame = findViewById(R.id.loadGame);
+        joinGame = findViewById(R.id.joinGame);
 
         newGame.setOnClickListener(v -> {
+            Intent newGame1 = new Intent(getApplicationContext(), NewGame.class);
+            startActivity(newGame1);
+            finish();
+        });
+
+        joinGame.setOnClickListener(v -> {
             Intent newGame1 = new Intent(getApplicationContext(), NewGame.class);
             startActivity(newGame1);
             finish();
