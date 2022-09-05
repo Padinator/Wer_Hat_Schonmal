@@ -1,9 +1,7 @@
 package com.example.ichhabschonmal.online;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -11,11 +9,8 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
 import com.example.ichhabschonmal.R;
 import com.google.firebase.messaging.FirebaseMessaging;
 
@@ -48,30 +43,27 @@ public class HostOnlineGame extends AppCompatActivity {
         message = findViewById(R.id.message);
         Button btnSend = findViewById(R.id.send);
 
-        btnSend.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                TOPIC = "/topics/userABC"; //topic must match with what the receiver subscribed to
-                NOTIFICATION_TITLE = title.getText().toString();
-                NOTIFICATION_MESSAGE = message.getText().toString();
+        btnSend.setOnClickListener(v -> {
+            TOPIC = "/topics/userABC"; //topic must match with what the receiver subscribed to
+            NOTIFICATION_TITLE = title.getText().toString();
+            NOTIFICATION_MESSAGE = message.getText().toString();
 
-                JSONObject notification = new JSONObject();
-                JSONObject notifcationBody = new JSONObject();
-                try {
-                    String token = FirebaseMessaging.getInstance().getToken().toString();
+            JSONObject notification = new JSONObject();
+            JSONObject notifcationBody = new JSONObject();
+            try {
+                String token = FirebaseMessaging.getInstance().getToken().toString();
 
-                    notifcationBody.put("title", NOTIFICATION_TITLE);
-                    notifcationBody.put("message", token);
+                notifcationBody.put("title", NOTIFICATION_TITLE);
+                notifcationBody.put("message", token);
 
-                    notification.put("to", TOPIC);
-                    notification.put("data", notifcationBody);
-                    Log.e(TAG, "onCreate: " + notifcationBody);
+                notification.put("to", TOPIC);
+                notification.put("data", notifcationBody);
+                Log.e(TAG, "onCreate: " + notifcationBody);
 
-                } catch (JSONException e) {
-                    Log.e(TAG, "onCreate: " + e.getMessage());
-                }
-                sendNotification(notification);
+            } catch (JSONException e) {
+                Log.e(TAG, "onCreate: " + e.getMessage());
             }
+            sendNotification(notification);
         });
     }
 
@@ -97,37 +89,6 @@ public class HostOnlineGame extends AppCompatActivity {
                 return params;
             }
         };
-        MySingleton.getInstance(getApplicationContext()).addToRequestQueue(jsonObjectRequest);
     }
 
-    private static class MySingleton {
-        private static MySingleton instance;
-        private RequestQueue requestQueue;
-        private Context ctx;
-
-        private MySingleton(Context context) {
-            ctx = context;
-            requestQueue = getRequestQueue();
-        }
-
-        public static synchronized MySingleton getInstance(Context context) {
-            if (instance == null) {
-                instance = new MySingleton(context);
-            }
-            return instance;
-        }
-
-        public RequestQueue getRequestQueue() {
-            if (requestQueue == null) {
-                // getApplicationContext() is key, it keeps you from leaking the
-                // Activity or BroadcastReceiver if someone passes one in.
-                requestQueue = Volley.newRequestQueue(ctx.getApplicationContext());
-            }
-            return requestQueue;
-        }
-
-        public <T> void addToRequestQueue(Request<T> req) {
-            getRequestQueue().add(req);
-        }
-    }
 }
