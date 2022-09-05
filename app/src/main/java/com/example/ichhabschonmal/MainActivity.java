@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 
+import com.example.ichhabschonmal.online_gaming.JoinGame;
+
 public class MainActivity extends AppCompatActivity {
 
     @Override
@@ -32,8 +34,8 @@ public class MainActivity extends AppCompatActivity {
         });
 
         joinGame.setOnClickListener(v -> {
-            Intent newGame1 = new Intent(getApplicationContext(), NewGame.class);
-            startActivity(newGame1);
+            Intent joinGame1 = new Intent(getApplicationContext(), JoinGame.class);
+            startActivity(joinGame1);
             finish();
         });
 

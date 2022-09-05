@@ -18,7 +18,7 @@ import android.widget.Toast;
 
 import com.example.ichhabschonmal.database.AppDatabase;
 import com.example.ichhabschonmal.database.Game;
-import com.example.ichhabschonmal.online.HostOnlineGame;
+import com.example.ichhabschonmal.online_gaming.HostOnlineGame;
 
 import java.util.ArrayList;
 import java.util.List;
