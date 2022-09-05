@@ -52,6 +52,7 @@ public class FCMService extends FirebaseMessagingService {
     public void onNewToken(String s) {
         super.onNewToken(s);
         FirebaseMessaging.getInstance().subscribeToTopic(SUBSCRIBE_TO);
+        String token = FirebaseMessaging.getInstance().getToken().toString();
 
         Log.d("NEW_TOKEN", s);
     }
