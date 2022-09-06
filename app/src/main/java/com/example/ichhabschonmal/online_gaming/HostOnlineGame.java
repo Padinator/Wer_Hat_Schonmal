@@ -49,12 +49,12 @@ public class HostOnlineGame extends AppCompatActivity {
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
-        Thread1 = new Thread(new Thread1());
+        Thread1 = new Thread(new Connector());
         Thread1.start();
         btnSend.setOnClickListener(v -> {
             message = etMessage.getText().toString().trim();
             if (!message.isEmpty()) {
-                new Thread(new Thread3(message)).start();
+                new Thread(new Run3(message)).start();
             }
         });
     }
@@ -70,7 +70,7 @@ public class HostOnlineGame extends AppCompatActivity {
     private PrintWriter output;
     private BufferedReader input;
 
-    class Thread1 implements Runnable {
+    class Connector implements Runnable {
 
         @Override
         public void run() {
@@ -88,7 +88,7 @@ public class HostOnlineGame extends AppCompatActivity {
                     output = new PrintWriter(socket.getOutputStream());
                     input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                     runOnUiThread(() -> tvMessages.setText("Connected\n"));
-                    new Thread(new Thread2()).start();
+                    new Thread(new Run2()).start();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -99,19 +99,21 @@ public class HostOnlineGame extends AppCompatActivity {
 
     }
 
-    private class Thread2 implements Runnable {
+    private class Run2 implements Runnable {
 
         @Override
         public void run() {
-            while (true) {
+            boolean doneReading = false;
+
+            while (!doneReading) {
                 try {
                     final String message = input.readLine();
                     if (message != null) {
                         runOnUiThread(() -> tvMessages.append("client:" + message + "\n"));
                     } else {
-                        Thread1 = new Thread(new Thread1());
+                        Thread1 = new Thread(new Connector());
                         Thread1.start();
-                        return;
+                        doneReading = true;
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -120,10 +122,10 @@ public class HostOnlineGame extends AppCompatActivity {
         }
 
     }
-    class Thread3 implements Runnable {
+    class Run3 implements Runnable {
         private final String message;
 
-        Thread3(String message) {
+        Run3(String message) {
             this.message = message;
         }
 
@@ -131,8 +133,9 @@ public class HostOnlineGame extends AppCompatActivity {
         public void run() {
             output.write(message);
             output.flush();
+
             runOnUiThread(() -> {
-                tvMessages.append("server: " + message + "\n");
+                tvMessages.append("server sent this: " + message + "\n");
                 etMessage.setText("");
             });
         }

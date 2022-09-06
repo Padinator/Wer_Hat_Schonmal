@@ -18,13 +18,17 @@ import java.net.Socket;
 
 @SuppressLint("SetTextI18n")
 public class JoinGame extends AppCompatActivity {
-    Thread Thread1 = null;
     EditText etIP, etPort;
     TextView tvMessages;
     EditText etMessage;
     Button btnSend;
+
+    Thread Thread1 = null;
     String SERVER_IP;
     int SERVER_PORT;
+
+    private PrintWriter output;
+    private BufferedReader input;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,50 +45,51 @@ public class JoinGame extends AppCompatActivity {
             tvMessages.setText("");
             SERVER_IP = etIP.getText().toString().trim();
             SERVER_PORT = Integer.parseInt(etPort.getText().toString().trim());
-            Thread1 = new Thread(new Thread1());
+            Thread1 = new Thread(new Connector());
             Thread1.start();
         });
 
         btnSend.setOnClickListener(v -> {
             String message = etMessage.getText().toString().trim();
+
             if (!message.isEmpty()) {
-                new Thread(new Thread3(message)).start();
+                new Thread(new Run3(message)).start();
             }
         });
     }
 
-    private PrintWriter output;
-    private BufferedReader input;
-
-    class Thread1 implements Runnable {
+    class Connector implements Runnable {
         public void run() {
-            Socket socket;
+            Socket server;
 
             try {
-                socket = new Socket(SERVER_IP, SERVER_PORT);
-                output = new PrintWriter(socket.getOutputStream());
-                input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                server = new Socket(SERVER_IP, SERVER_PORT);
+                output = new PrintWriter(server.getOutputStream());
+                input = new BufferedReader(new InputStreamReader(server.getInputStream()));
                 runOnUiThread(() -> tvMessages.setText("Connected\n"));
-                new Thread(new Thread2()).start();
+                new Thread(new Run2()).start();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
     }
 
-    class Thread2 implements Runnable {
+    class Run2 implements Runnable {
 
         @Override
         public void run() {
-            while (true) {
+            boolean doneReading = false;
+
+            while (!doneReading) {
                 try {
                     final String message = input.readLine();
+
                     if (message != null) {
                         runOnUiThread(() -> tvMessages.append("server: " + message + "\n"));
                     } else {
-                        Thread1 = new Thread(new Thread1());
+                        Thread1 = new Thread(new Connector());
                         Thread1.start();
-                        return;
+                        doneReading = true;
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -93,10 +98,10 @@ public class JoinGame extends AppCompatActivity {
         }
 
     }
-    class Thread3 implements Runnable {
+    class Run3 implements Runnable {
         private final String message;
 
-        Thread3(String message) {
+        Run3(String message) {
             this.message = message;
         }
 
@@ -104,8 +109,9 @@ public class JoinGame extends AppCompatActivity {
         public void run() {
             output.write(message);
             output.flush();
+
             runOnUiThread(() -> {
-                tvMessages.append("client: " + message + "\n");
+                tvMessages.append("client sent this: " + message + "\n");
                 etMessage.setText("");
             });
         }
