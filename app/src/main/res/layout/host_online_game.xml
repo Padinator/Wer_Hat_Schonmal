@@ -10,6 +10,7 @@
         android:layout_height = "wrap_content"
         android:textAppearance = "@style/Base.TextAppearance.AppCompat.Medium"
         android:text="IP"/>
+
     <TextView
         android:id = "@+id/tvPort"
         android:layout_width = "wrap_content"
@@ -17,6 +18,7 @@
         android:layout_below = "@+id/tvIP"
         android:textAppearance = "@style/Base.TextAppearance.AppCompat.Medium"
         android:text="Port"/>
+
     <TextView
         android:id = "@+id/tvConnectionStatus"
         android:layout_width = "match_parent"
@@ -24,6 +26,7 @@
         android:layout_below = "@+id/tvPort"
         android:textAppearance = "@style/Base.TextAppearance.AppCompat.Medium"
         android:text="Connection status" />
+
     <TextView
         android:id = "@+id/tvMessages"
         android:layout_width = "match_parent"
@@ -32,7 +35,8 @@
         android:layout_below = "@+id/tvConnectionStatus"
         android:inputType = "textMultiLine"
         android:textAppearance = "@style/Base.TextAppearance.AppCompat.Medium"
-        android:text="Messages:"/>
+        android:hint="Messages:"/>
+
     <EditText
         android:id = "@+id/etMessage"
         android:layout_width = "match_parent"
@@ -40,6 +44,7 @@
         android:layout_above = "@+id/btnSend"
         android:hint = "Enter Message"
         android:inputType = "text" />
+
     <Button
         android:id = "@+id/btnSend"
         android:layout_width = "match_parent"
