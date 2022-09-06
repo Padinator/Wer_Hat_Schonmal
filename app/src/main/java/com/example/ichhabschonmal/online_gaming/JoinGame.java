@@ -7,6 +7,7 @@ import android.os.Bundle;
 import com.example.ichhabschonmal.R;
 
 import android.annotation.SuppressLint;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -18,17 +19,17 @@ import java.net.Socket;
 
 @SuppressLint("SetTextI18n")
 public class JoinGame extends AppCompatActivity {
-    EditText etIP, etPort;
-    TextView tvMessages;
-    EditText etMessage;
-    Button btnSend;
+    private EditText etIP, etPort;
+    private TextView tvMessages;
+    private EditText etMessage;
+    private Button btnSend;
 
-    Thread Thread1 = null;
-    String SERVER_IP;
-    int SERVER_PORT;
+    private Thread Thread1 = null;
+    private String SERVER_IP;
+    private int SERVER_PORT;
 
-    private PrintWriter output;
     private BufferedReader input;
+    private PrintWriter output;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,13 +61,14 @@ public class JoinGame extends AppCompatActivity {
 
     class Connector implements Runnable {
         public void run() {
-            Socket server;
+            Socket socket;
 
             try {
-                server = new Socket(SERVER_IP, SERVER_PORT);
-                output = new PrintWriter(server.getOutputStream());
-                input = new BufferedReader(new InputStreamReader(server.getInputStream()));
+                socket = new Socket(SERVER_IP, SERVER_PORT);
+                output = new PrintWriter(socket.getOutputStream());
+                input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 runOnUiThread(() -> tvMessages.setText("Connected\n"));
+
                 new Thread(new Run2()).start();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -78,22 +80,25 @@ public class JoinGame extends AppCompatActivity {
 
         @Override
         public void run() {
-            boolean doneReading = false;
 
-            while (!doneReading) {
-                try {
-                    final String message = input.readLine();
-
-                    if (message != null) {
-                        runOnUiThread(() -> tvMessages.append("server: " + message + "\n"));
-                    } else {
-                        Thread1 = new Thread(new Connector());
-                        Thread1.start();
-                        doneReading = true;
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
+            try {
+                while (input.ready()) {
+                    Log.e("Client sent to server", "Ready");
+                    runOnUiThread(() -> {
+                        try {
+                            tvMessages.append("server: " + input.readLine() + "\n");
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    });
                 }
+                Log.e("Client sent to server", "Not Ready");
+
+                // Thread1 = new Thread(new Connector());
+                // Thread1.start();
+
+            }catch (IOException ex) {
+                ex.printStackTrace();
             }
         }
 
@@ -107,7 +112,7 @@ public class JoinGame extends AppCompatActivity {
 
         @Override
         public void run() {
-            output.write(message);
+            output.println(message);
             output.flush();
 
             runOnUiThread(() -> {

@@ -9,6 +9,7 @@ import com.example.ichhabschonmal.R;
 import android.annotation.SuppressLint;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -25,34 +26,41 @@ import java.nio.ByteOrder;
 
 @SuppressLint("SetTextI18n")
 public class HostOnlineGame extends AppCompatActivity {
-    ServerSocket serverSocket;
-    Thread Thread1 = null;
-    TextView tvIP, tvPort;
-    TextView tvMessages;
-    EditText etMessage;
-    Button btnSend;
-    public static String SERVER_IP = "";
-    public static final int SERVER_PORT = 8080;
-    String message;
+    private Thread Thread1 = null;
+    private TextView tvIP, tvPort;
+    private TextView tvMessages;
+    private EditText etMessage;
+    private Button btnSend;
+
+    private ServerSocket serverSocket;
+    private static String SERVER_IP = "";
+    private final int SERVER_PORT = 8080;
+
+    private String message;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.host_online_game);
+
         tvIP = findViewById(R.id.tvIP);
         tvPort = findViewById(R.id.tvPort);
         tvMessages = findViewById(R.id.tvMessages);
         etMessage = findViewById(R.id.etMessage);
         btnSend = findViewById(R.id.btnSend);
+
         try {
             SERVER_IP = getLocalIpAddress();
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
+
         Thread1 = new Thread(new Connector());
         Thread1.start();
+
         btnSend.setOnClickListener(v -> {
             message = etMessage.getText().toString().trim();
+
             if (!message.isEmpty()) {
                 new Thread(new Run3(message)).start();
             }
@@ -74,19 +82,21 @@ public class HostOnlineGame extends AppCompatActivity {
 
         @Override
         public void run() {
-            Socket socket;
+            Socket serverSocket;
 
             try {
-                serverSocket = new ServerSocket(SERVER_PORT);
+                HostOnlineGame.this.serverSocket = new ServerSocket(SERVER_PORT);
+
                 runOnUiThread(() -> {
                     tvMessages.setText("Not connected");
                     tvIP.setText("IP: " + SERVER_IP);
                     tvPort.setText("Port: " + SERVER_PORT);
                 });
+
                 try {
-                    socket = serverSocket.accept();
-                    output = new PrintWriter(socket.getOutputStream());
-                    input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                    serverSocket = HostOnlineGame.this.serverSocket.accept();
+                    output = new PrintWriter(serverSocket.getOutputStream());
+                    input = new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));
                     runOnUiThread(() -> tvMessages.setText("Connected\n"));
                     new Thread(new Run2()).start();
                 } catch (IOException e) {
@@ -108,12 +118,15 @@ public class HostOnlineGame extends AppCompatActivity {
             while (!doneReading) {
                 try {
                     final String message = input.readLine();
+                    Log.e("Client sent to server", "Ready");
+
                     if (message != null) {
                         runOnUiThread(() -> tvMessages.append("client:" + message + "\n"));
                     } else {
-                        Thread1 = new Thread(new Connector());
-                        Thread1.start();
+                        // Thread1 = new Thread(new Connector());
+                        // Thread1.start();
                         doneReading = true;
+                        Log.e("Client sent to server", "Not Ready");
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -131,7 +144,7 @@ public class HostOnlineGame extends AppCompatActivity {
 
         @Override
         public void run() {
-            output.write(message);
+            output.println(message);
             output.flush();
 
             runOnUiThread(() -> {
