@@ -35,8 +35,10 @@ public class HostOnlineGame extends AppCompatActivity {
     private ServerSocket serverSocket;
     private static String SERVER_IP = "";
     private final int SERVER_PORT = 8080;
-
     private String message;
+
+    private PrintWriter output;
+    private BufferedReader input;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,14 +71,12 @@ public class HostOnlineGame extends AppCompatActivity {
 
     private String getLocalIpAddress() throws UnknownHostException {
         WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
-        assert wifiManager != null;
         WifiInfo wifiInfo = wifiManager.getConnectionInfo();
         int ipInt = wifiInfo.getIpAddress();
-        return InetAddress.getByAddress(ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(ipInt).array()).getHostAddress();
-    }
 
-    private PrintWriter output;
-    private BufferedReader input;
+        return InetAddress.getByAddress(ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN)
+                .putInt(ipInt).array()).getHostAddress();
+    }
 
     class Connector implements Runnable {
 
@@ -98,6 +98,7 @@ public class HostOnlineGame extends AppCompatActivity {
                     output = new PrintWriter(serverSocket.getOutputStream());
                     input = new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));
                     runOnUiThread(() -> tvMessages.setText("Connected\n"));
+
                     new Thread(new Run2()).start();
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -135,6 +136,7 @@ public class HostOnlineGame extends AppCompatActivity {
         }
 
     }
+
     class Run3 implements Runnable {
         private final String message;
 
