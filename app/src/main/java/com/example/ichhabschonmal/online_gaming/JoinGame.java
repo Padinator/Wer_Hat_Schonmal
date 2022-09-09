@@ -88,7 +88,7 @@ public class JoinGame extends AppCompatActivity {
                     Log.e("Server sent to client", "Ready");
 
                     if (message != null) {
-                        runOnUiThread(() -> tvMessages.append("server:" + message + "\n"));
+                        runOnUiThread(() -> tvMessages.append("server: " + message + "\n"));
                     } else {
                         // Thread1 = new Thread(new Connector());
                         // Thread1.start();
