@@ -1,20 +1,18 @@
 package com.example.ichhabschonmal.online_gaming;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.os.Bundle;
-
-import com.example.ichhabschonmal.R;
-import com.example.ichhabschonmal.wifi_direct.ServerSocketEndPoint;
-
 import android.annotation.SuppressLint;
+import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.ichhabschonmal.R;
+import com.example.ichhabschonmal.wifi_direct.ServerSocketEndPoint;
+
 import java.io.IOException;
-import java.net.UnknownHostException;
 
 @SuppressLint("SetTextI18n")
 public class HostOnlineGame extends AppCompatActivity {
@@ -23,7 +21,7 @@ public class HostOnlineGame extends AppCompatActivity {
     private Thread connectionThread;
     private Thread receiverThread;
     private Thread senderThread;
-    private ServerSocketEndPoint.Receiver receiverAction;
+    private ServerSocketEndPoint.Client.Receiver receiverAction;
 
     private String message;
 
@@ -51,7 +49,7 @@ public class HostOnlineGame extends AppCompatActivity {
         tvPort.setText("" + ServerSocketEndPoint.SERVER_PORT);
 
         // Create actions after messaging
-        receiverAction = serverEndPoint.new Receiver("Message from client") {
+        receiverAction = serverEndPoint.new Client().new Receiver() {
 
             @Override
             public void action() {
@@ -94,7 +92,7 @@ public class HostOnlineGame extends AppCompatActivity {
             message = etMessage.getText().toString().trim();
 
             if (!message.isEmpty()) {
-                serverEndPoint.sendMessage(message);
+                serverEndPoint.sendMessageToAllClients(message);
                 tvMessages.append("server sent this: " + message + "\n");
                 etMessage.setText("");
             }
