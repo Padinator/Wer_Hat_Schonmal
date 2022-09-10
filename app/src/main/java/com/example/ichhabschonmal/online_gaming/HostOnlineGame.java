@@ -1,18 +1,19 @@
 package com.example.ichhabschonmal.online_gaming;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.os.Bundle;
-
-import com.example.ichhabschonmal.R;
-
 import android.annotation.SuppressLint;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.ichhabschonmal.HelpFunctions;
+import com.example.ichhabschonmal.R;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -39,6 +40,9 @@ public class HostOnlineGame extends AppCompatActivity {
 
     private PrintWriter output;
     private BufferedReader input;
+
+    HelpFunctions helpFunctions;
+    String device;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +71,10 @@ public class HostOnlineGame extends AppCompatActivity {
                 new Thread(new Run3(message)).start();
             }
         });
+
+
+        helpFunctions = new HelpFunctions();
+        device = helpFunctions.getNameOfDevice();
     }
 
     private String getLocalIpAddress() throws UnknownHostException {
@@ -150,7 +158,7 @@ public class HostOnlineGame extends AppCompatActivity {
             output.flush();
 
             runOnUiThread(() -> {
-                tvMessages.append("server sent this: " + message + "\n");
+                tvMessages.append(device + " " + message + "\n");
                 etMessage.setText("");
             });
         }
