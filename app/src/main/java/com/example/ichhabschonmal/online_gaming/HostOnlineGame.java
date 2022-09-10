@@ -13,14 +13,18 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.io.IOException;
 import java.net.UnknownHostException;
 
 @SuppressLint("SetTextI18n")
 public class HostOnlineGame extends AppCompatActivity {
     private ServerSocketEndPoint serverEndPoint;
+
     private Thread connectionThread;
+    private Thread receiverThread;
     private Thread senderThread;
-    private ServerSocketEndPoint.Receiver actionThread;
+    private ServerSocketEndPoint.Receiver receiverAction;
+
     private String message;
 
     @Override
@@ -38,7 +42,7 @@ public class HostOnlineGame extends AppCompatActivity {
         // Initialize server endpoint
         try {
             serverEndPoint = new ServerSocketEndPoint(this, getApplicationContext());
-        } catch (UnknownHostException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
@@ -47,7 +51,7 @@ public class HostOnlineGame extends AppCompatActivity {
         tvPort.setText("" + ServerSocketEndPoint.SERVER_PORT);
 
         // Create actions after messaging
-        actionThread = serverEndPoint.new Receiver("Message from client") {
+        receiverAction = serverEndPoint.new Receiver("Message from client") {
 
             @Override
             public void action() {
@@ -57,17 +61,40 @@ public class HostOnlineGame extends AppCompatActivity {
 
         };
 
-        // Create the corresponding thread
-        connectionThread = new Thread(serverEndPoint.new Connector(actionThread));
-        connectionThread.start();
+        // Create connection to Socket
+        serverEndPoint.startConnection(2, receiverAction);
+
+        // Receive messages
+        //serverEndPoint.receiveMessages(receiverAction);
+        /*
+        // Disconnect from Socket
+        new Thread(() -> {
+            try {
+                Thread.sleep(5000);
+                Log.e("Test1", "Disconnect");
+                serverEndPoint.disconnectSocket();
+
+                new Thread(() -> {
+                    try {
+                        Thread.sleep(5000);
+                        Log.e("Test1", "Reconnect");
+                        serverEndPoint.startConnection(receiverAction);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }).start();
+            } catch (IOException | InterruptedException e) {
+                e.printStackTrace();
+            }
+        }).start();
+        */
 
         // Set OnClickListener, send messages
         btnSend.setOnClickListener(v -> {
             message = etMessage.getText().toString().trim();
 
             if (!message.isEmpty()) {
-                senderThread = new Thread(serverEndPoint.new Sender(message));
-                senderThread.start();
+                serverEndPoint.sendMessage(message);
                 tvMessages.append("server sent this: " + message + "\n");
                 etMessage.setText("");
             }
