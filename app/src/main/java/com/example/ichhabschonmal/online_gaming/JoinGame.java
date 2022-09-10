@@ -1,28 +1,21 @@
 package com.example.ichhabschonmal.online_gaming;
 
-import android.annotation.SuppressLint;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
+import androidx.appcompat.app.AppCompatActivity;
+
 import android.os.Bundle;
+
+import com.example.ichhabschonmal.R;
+
+import android.annotation.SuppressLint;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-
-import androidx.appcompat.app.AppCompatActivity;
-
-import com.example.ichhabschonmal.HelpFunctions;
-import com.example.ichhabschonmal.R;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.net.InetAddress;
 import java.net.Socket;
-import java.net.UnknownHostException;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 
 @SuppressLint("SetTextI18n")
 public class JoinGame extends AppCompatActivity {
@@ -38,9 +31,6 @@ public class JoinGame extends AppCompatActivity {
     private BufferedReader input;
     private PrintWriter output;
 
-    HelpFunctions helpFunctions;
-    String device;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,9 +41,6 @@ public class JoinGame extends AppCompatActivity {
         etMessage = findViewById(R.id.etMessage);
         btnSend = findViewById(R.id.btnSend);
         Button btnConnect = findViewById(R.id.btnConnect);
-
-        helpFunctions = new HelpFunctions();
-        device = helpFunctions.getNameOfDevice();
 
         btnConnect.setOnClickListener(v -> {
             tvMessages.setText("");
@@ -101,7 +88,7 @@ public class JoinGame extends AppCompatActivity {
                     Log.e("Server sent to client", "Ready");
 
                     if (message != null) {
-                        runOnUiThread(() -> tvMessages.append("server:" + message + device +"\n"));
+                        runOnUiThread(() -> tvMessages.append("server: " + message + "\n"));
                     } else {
                         // Thread1 = new Thread(new Connector());
                         // Thread1.start();
@@ -128,20 +115,10 @@ public class JoinGame extends AppCompatActivity {
             output.flush();
 
             runOnUiThread(() -> {
-
-                tvMessages.append(device+ ": " + message + device+ "\n");
+                tvMessages.append("client sent this: " + message + "\n");
                 etMessage.setText("");
             });
         }
-    }
 
-
-    private String getLocalIpAddress() throws UnknownHostException {
-        WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
-        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
-        int ipInt = wifiInfo.getIpAddress();
-
-        return InetAddress.getByAddress(ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN)
-                .putInt(ipInt).array()).getHostAddress();
     }
 }
