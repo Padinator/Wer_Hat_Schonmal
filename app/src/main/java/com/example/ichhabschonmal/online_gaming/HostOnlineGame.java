@@ -10,7 +10,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.ichhabschonmal.R;
-import com.example.ichhabschonmal.wifi_direct.ServerSocketEndPoint;
+import com.example.ichhabschonmal.server_client_communication.ServerSocketEndPoint;
 
 import java.io.IOException;
 
@@ -60,32 +60,35 @@ public class HostOnlineGame extends AppCompatActivity {
         };
 
         // Create connection to Socket
-        serverEndPoint.startConnection(2, receiverAction);
+        serverEndPoint.createConnection(1, receiverAction);
 
         // Receive messages
         //serverEndPoint.receiveMessages(receiverAction);
-        /*
+
         // Disconnect from Socket
         new Thread(() -> {
             try {
                 Thread.sleep(5000);
-                Log.e("Test1", "Disconnect");
-                serverEndPoint.disconnectSocket();
+                Log.e("Test1", "Stop");
+                serverEndPoint.stopReceivingMessagesFromAllClients();
+                Log.e("Test1", "Stopped");
 
                 new Thread(() -> {
                     try {
                         Thread.sleep(5000);
-                        Log.e("Test1", "Reconnect");
-                        serverEndPoint.startConnection(receiverAction);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
+                    Log.e("Test1", "Start");
+                    serverEndPoint.continueReceivingMessagesFromAllClients();
+                    Log.e("Test1", "Started");
                 }).start();
-            } catch (IOException | InterruptedException e) {
+
+            } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }).start();
-        */
+
 
         // Set OnClickListener, send messages
         btnSend.setOnClickListener(v -> {

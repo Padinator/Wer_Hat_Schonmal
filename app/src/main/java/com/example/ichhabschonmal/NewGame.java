@@ -20,6 +20,9 @@ import com.example.ichhabschonmal.database.AppDatabase;
 import com.example.ichhabschonmal.database.Game;
 import com.example.ichhabschonmal.online_gaming.HostOnlineGame;
 
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
