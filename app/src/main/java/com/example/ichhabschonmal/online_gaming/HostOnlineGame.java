@@ -11,17 +11,14 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.ichhabschonmal.R;
 import com.example.ichhabschonmal.server_client_communication.ServerSocketEndPoint;
+import com.example.ichhabschonmal.server_client_communication.SocketCommunicator;
 
 import java.io.IOException;
 
 @SuppressLint("SetTextI18n")
 public class HostOnlineGame extends AppCompatActivity {
     private ServerSocketEndPoint serverEndPoint;
-
-    private Thread connectionThread;
-    private Thread receiverThread;
-    private Thread senderThread;
-    private ServerSocketEndPoint.Client.Receiver receiverAction;
+    private SocketCommunicator.Receiver receiverAction;
 
     private String message;
 
@@ -45,16 +42,17 @@ public class HostOnlineGame extends AppCompatActivity {
         }
 
         // Set TextViews
-        tvIP.setText(serverEndPoint.getSERVER_IP());
-        tvPort.setText("" + ServerSocketEndPoint.SERVER_PORT);
+        tvIP.setText("Host-IP: " + serverEndPoint.getServerIP());
+        tvPort.setText("Host-Port: " + ServerSocketEndPoint.SERVER_PORT);
 
         // Create actions after messaging
-        receiverAction = serverEndPoint.new Client().new Receiver() {
+        receiverAction = new SocketCommunicator(null, null, null, null, null).new Receiver() {
 
             @Override
             public void action() {
-                Log.e("ActionThread", "actioning: " + serverEndPoint.getMessage());
-                runOnUiThread(() -> tvMessages.append("client: " + serverEndPoint.getMessage() + "\n"));
+                runOnUiThread(() -> {
+                    tvMessages.append("client: " + serverEndPoint.getClientsMessage(0) + "\n");
+                });
             }
 
         };
@@ -70,7 +68,7 @@ public class HostOnlineGame extends AppCompatActivity {
             try {
                 Thread.sleep(5000);
                 Log.e("Test1", "Stop");
-                serverEndPoint.stopReceivingMessagesFromAllClients();
+                serverEndPoint.stopReceivingMessages();
                 Log.e("Test1", "Stopped");
 
                 new Thread(() -> {
@@ -80,7 +78,7 @@ public class HostOnlineGame extends AppCompatActivity {
                         e.printStackTrace();
                     }
                     Log.e("Test1", "Start");
-                    serverEndPoint.continueReceivingMessagesFromAllClients();
+                    serverEndPoint.continueReceivingMessages();
                     Log.e("Test1", "Started");
                 }).start();
 
@@ -95,7 +93,7 @@ public class HostOnlineGame extends AppCompatActivity {
             message = etMessage.getText().toString().trim();
 
             if (!message.isEmpty()) {
-                serverEndPoint.sendMessageToAllClients(message);
+                serverEndPoint.sendMessage(message);
                 tvMessages.append("server sent this: " + message + "\n");
                 etMessage.setText("");
             }

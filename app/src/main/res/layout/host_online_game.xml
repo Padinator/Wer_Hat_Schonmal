@@ -9,7 +9,7 @@
         android:layout_width = "wrap_content"
         android:layout_height = "wrap_content"
         android:textAppearance = "@style/Base.TextAppearance.AppCompat.Medium"
-        android:text="IP"/>
+        android:text="Host-IP"/>
 
     <TextView
         android:id = "@+id/tvPort"
@@ -17,7 +17,7 @@
         android:layout_height = "wrap_content"
         android:layout_below = "@+id/tvIP"
         android:textAppearance = "@style/Base.TextAppearance.AppCompat.Medium"
-        android:text="Port"/>
+        android:text="Host-Port"/>
 
     <TextView
         android:id = "@+id/tvConnectionStatus"
