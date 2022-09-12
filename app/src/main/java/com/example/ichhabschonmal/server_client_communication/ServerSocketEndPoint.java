@@ -17,13 +17,11 @@ public class ServerSocketEndPoint extends SocketEndPoint {
     private final Activity activity;
     private final Context context;
 
-    private ServerSocket serverSocket;
-    public static final int SERVER_PORT = 8080;
-
+    private final ServerSocket serverSocket;
     private Thread connectionThread;
     private SocketCommunicator.Receiver receiverAction;
 
-    private LinkedList<Client> clients = new LinkedList<>();
+    private final LinkedList<Client> clients = new LinkedList<>();
     private int countOfClients;
 
     /*
@@ -163,13 +161,13 @@ public class ServerSocketEndPoint extends SocketEndPoint {
                     BufferedReader input;
                     PrintWriter output;
                     Socket serverEndPoint;
-                    SocketCommunicator socketEndPoint;
+                    SocketCommunicator socketCommunicatorToClient;
 
                     serverEndPoint = serverSocket.accept(); // Searches for clients always???
                     input = new BufferedReader(new InputStreamReader(serverEndPoint.getInputStream()));
                     output = new PrintWriter(serverEndPoint.getOutputStream());
-                    socketEndPoint = new SocketCommunicator(activity, context, serverEndPoint, input, output);
-                    clients.add(new Client(socketEndPoint, receiverAction));
+                    socketCommunicatorToClient = new SocketCommunicator(activity, context, serverEndPoint, input, output);
+                    clients.add(new Client(socketCommunicatorToClient, receiverAction));
 
                     if (clients.getLast().getReceiver() != null)
                         clients.getLast().receiveMessages(receiverAction);

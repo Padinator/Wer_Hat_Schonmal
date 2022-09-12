@@ -11,19 +11,11 @@
         android:hint = "IP-Address"
         android:inputType = "text" />
 
-    <EditText
-        android:id = "@+id/etPort"
-        android:layout_width = "match_parent"
-        android:layout_height = "wrap_content"
-        android:layout_below = "@+id/etIP"
-        android:hint = "Port No"
-        android:inputType = "number" />
-
     <Button
         android:id = "@+id/btnConnect"
         android:layout_width = "match_parent"
         android:layout_height = "wrap_content"
-        android:layout_below = "@+id/etPort"
+        android:layout_below = "@+id/etIP"
         android:layout_gravity = "center"
         android:layout_marginTop = "16dp"
         android:text = "Connect To Server" />

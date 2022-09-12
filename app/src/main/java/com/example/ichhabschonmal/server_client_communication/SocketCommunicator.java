@@ -35,6 +35,10 @@ public class SocketCommunicator {
         endPoint.close();
     }
 
+    public boolean isCOnnected() {
+        return endPoint.isConnected();
+    }
+
     public abstract class Receiver implements Runnable {
 
         private boolean doneReading = false;

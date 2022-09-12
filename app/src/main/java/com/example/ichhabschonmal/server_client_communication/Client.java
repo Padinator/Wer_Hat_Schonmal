@@ -18,12 +18,39 @@ public class Client {
         setReceiver(receiverAction);
     }
 
+    public Client(SocketCommunicator endPoint, SocketCommunicator.Receiver receiverAction, String deviceName, String IPAddress) {
+        this.communicator = endPoint;
+        setReceiver(receiverAction);
+        this.deviceName = deviceName;
+        this.IPAddress = IPAddress;
+    }
+
+    public String getDeviceName() {
+        return deviceName;
+    }
+
+    public String getIPAddress() {
+        return IPAddress;
+    }
+
+    public void setDeviceName(String deviceName) {
+        this.deviceName = deviceName;
+    }
+
+    public void setIPAddress(String IPAddress) {
+        this.IPAddress = IPAddress;
+    }
+
     public SocketCommunicator.Receiver getReceiver() {
         return receiver;
     }
 
     public String getMessage() {
         return receiver.getMessage();
+    }
+
+    public boolean isConnected() {
+        return communicator.isCOnnected();
     }
 
     public void setReceiver(SocketCommunicator.Receiver receiverAction) {
@@ -39,7 +66,7 @@ public class Client {
 
     @Override
     public String toString() { /////////////////////////////////////
-        return "Client 1: Device:" + deviceName + ", IP-Address: " + IPAddress;
+        return "Client 1: Device: " + deviceName + ", IP-Address: " + IPAddress;
     }
 
     public void receiveMessages(SocketCommunicator.Receiver receiverAction) {

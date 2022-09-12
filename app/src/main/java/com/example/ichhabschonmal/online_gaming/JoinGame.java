@@ -5,6 +5,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 
 import com.example.ichhabschonmal.R;
+import com.example.ichhabschonmal.server_client_communication.ClientSocketEndPoint;
+import com.example.ichhabschonmal.server_client_communication.SocketCommunicator;
 
 import android.annotation.SuppressLint;
 import android.util.Log;
@@ -19,106 +21,55 @@ import java.net.Socket;
 
 @SuppressLint("SetTextI18n")
 public class JoinGame extends AppCompatActivity {
-    private EditText etIP, etPort;
+    private EditText etIP;
     private TextView tvMessages;
     private EditText etMessage;
     private Button btnSend;
 
-    private Thread Thread1 = null;
-    private String SERVER_IP;
-    private int SERVER_PORT;
-
-    private BufferedReader input;
-    private PrintWriter output;
+    private ClientSocketEndPoint clientEndPoint;
+    private SocketCommunicator.Receiver receiverAction;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.join_game);
         etIP = findViewById(R.id.etIP);
-        etPort = findViewById(R.id.etPort);
         tvMessages = findViewById(R.id.tvMessages);
         etMessage = findViewById(R.id.etMessage);
         btnSend = findViewById(R.id.btnSend);
         Button btnConnect = findViewById(R.id.btnConnect);
 
+        receiverAction = new SocketCommunicator(null, null, null, null, null).new Receiver() {
+
+            @Override
+            public void action() {
+                tvMessages.setText("server: " + clientEndPoint.getClientsMessage());
+            }
+
+        };
+
         btnConnect.setOnClickListener(v -> {
-            tvMessages.setText("");
-            SERVER_IP = etIP.getText().toString().trim();
-            SERVER_PORT = Integer.parseInt(etPort.getText().toString().trim());
-            Thread1 = new Thread(new Connector());
-            Thread1.start();
+            clientEndPoint = new ClientSocketEndPoint(this, getApplicationContext(), etIP.getText().toString().trim());
+
+            try {
+                if (clientEndPoint.createConnection(receiverAction))
+                    tvMessages.setText("Connected");
+                else
+                    tvMessages.setText("Not Connected");
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         });
 
         btnSend.setOnClickListener(v -> {
             String message = etMessage.getText().toString().trim();
 
             if (!message.isEmpty()) {
-                new Thread(new Run3(message)).start();
+                clientEndPoint.sendMessage(message);
+                tvMessages.append("server sent this: " + message);
             }
+
+            etMessage.setText("");
         });
-    }
-
-    class Connector implements Runnable {
-        public void run() {
-            Socket socket;
-
-            try {
-                socket = new Socket(SERVER_IP, SERVER_PORT);
-                output = new PrintWriter(socket.getOutputStream());
-                input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                runOnUiThread(() -> tvMessages.setText("Connected\n"));
-
-                new Thread(new Run2()).start();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    class Run2 implements Runnable {
-
-        @Override
-        public void run() {
-            boolean doneReading = false;
-
-            while (!doneReading) {
-                try {
-                    final String message = input.readLine();
-                    Log.e("Server sent to client", "Ready");
-
-                    if (message != null) {
-                        runOnUiThread(() -> tvMessages.append("server: " + message + "\n"));
-                    } else {
-                        // Thread1 = new Thread(new Connector());
-                        // Thread1.start();
-                        doneReading = true;
-                        Log.e("Server sent to client", "Not Ready");
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-    }
-    class Run3 implements Runnable {
-        private final String message;
-
-        Run3(String message) {
-            this.message = message;
-        }
-
-        @Override
-        public void run() {
-            output.println(message);
-            output.flush();
-
-            runOnUiThread(() -> {
-                tvMessages.append("client sent this: " + message + "\n");
-                etMessage.setText("");
-            });
-        }
-
     }
 }

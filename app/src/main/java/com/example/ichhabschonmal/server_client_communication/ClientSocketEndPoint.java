@@ -2,26 +2,29 @@ package com.example.ichhabschonmal.server_client_communication;
 
 import android.app.Activity;
 import android.content.Context;
+import android.util.Log;
+import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.ConnectException;
+import java.net.NoRouteToHostException;
 import java.net.Socket;
+import java.util.concurrent.Semaphore;
 
 public class ClientSocketEndPoint extends SocketEndPoint {
     private final Activity activity;
     private final Context context;
 
-    public static final int SERVER_PORT = 8080;
-
     private Client client;
-
     private Thread connectionThread;
     private SocketCommunicator.Receiver receiverAction;
+    Semaphore connection;
 
 
-    public ClientSocketEndPoint(Activity activity, Context context, String serverIP) throws IOException {
+    public ClientSocketEndPoint(Activity activity, Context context, String serverIP) {
         super(activity, context, serverIP);
 
         this.activity = activity;
@@ -35,7 +38,22 @@ public class ClientSocketEndPoint extends SocketEndPoint {
     *
      */
     public String getClientsMessage() {
-        return client.getMessage();
+        if (client != null)
+            return client.getMessage();
+        else
+            throw new NullPointerException("Cannot read message from client, no client was created!");
+    }
+
+    /*
+    *
+    * Returns the client's connection status.
+    *
+     */
+    public boolean isConnected() {
+        if (client != null)
+            return client.isConnected();
+        else
+            throw new NullPointerException("Cannot check connection status of client, when no one was created!");
     }
 
     /*
@@ -43,20 +61,26 @@ public class ClientSocketEndPoint extends SocketEndPoint {
      * Creates connection between host and client.
      *
      */
-    public void createConnection() {
-        createConnection(null);
+    public boolean createConnection() throws InterruptedException {
+        return createConnection(null);
     }
 
     /*
      *
      * Creates connection between host and client and starts receiving messages.
+     * Returns, if connection could be created -> automatically synchronization
      *
      */
-    public void createConnection(SocketCommunicator.Receiver receiverAction) {
+    public boolean createConnection(SocketCommunicator.Receiver receiverAction) throws InterruptedException {
         this.receiverAction = receiverAction;
 
         connectionThread = new Thread(new ClientConnector());
         connectionThread.start();
+
+        connection = new Semaphore(0); // Connect client with host
+        connection.acquire();
+
+        return client != null && client.isConnected();
     }
 
     /*
@@ -118,18 +142,31 @@ public class ClientSocketEndPoint extends SocketEndPoint {
                 BufferedReader input;
                 PrintWriter output;
                 Socket clientEndPoint;
-                SocketCommunicator socketEndPoint;
+                SocketCommunicator socketCommunicatorToServer;
+
+                Log.e("Server-Port", "Server-IP: " + serverIP + ", Server-Port: " + SERVER_PORT + "");
 
                 clientEndPoint = new Socket(serverIP, SERVER_PORT);
+                //clientEndPoint = new Socket("192.168.1.38", 8080);
+                Log.e("Server-Port", "1");
                 input = new BufferedReader(new InputStreamReader(clientEndPoint.getInputStream()));
+                Log.e("Server-Port", "2");
                 output = new PrintWriter(clientEndPoint.getOutputStream());
-                socketEndPoint = new SocketCommunicator(activity, context, clientEndPoint, input, output);
-                client = new Client(socketEndPoint, receiverAction);
+                Log.e("Server-Port", "3");
+                socketCommunicatorToServer = new SocketCommunicator(activity, context, clientEndPoint, input, output);
+                Log.e("Server-Port", "4");
+                client = new Client(socketCommunicatorToServer, receiverAction, getNameOfDevice(),getLocalIpAddress());
+                Log.e("Client", client.toString());
 
                 if (client.getReceiver() != null)
                     client.receiveMessages(receiverAction);
+            } catch (NoRouteToHostException | ConnectException e) {
+                Log.e("NoRouteToHostException", "No Host is waiting for a connection!");
+                activity.runOnUiThread(() -> Toast.makeText(context, "No Host is waiting for a connection!", Toast.LENGTH_SHORT).show());
             } catch (IOException e) {
                 e.printStackTrace();
+            } finally {
+                connection.release();
             }
         }
     }
