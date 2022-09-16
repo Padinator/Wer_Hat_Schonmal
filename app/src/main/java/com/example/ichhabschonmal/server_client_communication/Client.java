@@ -50,7 +50,7 @@ public class Client {
     }
 
     public boolean isConnected() {
-        return communicator.isCOnnected();
+        return communicator.isConnected();
     }
 
     public void setReceiver(SocketCommunicator.Receiver receiverAction) {
@@ -66,7 +66,7 @@ public class Client {
 
     @Override
     public String toString() { /////////////////////////////////////
-        return "Client 1: Device: " + deviceName + ", IP-Address: " + IPAddress;
+        return "Client: Device: " + deviceName + ", IP-Address: " + IPAddress;
     }
 
     public void receiveMessages(SocketCommunicator.Receiver receiverAction) {

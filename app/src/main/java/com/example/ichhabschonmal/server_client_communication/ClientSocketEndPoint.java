@@ -32,6 +32,16 @@ public class ClientSocketEndPoint extends SocketEndPoint {
         this.serverIP = serverIP;
     }
 
+
+    /*
+    *
+    * Returns client ip address
+    *
+     */
+    public String getClientIpAddress() {
+        return client.getIPAddress();
+    }
+
     /*
     *
     * Returns the message, the client has received.

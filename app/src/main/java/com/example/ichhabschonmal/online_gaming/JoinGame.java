@@ -1,23 +1,16 @@
 package com.example.ichhabschonmal.online_gaming;
 
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.ichhabschonmal.R;
 import com.example.ichhabschonmal.server_client_communication.ClientSocketEndPoint;
 import com.example.ichhabschonmal.server_client_communication.SocketCommunicator;
-
-import android.annotation.SuppressLint;
-import android.util.Log;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.Socket;
 
 @SuppressLint("SetTextI18n")
 public class JoinGame extends AppCompatActivity {
@@ -52,9 +45,11 @@ public class JoinGame extends AppCompatActivity {
             clientEndPoint = new ClientSocketEndPoint(this, getApplicationContext(), etIP.getText().toString().trim());
 
             try {
-                if (clientEndPoint.createConnection(receiverAction))
+                if (clientEndPoint.createConnection(receiverAction)) {
                     tvMessages.setText("Connected");
-                else
+                    clientEndPoint.sendMessage(clientEndPoint.getNameOfDevice() + " " + clientEndPoint.getClientIpAddress());
+
+                } else
                     tvMessages.setText("Not Connected");
             } catch (InterruptedException e) {
                 e.printStackTrace();

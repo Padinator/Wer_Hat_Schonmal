@@ -1,10 +1,5 @@
 package com.example.ichhabschonmal;
 
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDelegate;
-import androidx.room.Room;
-
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,13 +11,15 @@ import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.Toast;
 
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.room.Room;
+
 import com.example.ichhabschonmal.database.AppDatabase;
 import com.example.ichhabschonmal.database.Game;
 import com.example.ichhabschonmal.online_gaming.HostOnlineGame;
 
-import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -87,7 +84,7 @@ public class NewGame extends AppCompatActivity {
             else if (exists(fileName, listOfGames))
                 Toast.makeText(NewGame.this, "Dateiname darf nicht mehrfach verwendet werden!", Toast.LENGTH_LONG).show();
             else if (playerNumber.isEmpty())
-                    Toast.makeText(NewGame.this, "Spielerzahlfeld darf nicht leer sein!", Toast.LENGTH_LONG).show();
+                Toast.makeText(NewGame.this, "Spielerzahlfeld darf nicht leer sein!", Toast.LENGTH_LONG).show();
             else if (playerNumber.contains("."))
                 Toast.makeText(NewGame.this, "Spielerzahl darf keinen Punkt enthalten!", Toast.LENGTH_LONG).show();
             else if (storyMinNumber.isEmpty())
@@ -125,18 +122,19 @@ public class NewGame extends AppCompatActivity {
             else if (Integer.parseInt(storyMinNumber) > Integer.parseInt(storyMaxNumber))          // Casts are valid, because of if-cases before
                 Toast.makeText(NewGame.this, "Minimum-Storyzahl muss kleiner oder gleich der Maximum-Storyzahl sein!", Toast.LENGTH_LONG).show();
             else {
-                 if (!playMode.isChecked()) {       // One phone for all player, only one counter
-                     Intent newGameIntent = new Intent(getApplicationContext(), CreatePlayers.class);
-                     newGameIntent.putExtra("MinStoryNumber", Integer.parseInt(storyMinNumber));     // Give storyMinNumber
-                     newGameIntent.putExtra("MaxStoryNumber", Integer.parseInt(storyMaxNumber));     // Give storyMaxNumber
-                     newGameIntent.putExtra("playerNumber", Integer.parseInt(playerNumber));     // Give number of players
-                     newGameIntent.putExtra("GameName", gameName.getText().toString());     // Give the name of the game
-                     newGameIntent.putExtra("DrinkOfTheGame", drinkOfTheGame);
-                     startActivity(newGameIntent);
-                 } else {
-                    Intent newGameMultipleDevicesIntent = new Intent(getApplicationContext(), HostOnlineGame.class);
-                    startActivity(newGameMultipleDevicesIntent);
-                }
+                Intent intent;
+
+                if (!playMode.isChecked())        // One phone for all player, only one counter
+                    intent = new Intent(getApplicationContext(), CreatePlayers.class);
+                else
+                    intent = new Intent(getApplicationContext(), HostOnlineGame.class);
+
+                intent.putExtra("MinStoryNumber", Integer.parseInt(storyMinNumber));     // Give storyMinNumber
+                intent.putExtra("MaxStoryNumber", Integer.parseInt(storyMaxNumber));     // Give storyMaxNumber
+                intent.putExtra("playerNumber", Integer.parseInt(playerNumber));     // Give number of players
+                intent.putExtra("GameName", gameName.getText().toString());     // Give the name of the game
+                intent.putExtra("DrinkOfTheGame", drinkOfTheGame);
+                startActivity(intent);
             }
         });
         // calling the action bar

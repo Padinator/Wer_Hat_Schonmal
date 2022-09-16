@@ -21,7 +21,7 @@ public class ServerSocketEndPoint extends SocketEndPoint {
     private Thread connectionThread;
     private SocketCommunicator.Receiver receiverAction;
 
-    private final LinkedList<Client> clients = new LinkedList<>();
+    public final LinkedList<Client> clients = new LinkedList<>();
     private int countOfClients;
 
     /*
@@ -42,9 +42,9 @@ public class ServerSocketEndPoint extends SocketEndPoint {
     }
 
     /*
-    *
-    * Return a list of all clients' messages.
-    *
+     *
+     * Return a list of all clients' messages.
+     *
      */
     public ArrayList<String> getClientsMessages() {
         ArrayList<String> messages = new ArrayList<>();
@@ -56,12 +56,46 @@ public class ServerSocketEndPoint extends SocketEndPoint {
     }
 
     /*
-    *
-    * Returns a client's message.
-    *
+     *
+     * Returns a client's message.
+     *
      */
     public String getClientsMessage(int index) {
         return clients.get(index).getMessage();
+    }
+
+
+    public String getClientsIPAddress(int index) {
+        if (index < 0 || index >= clients.size())
+            throw new IndexOutOfBoundsException("No client (IP) found, invalid index: " + index);
+
+        Log.e("Client index", index + "");
+        return clients.get(index).getIPAddress();
+    }
+
+    public String getClientsDeviceName(int index) {
+        if (index < 0 || index >= clients.size())
+            throw new IndexOutOfBoundsException("No client (Device) found, invalid index: " + index);
+
+        return clients.get(index).getDeviceName();
+    }
+
+    public void setClientsDeviceName(int index, String deviceName) {
+        if (index < 0 || index >= clients.size())
+            throw new IndexOutOfBoundsException("No client (Device) found, invalid index: " + index);
+
+        clients.get(index).setDeviceName(deviceName);
+    }
+
+    public void setClientsIPAddress(int index, String IPAdress) {
+        if (index < 0 || index >= clients.size())
+            throw new IndexOutOfBoundsException("No client (Device) found, invalid index: " + index);
+
+        clients.get(index).setIPAddress(IPAdress);
+    }
+
+    public int sizeOfClients() {
+        return clients.size();
     }
 
     /*
@@ -137,7 +171,7 @@ public class ServerSocketEndPoint extends SocketEndPoint {
             client.sendMessage(message);
     }
 
-    public void disconnectServerFromClients() throws IOException {
+    public void disconnectClientsFromServer() throws IOException {
         for (Client client : clients)
             client.disconnectClientFromServer();
     }
@@ -152,23 +186,25 @@ public class ServerSocketEndPoint extends SocketEndPoint {
             serverSocket.close();
     }
 
+
     private class ServerConnector implements Runnable {
 
         @Override
         public void run() {
             try {
+
                 for (int i = 0; i < countOfClients; i++) {
                     BufferedReader input;
                     PrintWriter output;
                     Socket serverEndPoint;
                     SocketCommunicator socketCommunicatorToClient;
 
-                    serverEndPoint = serverSocket.accept(); // Searches for clients always???
+                    serverEndPoint = serverSocket.accept(); // Searches for clients always
                     input = new BufferedReader(new InputStreamReader(serverEndPoint.getInputStream()));
                     output = new PrintWriter(serverEndPoint.getOutputStream());
                     socketCommunicatorToClient = new SocketCommunicator(activity, context, serverEndPoint, input, output);
                     clients.add(new Client(socketCommunicatorToClient, receiverAction));
-
+                    Log.e("ServerConnector", clients.toString());
                     if (clients.getLast().getReceiver() != null)
                         clients.getLast().receiveMessages(receiverAction);
                 }

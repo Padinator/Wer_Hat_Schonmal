@@ -35,7 +35,7 @@ public class SocketCommunicator {
         endPoint.close();
     }
 
-    public boolean isCOnnected() {
+    public boolean isConnected() {
         return endPoint.isConnected();
     }
 
