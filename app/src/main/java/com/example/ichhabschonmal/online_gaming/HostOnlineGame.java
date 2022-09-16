@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.ichhabschonmal.R;
-import com.example.ichhabschonmal.adapter.ClientAdapter;
+import com.example.ichhabschonmal.adapter.HostOnlineGameAdapter;
 import com.example.ichhabschonmal.server_client_communication.ServerSocketEndPoint;
 import com.example.ichhabschonmal.server_client_communication.SocketCommunicator;
 
@@ -29,7 +29,7 @@ public class HostOnlineGame extends AppCompatActivity {
     private String message;
     ImageButton kickClient;
     RecyclerView recyclerView;
-    ClientAdapter clientAdapter;
+    HostOnlineGameAdapter hostOnlineGameAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,8 +55,8 @@ public class HostOnlineGame extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         //ClientAdapter
-        clientAdapter = new ClientAdapter(this, serverEndPoint);
-        recyclerView.setAdapter(clientAdapter);
+        hostOnlineGameAdapter = new HostOnlineGameAdapter(this, serverEndPoint);
+        recyclerView.setAdapter(hostOnlineGameAdapter);
 
 
         // Set TextViews
@@ -79,8 +79,8 @@ public class HostOnlineGame extends AppCompatActivity {
 
                     Log.e("Server receives", serverEndPoint.clients.toString());
                     runOnUiThread(() -> {
-                        clientAdapter.notifyDataSetChanged();
-                        recyclerView.setAdapter(clientAdapter);
+                        hostOnlineGameAdapter.notifyDataSetChanged();
+                        recyclerView.setAdapter(hostOnlineGameAdapter);
                     });
                 }
             }

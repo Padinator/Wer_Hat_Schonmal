@@ -14,14 +14,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.ichhabschonmal.R;
 import com.example.ichhabschonmal.server_client_communication.ServerSocketEndPoint;
 
-public class ClientAdapter extends RecyclerView.Adapter<ClientAdapter.ViewHolder> {
+public class HostOnlineGameAdapter extends RecyclerView.Adapter<HostOnlineGameAdapter.ViewHolder> {
 
     private final LayoutInflater inflater;
     private final Context context;
     private final ServerSocketEndPoint serverEndPoint;
 
 
-    public ClientAdapter(Context context, ServerSocketEndPoint serverEndPoint) {
+    public HostOnlineGameAdapter(Context context, ServerSocketEndPoint serverEndPoint) {
         this.inflater = LayoutInflater.from(context);
         this.context = context;
         this.serverEndPoint = serverEndPoint;
@@ -31,7 +31,7 @@ public class ClientAdapter extends RecyclerView.Adapter<ClientAdapter.ViewHolder
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = inflater.inflate(R.layout.client_item, parent, false);
-        return new ClientAdapter.ViewHolder(view);
+        return new HostOnlineGameAdapter.ViewHolder(view);
     }
 
     @Override

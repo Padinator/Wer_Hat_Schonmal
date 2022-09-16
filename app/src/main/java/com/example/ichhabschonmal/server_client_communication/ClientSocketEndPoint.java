@@ -21,7 +21,7 @@ public class ClientSocketEndPoint extends SocketEndPoint {
     private Client client;
     private Thread connectionThread;
     private SocketCommunicator.Receiver receiverAction;
-    Semaphore connection;
+    private Semaphore connected;
 
 
     public ClientSocketEndPoint(Activity activity, Context context, String serverIP) {
@@ -87,8 +87,8 @@ public class ClientSocketEndPoint extends SocketEndPoint {
         connectionThread = new Thread(new ClientConnector());
         connectionThread.start();
 
-        connection = new Semaphore(0); // Connect client with host
-        connection.acquire();
+        connected = new Semaphore(0); // Connect client with host
+        connected.acquire();
 
         return client != null && client.isConnected();
     }
@@ -176,7 +176,7 @@ public class ClientSocketEndPoint extends SocketEndPoint {
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
-                connection.release();
+                connected.release();
             }
         }
     }
