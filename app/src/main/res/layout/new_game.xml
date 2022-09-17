@@ -125,17 +125,18 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/storyMaxCountOption"
-            android:text="Drink auswaehlen fuer die Runde: "
             android:layout_marginLeft="30dp"
             android:layout_marginRight="30dp"
             android:layout_marginBottom="15dp"
-            android:textSize="20dp"/>
+            android:text="Drink auswaehlen:"
+            android:textSize="20dp" />
 
         <Spinner
             android:id="@+id/drinkVariantsOne"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/chooseDrink"
+            android:layout_below="@+id/storyMaxCount"
+            android:layout_toRightOf="@id/chooseDrink"
             android:layout_marginLeft="30dp"
             android:layout_marginRight="30dp"
             android:layout_marginBottom="15dp"

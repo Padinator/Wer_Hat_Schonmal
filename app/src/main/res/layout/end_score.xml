@@ -42,9 +42,9 @@
                 android:id="@+id/exitGame"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/recyclerView"
+                android:layout_below="@id/viewAllStories"
                 android:layout_centerHorizontal="true"
-                android:text="BEENDEN"
+                android:text="Beenden"
                 android:layout_marginTop="0dp">
             </Button>
 
@@ -52,7 +52,7 @@
                 android:id="@+id/viewAllStories"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/exitGame"
+                android:layout_below="@id/recyclerView"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="20dp"
                 android:text="Alle Stories ansehen"

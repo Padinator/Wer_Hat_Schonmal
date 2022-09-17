@@ -104,11 +104,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/solution"
+                android:layout_centerHorizontal="true"
                 android:layout_marginBottom="15dp"
                 android:background="@android:drawable/btn_dropdown"
-                android:layout_centerHorizontal="true"
                 android:spinnerMode="dropdown"
-                android:visibility="invisible"/>
+                android:visibility="invisible" />
 
         </RelativeLayout>
 
