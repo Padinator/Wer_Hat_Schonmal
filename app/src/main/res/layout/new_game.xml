@@ -21,12 +21,13 @@
 
         <EditText
             android:id="@+id/gameName"
+            android:text="aaaa"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_toRightOf="@+id/game"
-            android:hint="Dateiname"
             android:background="@drawable/textview_story_border"
-            android:paddingHorizontal="10dp"/>
+            android:hint="Dateiname"
+            android:paddingHorizontal="10dp" />
 
         <TextView
             android:id="@+id/playerCountOptions"
@@ -41,15 +42,16 @@
 
         <EditText
             android:id="@+id/playerCount"
+            android:text="3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/game"
-            android:layout_toRightOf="@+id/playerCountOptions"
             android:layout_marginBottom="15dp"
-            android:hint="3"
+            android:layout_toRightOf="@+id/playerCountOptions"
             android:background="@drawable/textview_story_border"
-            android:paddingHorizontal="10dp"
-            android:inputType="numberDecimal"/>
+            android:hint="3"
+            android:inputType="numberDecimal"
+            android:paddingHorizontal="10dp" />
 
         <TextView
             android:id="@+id/playModeOptionns"
@@ -79,19 +81,20 @@
             android:layout_marginRight="30dp"
             android:layout_marginBottom="15dp"
             android:text="Mindest-Storyzahl pro Person:"
-            android:textSize="20dp"/>
+            android:textSize="20dp" />
 
         <EditText
             android:id="@+id/storyMinCount"
+            android:text="2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/playModeOptionns"
-            android:layout_toRightOf="@+id/storyMinCountOption"
             android:layout_marginBottom="15dp"
-            android:hint="2"
+            android:layout_toRightOf="@+id/storyMinCountOption"
             android:background="@drawable/textview_story_border"
-            android:paddingHorizontal="10dp"
-            android:inputType="numberDecimal"/>
+            android:hint="2"
+            android:inputType="numberDecimal"
+            android:paddingHorizontal="10dp" />
 
         <TextView
             android:id="@+id/storyMaxCountOption"
@@ -106,32 +109,34 @@
 
         <EditText
             android:id="@+id/storyMaxCount"
+            android:text="4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/storyMinCountOption"
-            android:layout_toRightOf="@+id/storyMaxCountOption"
             android:layout_marginBottom="15dp"
-            android:hint="4"
+            android:layout_toRightOf="@+id/storyMaxCountOption"
             android:background="@drawable/textview_story_border"
-            android:paddingHorizontal="10dp"
-            android:inputType="numberDecimal"/>
+            android:hint="4"
+            android:inputType="numberDecimal"
+            android:paddingHorizontal="10dp" />
 
         <TextView
             android:id="@+id/chooseDrink"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/storyMaxCountOption"
-            android:text="Drink auswaehlen fuer die Runde: "
             android:layout_marginLeft="30dp"
             android:layout_marginRight="30dp"
             android:layout_marginBottom="15dp"
-            android:textSize="20dp"/>
+            android:text="Drink auswaehlen:"
+            android:textSize="20dp" />
 
         <Spinner
             android:id="@+id/drinkVariantsOne"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/chooseDrink"
+            android:layout_below="@+id/storyMaxCount"
+            android:layout_toRightOf="@id/chooseDrink"
             android:layout_marginLeft="30dp"
             android:layout_marginRight="30dp"
             android:layout_marginBottom="15dp"

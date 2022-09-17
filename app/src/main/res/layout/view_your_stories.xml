@@ -33,7 +33,7 @@
                     android:id="@+id/saveEditedStories"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Bestätigen"
+                    android:text="Speichern"
                     android:layout_below="@+id/myStories"
                     android:layout_toRightOf="@+id/middleOne"/>
 

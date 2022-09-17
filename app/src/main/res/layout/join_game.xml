@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="16dp">
+
+    <EditText
+        android:id = "@+id/etIP"
+        android:layout_width = "match_parent"
+        android:layout_height = "wrap_content"
+        android:hint = "IP-Address"
+        android:inputType = "text" />
+
+    <Button
+        android:id = "@+id/btnConnect"
+        android:layout_width = "match_parent"
+        android:layout_height = "wrap_content"
+        android:layout_below = "@+id/etIP"
+        android:layout_gravity = "center"
+        android:layout_marginTop = "16dp"
+        android:text = "Connect To Server" />
+
+    <TextView
+        android:id = "@+id/tvMessages"
+        android:layout_width = "match_parent"
+        android:layout_height = "wrap_content"
+        android:layout_above = "@+id/etMessage"
+        android:layout_below = "@+id/btnConnect"
+        android:inputType = "textMultiLine"
+        android:textAppearance = "@style/Base.TextAppearance.AppCompat.Medium"
+        android:hint="Messages:" />
+
+    <EditText
+        android:id = "@+id/etMessage"
+        android:layout_width = "match_parent"
+        android:layout_height = "wrap_content"
+        android:layout_above = "@+id/btnSend"
+        android:hint = "Enter Message"
+        android:inputType = "text" />
+
+    <Button
+        android:id = "@+id/btnSend"
+        android:layout_width = "match_parent"
+        android:layout_height = "wrap_content"
+        android:layout_alignParentBottom = "true"
+        android:text = "SEND" />
+</RelativeLayout>

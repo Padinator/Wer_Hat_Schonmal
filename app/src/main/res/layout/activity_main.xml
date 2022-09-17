@@ -21,16 +21,28 @@
             android:textColor="@color/white" />
 
         <Button
-            android:id="@+id/loadGame"
+            android:id="@+id/joinGame"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/newGame"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="10dp"
+            android:backgroundTint="@color/black"
+            android:gravity="center"
+            android:text="Spiel beitreten"
+            android:textColor="@color/white" />
+
+        <Button
+            android:id="@+id/loadGame"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/joinGame"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="10dp"
             android:layout_marginBottom="50dp"
             android:backgroundTint="@color/black"
             android:gravity="center"
-            android:text="Laden"
+            android:text="Spielstand Laden"
             android:textColor="@color/white" />
 
     </RelativeLayout>
