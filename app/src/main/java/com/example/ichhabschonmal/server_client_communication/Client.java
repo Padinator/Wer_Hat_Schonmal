@@ -61,12 +61,12 @@ public class Client {
     }
 
     public boolean isConnected() {
-        return communicator.isCOnnected();
+        return communicator.isConnected();
     }
 
     @Override
     public String toString() {
-        return "Client 1: Device: " + deviceName + ", IP-Address: " + IPAddress;
+        return "Client: Device: " + deviceName + ", IP-Address: " + IPAddress;
     }
 
     public void receiveMessages(SocketCommunicator.Receiver receiverAction) {
@@ -102,10 +102,24 @@ public class Client {
             throw new NullPointerException("Class Client, during \"continueReceivingMessages(...)\" [for " + this + "]: Cannot start a running Receiver-Thread!");
     }
 
-    public void sendMessage(String message) {
+    /*
+     *
+     * Returns whether the message was sent successfully or not.
+     *
+     */
+    public boolean sendMessage(String message) {
         if (message != null) {
-            senderThread = new Thread(communicator.new Sender(message));
+            SocketCommunicator.Sender sender = communicator.new Sender(message);
+            senderThread = new Thread(sender);
             senderThread.start();
+
+            try {
+                senderThread.join();
+            } catch (InterruptedException e) {
+                return false;
+            }
+
+            return sender.getSent();
         } else
             throw new NullPointerException("During \"sendMessage(...)\": No message defined: " + null);
     }
@@ -115,14 +129,15 @@ public class Client {
         // Stop receiving messages
         receiver.setDoneReading(true);
 
-        if (communicator != null && !communicator.isClosed())
-            communicator.close(); // "input" and "output" will be closed automatically too
-
         if (receiverThread != null && receiverThread.getState() != Thread.State.TERMINATED)
             receiverThread.interrupt();
 
         // Stop sending messages
         if (senderThread != null && senderThread.getState() != Thread.State.TERMINATED)
             senderThread.interrupt();
+
+        // Close Socket for communication
+        if (communicator != null && !communicator.isClosed())
+            communicator.close(); // "input" and "output" will be closed automatically too
     }
 }

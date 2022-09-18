@@ -1,49 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="16dp">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_margin="16dp"
+    android:orientation="vertical">
 
-    <EditText
-        android:id="@+id/etIP"
+    <RelativeLayout
+        android:id="@+id/inputs"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="IP-Address"
-        android:inputType="text" />
+        android:layout_weight="1">
+
+        <TextView
+            android:id="@+id/connectionStatusInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="Status:   Nicht verbunden"
+            android:textAppearance = "@style/Base.TextAppearance.AppCompat.Medium" />
+
+        <TextView
+            android:id="@+id/tvIP"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/connectionStatusInfo"
+            android:padding="10dp"
+            android:text="IP eingeben: "
+            android:textAppearance = "@style/Base.TextAppearance.AppCompat.Medium" />
+
+        <EditText
+            android:id="@+id/etIP"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/connectionStatusInfo"
+            android:layout_toRightOf="@+id/tvIP"
+            android:paddingHorizontal="30dp"
+            android:textAppearance = "@style/Base.TextAppearance.AppCompat.Medium"
+            android:hint="IP-Adresse"
+            android:inputType="text" />
+    </RelativeLayout>
 
     <Button
-        android:id = "@+id/btnConnect"
-        android:layout_width = "match_parent"
-        android:layout_height = "wrap_content"
-        android:layout_below = "@+id/etIP"
-        android:layout_gravity = "center"
-        android:layout_marginTop = "16dp"
-        android:text = "Connect To Server" />
-
-    <TextView
-        android:id="@+id/tvMessages"
-        android:layout_width="match_parent"
+        android:id="@+id/btnConnect"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/etMessage"
-        android:layout_below="@+id/btnConnect"
-        android:layout_marginTop="0dp"
-        android:layout_marginBottom="-1dp"
-        android:hint="Not Connected:"
-        android:inputType="textMultiLine"
-        android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium" />
-
-    <EditText
-        android:id = "@+id/etMessage"
-        android:layout_width = "match_parent"
-        android:layout_height = "wrap_content"
-        android:layout_above = "@+id/btnSend"
-        android:hint = "Enter Message"
-        android:inputType = "text" />
-
-    <Button
-        android:id = "@+id/btnSend"
-        android:layout_width = "match_parent"
-        android:layout_height = "wrap_content"
-        android:layout_alignParentBottom = "true"
-        android:text = "SEND" />
-</RelativeLayout>
+        android:layout_gravity="center"
+        android:layout_marginTop="16dp"
+        android:paddingHorizontal="30dp"
+        android:text="Verbinden mit Host"/>
+</LinearLayout>

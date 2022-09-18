@@ -86,9 +86,14 @@ public class SocketCommunicator {
     public class Sender implements Runnable {
 
         private String message;
+        private boolean sent = false; // true: message was sent successfully
 
         public Sender(String message) {
             this.message = message;
+        }
+
+        public boolean getSent() {
+            return sent;
         }
 
         @Override
@@ -96,8 +101,12 @@ public class SocketCommunicator {
             if (output != null && !endPoint.isClosed()) {
                 output.println(message);
                 output.flush();
-            } else
-                activity.runOnUiThread(() -> Toast.makeText(context, "Cannot send: No connection to end point, server end point is closed: " + endPoint.isClosed(), Toast.LENGTH_SHORT).show());
+                sent = true;
+                Log.e("sent", "true");
+            } else {
+                sent = false;
+                Log.e("sent", "false");
+            }
         }
 
     }

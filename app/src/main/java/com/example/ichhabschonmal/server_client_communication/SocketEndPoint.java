@@ -17,6 +17,7 @@ public class SocketEndPoint {
 
     protected String serverIP;
     public static final int SERVER_PORT = 8080;
+    public static final String CLOSE_CONNECTION = "CLOSE_CONNECTION";
 
     public SocketEndPoint(Activity activity, Context context, String serverIP) {
         this.activity = activity;

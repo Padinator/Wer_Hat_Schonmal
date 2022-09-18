@@ -1,5 +1,6 @@
 package com.example.ichhabschonmal.server_client_communication;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
@@ -23,6 +24,9 @@ public class ClientSocketEndPoint extends SocketEndPoint {
     private SocketCommunicator.Receiver receiverAction;
     private Semaphore connected;
 
+    public static final String STATUS_CONNECTED = "Warten auf Host";
+    public static final String STATUS_NOT_CONNECTED = "Nicht verbunden";
+
 
     public ClientSocketEndPoint(Activity activity, Context context, String serverIP) {
         super(activity, context, serverIP);
@@ -33,10 +37,14 @@ public class ClientSocketEndPoint extends SocketEndPoint {
     }
 
 
+    public void setServerIP(String serverIP) {
+        this.serverIP = serverIP;
+    }
+
     /*
-    *
-    * Returns client ip address
-    *
+     *
+     * Returns the client's ip address.
+     *
      */
     public String getClientIpAddress() {
         return client.getIPAddress();
@@ -59,11 +67,20 @@ public class ClientSocketEndPoint extends SocketEndPoint {
      * Returns the client's connection status.
      *
      */
+    @SuppressLint("LongLogTag")
     public boolean isConnected() {
+        /*
         if (client != null)
             return client.isConnected();
         else
             throw new NullPointerException("Cannot check connection status of client, when no one was created!");
+         */
+
+        if (client != null)
+            return client.isConnected();
+
+        Log.e("ClientSocketEndPoint", "Cannot check connection status of client, when no one was created");
+        return false;
     }
 
     /*
@@ -93,8 +110,8 @@ public class ClientSocketEndPoint extends SocketEndPoint {
             connectionThread = new Thread(new ClientConnector());
             connectionThread.start();
 
-            connection = new Semaphore(0); // Connect client with host
-            connection.acquire();
+            connected = new Semaphore(0); // Connect client with host
+            connected.acquire();
 
             return client != null && client.isConnected();
         }
@@ -173,13 +190,9 @@ public class ClientSocketEndPoint extends SocketEndPoint {
 
                 clientEndPoint = new Socket(serverIP, SERVER_PORT);
                 //clientEndPoint = new Socket("192.168.1.38", 8080);
-                Log.e("Server-Port", "1");
                 input = new BufferedReader(new InputStreamReader(clientEndPoint.getInputStream()));
-                Log.e("Server-Port", "2");
                 output = new PrintWriter(clientEndPoint.getOutputStream());
-                Log.e("Server-Port", "3");
                 socketCommunicatorToServer = new SocketCommunicator(activity, context, clientEndPoint, input, output);
-                Log.e("Server-Port", "4");
                 client = new Client(socketCommunicatorToServer, receiverAction, getNameOfDevice(), getLocalIpAddress());
                 Log.e("Client", client.toString());
 

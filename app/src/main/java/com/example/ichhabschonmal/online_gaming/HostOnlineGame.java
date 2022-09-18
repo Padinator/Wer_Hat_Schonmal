@@ -3,10 +3,7 @@ package com.example.ichhabschonmal.online_gaming;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -24,24 +21,30 @@ import java.io.IOException;
 public class HostOnlineGame extends AppCompatActivity {
     private ServerSocketEndPoint serverEndPoint;
     private SocketCommunicator.Receiver receiverAction;
+    private int minStoryNumber, maxStoryNumber, maxPlayerNumber, connectedPlayers = 0;
 
+    private RecyclerView recyclerView;
+    private HostOnlineGameAdapter hostOnlineGameAdapter;
 
-    private String message;
-    ImageButton kickClient;
-    RecyclerView recyclerView;
-    HostOnlineGameAdapter hostOnlineGameAdapter;
+    private TextView tvIP, connectedClients;
+    private Button continues;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.host_online_game);
 
-        // Define and initialize TextViews, EditTexts and Buttons
-        TextView tvIP = findViewById(R.id.tvIP);
-        TextView tvPort = findViewById(R.id.tvPort);
-        EditText etMessage = findViewById(R.id.etMessage);
-        Button btnSend = findViewById(R.id.btnSend);
+        // TextViews
+        tvIP = findViewById(R.id.tvIP);
+        connectedClients = findViewById(R.id.connectedClients);
 
+        // Buttons
+        continues = findViewById(R.id.btnSend);
+
+        // Get from last intent
+        minStoryNumber = getIntent().getExtras().getInt("MinStoryNumber");
+        maxStoryNumber = getIntent().getExtras().getInt("MaxStoryNumber");
+        maxPlayerNumber = getIntent().getExtras().getInt("PlayerNumber");
 
         // Initialize server endpoint
         try {
@@ -50,21 +53,11 @@ public class HostOnlineGame extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        // RecyclerView
-        recyclerView = findViewById(R.id.recyclerView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-
-        //ClientAdapter
-        hostOnlineGameAdapter = new HostOnlineGameAdapter(this, serverEndPoint);
-        recyclerView.setAdapter(hostOnlineGameAdapter);
-
-
         // Set TextViews
-        tvIP.setText("Host-IP: " + serverEndPoint.getServerIP());
-        tvPort.setText("Host-Port: " + ServerSocketEndPoint.SERVER_PORT);
+        tvIP.setText("Host-IP:\t\t" + serverEndPoint.getServerIP());
+        connectedClients.setText("Verbunden:\t\t0 / " + (maxPlayerNumber - 1));
 
-
-        // Create actions after messaging
+        // Create actions for receiving messaging
         receiverAction = new SocketCommunicator(null, null, null, null, null).new Receiver() {
 
             @Override
@@ -77,7 +70,8 @@ public class HostOnlineGame extends AppCompatActivity {
                     serverEndPoint.setClientsIPAddress(clientIndex, s[0]);
                     serverEndPoint.setClientsDeviceName(clientIndex, s[1]);
 
-                    Log.e("Server receives", serverEndPoint.clients.toString());
+                    runOnUiThread(() -> connectedClients.setText("Verbunden:\t\t" + serverEndPoint.sizeOfClients() + " / " + (maxPlayerNumber - 1)));
+
                     runOnUiThread(() -> {
                         hostOnlineGameAdapter.notifyDataSetChanged();
                         recyclerView.setAdapter(hostOnlineGameAdapter);
@@ -86,18 +80,16 @@ public class HostOnlineGame extends AppCompatActivity {
             }
         };
 
+        // RecyclerView
+        recyclerView = findViewById(R.id.recyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        //ClientAdapter
+        hostOnlineGameAdapter = new HostOnlineGameAdapter(this, serverEndPoint, receiverAction, connectedClients, maxPlayerNumber);
+        recyclerView.setAdapter(hostOnlineGameAdapter);
+
         // Create connection to Socket
-        serverEndPoint.createConnection(2, receiverAction);
-
-        btnSend.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                serverEndPoint.sendMessage("123");
-
-            }
-        });
-
-
+        serverEndPoint.createConnection(maxPlayerNumber - 1, receiverAction);
     }
 
     private static String[] cutClientInfo(String clientInfo) {

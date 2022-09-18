@@ -90,7 +90,7 @@ public class CreatePlayers extends AppCompatActivity {
         // Set used variables
         minStoryNumber = getIntent().getExtras().getInt("MinStoryNumber");
         maxStoryNumber = getIntent().getExtras().getInt("MaxStoryNumber");
-        maxPlayerNumber = getIntent().getExtras().getInt("playerNumber");
+        maxPlayerNumber = getIntent().getExtras().getInt("PlayerNumber");
         //setItemsCanFocus(true);
 
         // Calling the action bar

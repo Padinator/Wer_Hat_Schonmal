@@ -1,5 +1,6 @@
 package com.example.ichhabschonmal.adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,18 +14,28 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.ichhabschonmal.R;
 import com.example.ichhabschonmal.server_client_communication.ServerSocketEndPoint;
+import com.example.ichhabschonmal.server_client_communication.SocketCommunicator;
+import com.example.ichhabschonmal.server_client_communication.SocketEndPoint;
+
+import java.io.IOException;
+import java.util.concurrent.Semaphore;
 
 public class HostOnlineGameAdapter extends RecyclerView.Adapter<HostOnlineGameAdapter.ViewHolder> {
 
     private final LayoutInflater inflater;
     private final Context context;
     private final ServerSocketEndPoint serverEndPoint;
+    private final SocketCommunicator.Receiver receiverAction;
+    private final TextView connectedClients;
+    private final int maxClientNumber;
 
-
-    public HostOnlineGameAdapter(Context context, ServerSocketEndPoint serverEndPoint) {
+    public HostOnlineGameAdapter(Context context, ServerSocketEndPoint serverEndPoint, SocketCommunicator.Receiver receiverAction, TextView connectedClients, int maxClientNumber) {
         this.inflater = LayoutInflater.from(context);
         this.context = context;
         this.serverEndPoint = serverEndPoint;
+        this.receiverAction = receiverAction;
+        this.connectedClients = connectedClients;
+        this.maxClientNumber = maxClientNumber;
     }
 
     @NonNull
@@ -36,10 +47,6 @@ public class HostOnlineGameAdapter extends RecyclerView.Adapter<HostOnlineGameAd
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        Log.e("position value", position + "");
-        Log.e("device name", serverEndPoint.getClientsDeviceName(position));
-        Log.e("ip", serverEndPoint.getClientsIPAddress(position));
-
         holder.deviceName.setText(serverEndPoint.getClientsDeviceName(position));
         holder.IPAddress.setText(serverEndPoint.getClientsIPAddress(position));
     }
@@ -54,6 +61,7 @@ public class HostOnlineGameAdapter extends RecyclerView.Adapter<HostOnlineGameAd
         TextView deviceName, IPAddress;
         ImageButton kickClient;
 
+        @SuppressLint({"SetTextI18n", "NotifyDataSetChanged"})
         ViewHolder(View itemView) {
             super(itemView);
             deviceName = itemView.findViewById(R.id.deviceName);
@@ -61,12 +69,27 @@ public class HostOnlineGameAdapter extends RecyclerView.Adapter<HostOnlineGameAd
             kickClient = itemView.findViewById(R.id.kickClient);
 
             kickClient.setOnClickListener(view -> {
-                Log.e("RecyclerView", "kick client");
+                // Disconnect and remove client
+                try {
+                    // Try notifying the client about the disconnecting a maximum of 5 times
+                    boolean clientIsDisconnected = serverEndPoint.sendMessageToClient(getLayoutPosition(), SocketEndPoint.CLOSE_CONNECTION); // Inform client to close connection
+
+                    for (int i = 0; !clientIsDisconnected && i < 4; i++)
+                        clientIsDisconnected = serverEndPoint.sendMessageToClient(getLayoutPosition(), SocketEndPoint.CLOSE_CONNECTION);
+
+                    serverEndPoint.disconnectClientFromServer(getLayoutPosition()); // Works correct with all Threads? How many Thread are running???
+                    notifyDataSetChanged();
+                    connectedClients.setText("Verbunden:\t\t" + serverEndPoint.sizeOfClients() + " / " + (maxClientNumber - 1));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                // Start another connection for a new client
+                serverEndPoint.createConnection(1, receiverAction);
             });
         }
-
-
     }
+
 }
 
 

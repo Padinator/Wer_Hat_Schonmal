@@ -1,67 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_margin="16dp">
 
-    <TextView
-        android:id = "@+id/tvIP"
-        android:layout_width = "wrap_content"
-        android:layout_height = "wrap_content"
-        android:textAppearance = "@style/Base.TextAppearance.AppCompat.Medium"
-        android:text="Host-IP"/>
-
-    <TextView
-        android:id="@+id/tvPort"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/tvIP"
-        android:text="Host-Port"
-        android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium" />
-
-    <TextView
-        android:id="@+id/tvConnectionStatus"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/tvPort"
-        android:text="Connection status"
-        android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium" />
-
-    <ScrollView
+    <RelativeLayout
         android:id="@+id/tvMessages"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/etMessage"
-        android:layout_below="@+id/tvConnectionStatus"
         android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium">
-<LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="500dp"
-        android:layout_centerInParent="true">
+        <TextView
+            android:id="@+id/tvIP"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Host-IP:  000.000.000.000"
+            android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium" />
 
-    </androidx.recyclerview.widget.RecyclerView>
+        <TextView
+            android:id="@+id/connectedClients"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvIP"
+            android:text="Verbunden:    0 / 0"
+            android:layout_marginBottom="50dp"
+            android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium" />
 
-</LinearLayout>
-    </ScrollView>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="500dp"
+            android:layout_centerInParent="true"
+            android:layout_below="@id/connectedClients"/>
 
-    <EditText
-        android:id = "@+id/etMessage"
-        android:layout_width = "match_parent"
-        android:layout_height = "wrap_content"
-        android:layout_above = "@+id/btnSend"
-        android:hint = "Enter Message"
-        android:inputType = "text" />
+        <Button
+            android:id="@+id/btnSend"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/recyclerView"
+            android:layout_alignParentBottom="true"
+            android:paddingHorizontal="30dp"
+            android:layout_centerHorizontal="true"
+            android:text="Weiter" />
 
-    <Button
-        android:id = "@+id/btnSend"
-        android:layout_width = "match_parent"
-        android:layout_height = "wrap_content"
-        android:layout_alignParentBottom = "true"
-        android:text = "SEND" />
+    </RelativeLayout>
 
-</RelativeLayout>
+</ScrollView>

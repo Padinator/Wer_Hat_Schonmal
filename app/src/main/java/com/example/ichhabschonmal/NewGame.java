@@ -131,7 +131,7 @@ public class NewGame extends AppCompatActivity {
 
                 intent.putExtra("MinStoryNumber", Integer.parseInt(storyMinNumber));     // Give storyMinNumber
                 intent.putExtra("MaxStoryNumber", Integer.parseInt(storyMaxNumber));     // Give storyMaxNumber
-                intent.putExtra("playerNumber", Integer.parseInt(playerNumber));     // Give number of players
+                intent.putExtra("PlayerNumber", Integer.parseInt(playerNumber));     // Give number of players
                 intent.putExtra("GameName", gameName.getText().toString());     // Give the name of the game
                 intent.putExtra("DrinkOfTheGame", drinkOfTheGame);
                 startActivity(intent);

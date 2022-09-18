@@ -1,5 +1,6 @@
 package com.example.ichhabschonmal.server_client_communication;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
@@ -21,7 +22,7 @@ public class ServerSocketEndPoint extends SocketEndPoint {
     private Thread connectionThread;
     private SocketCommunicator.Receiver receiverAction;
 
-    public final LinkedList<Client> clients = new LinkedList<>();
+    private final LinkedList<Client> clients = new LinkedList<>();
     private int countOfClients;
 
     /*
@@ -67,7 +68,7 @@ public class ServerSocketEndPoint extends SocketEndPoint {
 
     public String getClientsIPAddress(int index) {
         if (index < 0 || index >= clients.size())
-            throw new IndexOutOfBoundsException("No client (IP) found, invalid index: " + index);
+            throw new IndexOutOfBoundsException("Class ServerSocketEndPoint, no client (get IP) found, invalid index: " + index);
 
         Log.e("Client index", index + "");
         return clients.get(index).getIPAddress();
@@ -75,23 +76,23 @@ public class ServerSocketEndPoint extends SocketEndPoint {
 
     public String getClientsDeviceName(int index) {
         if (index < 0 || index >= clients.size())
-            throw new IndexOutOfBoundsException("No client (Device) found, invalid index: " + index);
+            throw new IndexOutOfBoundsException("Class ServerSocketEndPoint, no client (get Device) found, invalid index: " + index);
 
         return clients.get(index).getDeviceName();
     }
 
     public void setClientsDeviceName(int index, String deviceName) {
         if (index < 0 || index >= clients.size())
-            throw new IndexOutOfBoundsException("No client (Device) found, invalid index: " + index);
+            throw new IndexOutOfBoundsException("Class ServerSocketEndPoint, no client (set Device) found, invalid index: " + index);
 
         clients.get(index).setDeviceName(deviceName);
     }
 
-    public void setClientsIPAddress(int index, String IPAdress) {
+    public void setClientsIPAddress(int index, String IPAddress) {
         if (index < 0 || index >= clients.size())
-            throw new IndexOutOfBoundsException("No client (Device) found, invalid index: " + index);
+            throw new IndexOutOfBoundsException("Class ServerSocketEndPoint, no client (set IP) found, invalid index: " + index);
 
-        clients.get(index).setIPAddress(IPAdress);
+        clients.get(index).setIPAddress(IPAddress);
     }
 
     public int sizeOfClients() {
@@ -132,7 +133,7 @@ public class ServerSocketEndPoint extends SocketEndPoint {
             for (Client client : clients)
                 client.receiveMessages(receiverAction);
         } catch (NullPointerException e) {
-            throw new NullPointerException("\"During receiveMessages(...)\": No Receiver-Action defined: " + this.receiverAction);
+            throw new NullPointerException("Class ServerSocketEndPoint, during \"receiveMessages(...)\": No Receiver-Action defined: " + this.receiverAction);
         }
     }
 
@@ -149,7 +150,7 @@ public class ServerSocketEndPoint extends SocketEndPoint {
         if (receiverAction != null)
             receiverAction.setDoneReading(true);
         else
-            throw new NullPointerException("During \"stopReceivingMessages(...)\": No Receiver-Action defined: " + null);
+            throw new NullPointerException("Class ServerSocketEndPoint, during \"stopReceivingMessages(...)\": No Receiver-Action defined: " + null);
     }
 
     /*
@@ -163,6 +164,13 @@ public class ServerSocketEndPoint extends SocketEndPoint {
                 client.continueReceivingMessages();
     }
 
+    public boolean sendMessageToClient(int index, String message) {
+        if (index < 0 || index >= clients.size())
+            throw new IndexOutOfBoundsException("Class ServerSocketEndPoint, no client to sent found, invalid index: " + index);
+
+        return clients.get(index).sendMessage(message);
+    }
+
     /*
      *
      * Send messages to all clients.
@@ -173,10 +181,33 @@ public class ServerSocketEndPoint extends SocketEndPoint {
             client.sendMessage(message);
     }
 
+    /*
+     *
+     * Disconnect the connection from server to client, serverside disconnection.
+     *
+     */
+    @SuppressLint("LongLogTag")
+    public void disconnectClientFromServer(int index) throws IOException {
+        if (index < 0 || index >= clients.size())
+            throw new IndexOutOfBoundsException("ServerSocketEndPoint, no client (disconnect with index) found, invalid index: " + index);
+
+        if (clients.get(index) != null)
+            clients.get(index).disconnectClientFromServer();
+
+        clients.remove(index);
+    }
+
+    /*
+     *
+     * Disconnect all connections from server to clients, serverside disconnection.
+     *
+     */
     public void disconnectClientsFromServer() throws IOException {
         for (Client client : clients)
             if (client != null)
                 client.disconnectClientFromServer();
+
+        clients.clear();
     }
 
     public void disconnectServerSocket() throws IOException {
@@ -195,7 +226,6 @@ public class ServerSocketEndPoint extends SocketEndPoint {
         @Override
         public void run() {
             try {
-
                 for (int i = 0; i < countOfClients; i++) {
                     BufferedReader input;
                     PrintWriter output;
@@ -208,6 +238,7 @@ public class ServerSocketEndPoint extends SocketEndPoint {
                     socketCommunicatorToClient = new SocketCommunicator(activity, context, serverEndPoint, input, output);
                     clients.add(new Client(socketCommunicatorToClient, receiverAction));
                     Log.e("ServerConnector", clients.toString());
+
                     if (clients.getLast().getReceiver() != null)
                         clients.getLast().receiveMessages(receiverAction);
                 }
