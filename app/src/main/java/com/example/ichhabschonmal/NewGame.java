@@ -6,29 +6,43 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.room.Room;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.ichhabschonmal.database.AppDatabase;
 import com.example.ichhabschonmal.database.Game;
 import com.example.ichhabschonmal.online_gaming.HostOnlineGame;
 
-import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class NewGame extends AppCompatActivity {
 
     private Spinner drinkVariantsOne;
+
+    // meine ergaenzung
+    private AlertDialog dialog;
+    private Button save, back;
+    private ListView listDrink;
+    private AlertDialog.Builder dialogBuilder;
+    private ArrayAdapter adapter;
+    private TextView currentDrink;
+
+    public static ArrayList<String> drinks = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,11 +54,13 @@ public class NewGame extends AppCompatActivity {
 
         // Definitions
         EditText gameName, playerCount, storyMinCount, storyMaxCount;
-        Button nextMenu;
+        Button nextMenu, chooseDrink;
         Switch playMode;
-        ArrayAdapter adapter;
         AppDatabase db;
         List<Game> listOfGames;
+
+
+
 
         // EditTexts
         gameName = findViewById(R.id.gameName);
@@ -54,15 +70,17 @@ public class NewGame extends AppCompatActivity {
 
         // Buttons
         nextMenu = findViewById(R.id.nextMenu);
+        chooseDrink = findViewById(R.id.anotherDrink);
+
+        // TextViews
+        currentDrink = findViewById(R.id.currentDrink);
 
         // Create drop down menu for choosing a drink
-        drinkVariantsOne = findViewById(R.id.drinkVariantsOne);
-        ArrayList<String> drinks = new ArrayList<>();
         drinks.add("Bier");
         drinks.add("Vodka Shots");
         drinks.add("Tequila");
-        adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, drinks);
-        drinkVariantsOne.setAdapter(adapter);
+        drinks.add("Gin Shot");
+        drinks.add("Jaegermeister");
 
         // Switches
         playMode = findViewById(R.id.playMode);
@@ -74,13 +92,18 @@ public class NewGame extends AppCompatActivity {
         // Close database connection
         db.close();
 
+        // Pop up window
+        chooseDrink.setOnClickListener(e -> {
+            showDrinkSelection(drinks);
+        });
+
         nextMenu.setOnClickListener(view -> {
             String fileName, playerNumber, storyMinNumber, storyMaxNumber, drinkOfTheGame;
             fileName = gameName.getText().toString();
             playerNumber = playerCount.getText().toString();
             storyMinNumber = storyMinCount.getText().toString();
             storyMaxNumber = storyMaxCount.getText().toString();
-            drinkOfTheGame = drinkVariantsOne.getSelectedItem().toString();
+            drinkOfTheGame = currentDrink.getText().toString();
 
             if (fileName.isEmpty())            // Check only if gameName is valid, creating starts later
                 Toast.makeText(NewGame.this, "Dateiname darf nicht leer sein!", Toast.LENGTH_LONG).show();
@@ -157,12 +180,40 @@ public class NewGame extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    // PopUp Window for selection a drink
+    public void showDrinkSelection(ArrayList<String> drinks) {
+        dialogBuilder = new AlertDialog.Builder(this);
+        final View popUpView = getLayoutInflater().inflate(R.layout.popup, null);
+        listDrink = (ListView) popUpView.findViewById(R.id.listDrink);
+        save = (Button) popUpView.findViewById(R.id.save);
+        back = (Button) popUpView.findViewById(R.id.back);
+
+        // set list
+        adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, drinks);
+        listDrink.setAdapter(adapter);
+
+        listDrink.setOnItemClickListener((adapterView, view, i, l) -> {
+
+            save.setOnClickListener(v -> {
+                currentDrink.setText(drinks.get(i));
+                dialog.dismiss();
+            });
+
+            back.setOnClickListener(v -> {
+                dialog.dismiss();;
+            });
+        });
+
+        dialogBuilder.setView(popUpView);
+        dialog = dialogBuilder.create();
+        dialog.show();
+    }
+
     private boolean exists(String fileName, List<Game> games) {         // Check, if file name exists
         for (int i = 0; i < games.size(); i++) {
             if (fileName.equals(games.get(i).gameName))
                 return true;        // File name already exists
         }
-
         return false;       // File name exists not yet
     }
 
