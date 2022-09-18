@@ -33,9 +33,9 @@ public class ClientSocketEndPoint extends SocketEndPoint {
     }
 
     /*
-    *
-    * Returns the message, the client has received.
-    *
+     *
+     * Returns the message, the client has received.
+     *
      */
     public String getClientsMessage() {
         if (client != null)
@@ -45,9 +45,9 @@ public class ClientSocketEndPoint extends SocketEndPoint {
     }
 
     /*
-    *
-    * Returns the client's connection status.
-    *
+     *
+     * Returns the client's connection status.
+     *
      */
     public boolean isConnected() {
         if (client != null)
@@ -72,15 +72,24 @@ public class ClientSocketEndPoint extends SocketEndPoint {
      *
      */
     public boolean createConnection(SocketCommunicator.Receiver receiverAction) throws InterruptedException {
-        this.receiverAction = receiverAction;
+        boolean isConnected = false;
 
-        connectionThread = new Thread(new ClientConnector());
-        connectionThread.start();
+        if (client != null)
+            isConnected = isConnected();
 
-        connection = new Semaphore(0); // Connect client with host
-        connection.acquire();
+        if (!isConnected) {
+            this.receiverAction = receiverAction;
 
-        return client != null && client.isConnected();
+            connectionThread = new Thread(new ClientConnector());
+            connectionThread.start();
+
+            connection = new Semaphore(0); // Connect client with host
+            connection.acquire();
+
+            return client != null && client.isConnected();
+        }
+
+        return false;
     }
 
     /*
@@ -88,14 +97,11 @@ public class ClientSocketEndPoint extends SocketEndPoint {
      * Start Receiving messages from server.
      *
      */
-    public void receiveMessages(SocketCommunicator.Receiver receiverAction) {
-        try {
-            this.receiverAction = receiverAction;
-
+    public void receiveMessages(SocketCommunicator.Receiver receiverAction) throws NullPointerException {
+        if (client != null)
             client.receiveMessages(receiverAction);
-        } catch (NullPointerException e) {
-            throw new NullPointerException("\"During receiveMessages(...)\": No Receiver-Action defined: " + this.receiverAction);
-        }
+        else
+            throw new NullPointerException("\"Class ClientSocketEndPoint, during receiveMessages(...)\": No client defined: null");
     }
 
     /*
@@ -109,7 +115,7 @@ public class ClientSocketEndPoint extends SocketEndPoint {
         if (receiverAction != null)
             receiverAction.setDoneReading(true);
         else
-            throw new NullPointerException("During \"stopReceivingMessages(...)\": No Receiver-Action defined: " + null);
+            throw new NullPointerException("Class ClientSocketEndPoint, during \"stopReceivingMessages(...)\": No Receiver-Action defined: null");
     }
 
     /*
@@ -118,7 +124,10 @@ public class ClientSocketEndPoint extends SocketEndPoint {
      *
      */
     public void continueReceivingMessages() {
-        client.continueReceivingMessages();
+        if (client != null)
+            client.continueReceivingMessages();
+        else
+            throw new NullPointerException("Class ClientSocketEndPoint, during \"continueReceivingMessages(...)\": No client defined: null");
     }
 
     /*
@@ -127,11 +136,17 @@ public class ClientSocketEndPoint extends SocketEndPoint {
      *
      */
     public void sendMessage(String message) {
-        client.sendMessage(message);
+        if (client != null)
+            client.sendMessage(message);
+        else
+            throw new NullPointerException("Class ClientSocketEndPoint, during \"sendMessage(...)\": No client defined: null");
     }
 
     public void disconnectClient() throws IOException {
-        client.disconnectClientFromServer();
+        if (client != null)
+            client.disconnectClientFromServer();
+        else
+            throw new NullPointerException("Class ClientSocketEndPoint, during \"disconnectClient(...)\": No client defined: null");
     }
 
     private class ClientConnector implements Runnable {
@@ -155,7 +170,7 @@ public class ClientSocketEndPoint extends SocketEndPoint {
                 Log.e("Server-Port", "3");
                 socketCommunicatorToServer = new SocketCommunicator(activity, context, clientEndPoint, input, output);
                 Log.e("Server-Port", "4");
-                client = new Client(socketCommunicatorToServer, receiverAction, getNameOfDevice(),getLocalIpAddress());
+                client = new Client(socketCommunicatorToServer, receiverAction, getNameOfDevice(), getLocalIpAddress());
                 Log.e("Client", client.toString());
 
                 if (client.getReceiver() != null)

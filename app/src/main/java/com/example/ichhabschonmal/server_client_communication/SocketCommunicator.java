@@ -32,7 +32,8 @@ public class SocketCommunicator {
     }
 
     public void close() throws IOException {
-        endPoint.close();
+        if (!isClosed())
+            endPoint.close();
     }
 
     public boolean isCOnnected() {

@@ -109,7 +109,8 @@ public class ServerSocketEndPoint extends SocketEndPoint {
      */
     public void stopReceivingMessages() {
         for (Client client : clients)
-            client.stopReceivingMessages();
+            if (client != null)
+                client.stopReceivingMessages();
 
         if (receiverAction != null)
             receiverAction.setDoneReading(true);
@@ -124,7 +125,8 @@ public class ServerSocketEndPoint extends SocketEndPoint {
      */
     public void continueReceivingMessages() {
         for (Client client : clients)
-            client.continueReceivingMessages();
+            if (client != null)
+                client.continueReceivingMessages();
     }
 
     /*
@@ -139,7 +141,8 @@ public class ServerSocketEndPoint extends SocketEndPoint {
 
     public void disconnectServerFromClients() throws IOException {
         for (Client client : clients)
-            client.disconnectClientFromServer();
+            if (client != null)
+                client.disconnectClientFromServer();
     }
 
     public void disconnectServerSocket() throws IOException {

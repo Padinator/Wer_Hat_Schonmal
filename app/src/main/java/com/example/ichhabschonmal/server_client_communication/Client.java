@@ -33,24 +33,16 @@ public class Client {
         return IPAddress;
     }
 
+    public SocketCommunicator.Receiver getReceiver() {
+        return receiver;
+    }
+
     public void setDeviceName(String deviceName) {
         this.deviceName = deviceName;
     }
 
     public void setIPAddress(String IPAddress) {
         this.IPAddress = IPAddress;
-    }
-
-    public SocketCommunicator.Receiver getReceiver() {
-        return receiver;
-    }
-
-    public String getMessage() {
-        return receiver.getMessage();
-    }
-
-    public boolean isConnected() {
-        return communicator.isCOnnected();
     }
 
     public void setReceiver(SocketCommunicator.Receiver receiverAction) {
@@ -64,8 +56,16 @@ public class Client {
         };
     }
 
+    public String getMessage() {
+        return receiver.getMessage();
+    }
+
+    public boolean isConnected() {
+        return communicator.isCOnnected();
+    }
+
     @Override
-    public String toString() { /////////////////////////////////////
+    public String toString() {
         return "Client 1: Device: " + deviceName + ", IP-Address: " + IPAddress;
     }
 
@@ -76,30 +76,30 @@ public class Client {
             receiverThread = new Thread(receiver);
             receiverThread.start();
         } catch (NullPointerException e) {
-            throw new NullPointerException("\"During receiveMessages(...)\": No Receiver-Action defined: " + receiverAction);
+            throw new NullPointerException("\"Class Client, during receiveMessages(...)\": No Receiver-Action defined: null");
         }
     }
 
     public void stopReceivingMessages() {
-        if (receiver != null && receiverThread != null && receiverThread.getState() != Thread.State.TERMINATED) // interrupted???
+        if (receiver != null && receiverThread != null && receiverThread.getState() != Thread.State.TERMINATED)
             receiver.setDoneReading(true);
         else if (receiver == null)
-            throw new NullPointerException("During \"stopReceivingMessages(...)\" [for " + this + "]: Cannot terminate Receiver-Thread with \"setDoneReading()\"-method, no Receiver-Action defined: " + null);
+            throw new NullPointerException("Class Client, during \"stopReceivingMessages(...)\" [for " + this + "]: Cannot terminate Receiver-Thread with \"setDoneReading()\"-method, no Receiver-Action defined: " + null);
         else if (receiverThread == null)
-            throw new NullPointerException("During \"stopReceivingMessages(...)\" [for " + this + "]: Cannot stop a null-referenced Thread, no Receiver-Thread defined: " + null);
+            throw new NullPointerException("Class Client, during \"stopReceivingMessages(...)\" [for " + this + "]: Cannot stop a null-referenced Thread, no Receiver-Thread defined: " + null);
         else
-            throw new NullPointerException("During \"stopReceivingMessages(...)\" [for " + this + "]: Cannot stop a terminated Receiver-Thread!");
+            throw new NullPointerException("Class Client, during \"stopReceivingMessages(...)\" [for " + this + "]: Cannot stop a terminated Receiver-Thread!");
     }
 
     public void continueReceivingMessages() {
-        if (receiver != null && receiverThread != null && receiverThread.getState() == Thread.State.TERMINATED) // interrupted???
+        if (receiver != null && receiverThread != null && receiverThread.getState() == Thread.State.TERMINATED)
             receiveMessages(receiver);
         else if (receiver == null)
-            throw new NullPointerException("During \"continueReceivingMessages(...)\" [for " + this + "]: Cannot set \"run()\"-method of Receiver-Thread, no Receiver-Action defined: " + null);
+            throw new NullPointerException("Class Client, during \"continueReceivingMessages(...)\" [for " + this + "]: Cannot set \"run()\"-method of Receiver-Thread, no Receiver-Action defined: " + null);
         else if (receiverThread == null)
-            throw new NullPointerException("During \"continueReceivingMessages(...)\" [for " + this + "]: Cannot start a null-referenced Thread, no Receiver-Thread defined: " + null);
+            throw new NullPointerException("Class Client, during \"continueReceivingMessages(...)\" [for " + this + "]: Cannot start a null-referenced Thread, no Receiver-Thread defined: " + null);
         else
-            throw new NullPointerException("During \"continueReceivingMessages(...)\" [for " + this + "]: Cannot start a running Receiver-Thread!");
+            throw new NullPointerException("Class Client, during \"continueReceivingMessages(...)\" [for " + this + "]: Cannot start a running Receiver-Thread!");
     }
 
     public void sendMessage(String message) {
@@ -111,12 +111,12 @@ public class Client {
     }
 
     @SuppressLint("LongLogTag")
-    public void disconnectClientFromServer() throws IOException { //////////////////////
+    public void disconnectClientFromServer() throws IOException {
         // Stop receiving messages
         receiver.setDoneReading(true);
 
         if (communicator != null && !communicator.isClosed())
-            communicator.close(); // "input" and "output" will be closed too
+            communicator.close(); // "input" and "output" will be closed automatically too
 
         if (receiverThread != null && receiverThread.getState() != Thread.State.TERMINATED)
             receiverThread.interrupt();
