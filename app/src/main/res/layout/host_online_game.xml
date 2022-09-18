@@ -12,30 +12,42 @@
         android:text="Host-IP"/>
 
     <TextView
-        android:id = "@+id/tvPort"
-        android:layout_width = "wrap_content"
-        android:layout_height = "wrap_content"
-        android:layout_below = "@+id/tvIP"
-        android:textAppearance = "@style/Base.TextAppearance.AppCompat.Medium"
-        android:text="Host-Port"/>
+        android:id="@+id/tvPort"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvIP"
+        android:text="Host-Port"
+        android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium" />
 
     <TextView
-        android:id = "@+id/tvConnectionStatus"
-        android:layout_width = "match_parent"
-        android:layout_height = "wrap_content"
-        android:layout_below = "@+id/tvPort"
-        android:textAppearance = "@style/Base.TextAppearance.AppCompat.Medium"
-        android:text="Connection status" />
+        android:id="@+id/tvConnectionStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvPort"
+        android:text="Connection status"
+        android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium" />
 
-    <TextView
-        android:id = "@+id/tvMessages"
-        android:layout_width = "match_parent"
-        android:layout_height = "wrap_content"
-        android:layout_above = "@+id/etMessage"
-        android:layout_below = "@+id/tvConnectionStatus"
-        android:inputType = "textMultiLine"
-        android:textAppearance = "@style/Base.TextAppearance.AppCompat.Medium"
-        android:hint="Messages:"/>
+    <ScrollView
+        android:id="@+id/tvMessages"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/etMessage"
+        android:layout_below="@+id/tvConnectionStatus"
+        android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium">
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="500dp"
+        android:layout_centerInParent="true">
+
+    </androidx.recyclerview.widget.RecyclerView>
+
+</LinearLayout>
+    </ScrollView>
 
     <EditText
         android:id = "@+id/etMessage"

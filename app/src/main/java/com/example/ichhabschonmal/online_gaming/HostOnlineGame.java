@@ -3,13 +3,18 @@ package com.example.ichhabschonmal.online_gaming;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.ichhabschonmal.R;
+import com.example.ichhabschonmal.adapter.HostOnlineGameAdapter;
 import com.example.ichhabschonmal.server_client_communication.ServerSocketEndPoint;
 import com.example.ichhabschonmal.server_client_communication.SocketCommunicator;
 
@@ -20,7 +25,11 @@ public class HostOnlineGame extends AppCompatActivity {
     private ServerSocketEndPoint serverEndPoint;
     private SocketCommunicator.Receiver receiverAction;
 
+
     private String message;
+    ImageButton kickClient;
+    RecyclerView recyclerView;
+    HostOnlineGameAdapter hostOnlineGameAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,9 +39,9 @@ public class HostOnlineGame extends AppCompatActivity {
         // Define and initialize TextViews, EditTexts and Buttons
         TextView tvIP = findViewById(R.id.tvIP);
         TextView tvPort = findViewById(R.id.tvPort);
-        TextView tvMessages = findViewById(R.id.tvMessages);
         EditText etMessage = findViewById(R.id.etMessage);
         Button btnSend = findViewById(R.id.btnSend);
+
 
         // Initialize server endpoint
         try {
@@ -41,62 +50,79 @@ public class HostOnlineGame extends AppCompatActivity {
             e.printStackTrace();
         }
 
+        // RecyclerView
+        recyclerView = findViewById(R.id.recyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        //ClientAdapter
+        hostOnlineGameAdapter = new HostOnlineGameAdapter(this, serverEndPoint);
+        recyclerView.setAdapter(hostOnlineGameAdapter);
+
+
         // Set TextViews
         tvIP.setText("Host-IP: " + serverEndPoint.getServerIP());
         tvPort.setText("Host-Port: " + ServerSocketEndPoint.SERVER_PORT);
+
 
         // Create actions after messaging
         receiverAction = new SocketCommunicator(null, null, null, null, null).new Receiver() {
 
             @Override
             public void action() {
-                runOnUiThread(() -> {
-                    tvMessages.append("client: " + serverEndPoint.getClientsMessage(0) + "\n");
-                });
-            }
+                if (serverEndPoint.sizeOfClients() > 0) {
+                    int clientIndex = serverEndPoint.sizeOfClients() - 1;
+                    String clientInfo = serverEndPoint.getClientsMessage(clientIndex);
+                    String[] s = cutClientInfo(clientInfo);
 
+                    serverEndPoint.setClientsIPAddress(clientIndex, s[0]);
+                    serverEndPoint.setClientsDeviceName(clientIndex, s[1]);
+
+                    Log.e("Server receives", serverEndPoint.clients.toString());
+                    runOnUiThread(() -> {
+                        hostOnlineGameAdapter.notifyDataSetChanged();
+                        recyclerView.setAdapter(hostOnlineGameAdapter);
+                    });
+                }
+            }
         };
 
         // Create connection to Socket
-        serverEndPoint.createConnection(1, receiverAction);
+        serverEndPoint.createConnection(2, receiverAction);
 
-        // Receive messages
-        //serverEndPoint.receiveMessages(receiverAction);
+        btnSend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                serverEndPoint.sendMessage("123");
 
-        // Disconnect from Socket
-        new Thread(() -> {
-            try {
-                Thread.sleep(5000);
-                Log.e("Test1", "Stop");
-                serverEndPoint.stopReceivingMessages();
-                Log.e("Test1", "Stopped");
-
-                new Thread(() -> {
-                    try {
-                        Thread.sleep(5000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    Log.e("Test1", "Start");
-                    serverEndPoint.continueReceivingMessages();
-                    Log.e("Test1", "Started");
-                }).start();
-
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }).start();
-
-
-        // Set OnClickListener, send messages
-        btnSend.setOnClickListener(v -> {
-            message = etMessage.getText().toString().trim();
-
-            if (!message.isEmpty()) {
-                serverEndPoint.sendMessage(message);
-                tvMessages.append("server sent this: " + message + "\n");
-                etMessage.setText("");
             }
         });
+
+
     }
+
+    private static String[] cutClientInfo(String clientInfo) {
+        String[] s = new String[2];
+        int currentIndex = 0;
+        boolean gotIp = false;
+        for (int i = clientInfo.length() - 1; i > 0; i--) {
+            if (clientInfo.charAt(i) != ' ' && !gotIp) {
+                s[0] += clientInfo.charAt(i);
+            } else {
+                if (!gotIp) {
+                    gotIp = true;
+                    currentIndex = i;
+                }
+            }
+        }
+        s[0] = s[0].substring(4);
+        String temp = "";
+        for (int i = s[0].length() - 1; i >= 0; i--) {
+            temp += s[0].charAt(i);
+        }
+        s[0] = temp;
+        s[1] = clientInfo.substring(0, currentIndex);
+        return s;
+    }
+
 }
+

@@ -21,7 +21,7 @@ public class ClientSocketEndPoint extends SocketEndPoint {
     private Client client;
     private Thread connectionThread;
     private SocketCommunicator.Receiver receiverAction;
-    Semaphore connection;
+    private Semaphore connected;
 
 
     public ClientSocketEndPoint(Activity activity, Context context, String serverIP) {
@@ -30,6 +30,16 @@ public class ClientSocketEndPoint extends SocketEndPoint {
         this.activity = activity;
         this.context = context;
         this.serverIP = serverIP;
+    }
+
+
+    /*
+    *
+    * Returns client ip address
+    *
+     */
+    public String getClientIpAddress() {
+        return client.getIPAddress();
     }
 
     /*
@@ -181,7 +191,7 @@ public class ClientSocketEndPoint extends SocketEndPoint {
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
-                connection.release();
+                connected.release();
             }
         }
     }
