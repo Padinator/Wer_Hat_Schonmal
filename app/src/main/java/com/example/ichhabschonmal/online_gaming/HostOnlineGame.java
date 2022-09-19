@@ -1,8 +1,8 @@
 package com.example.ichhabschonmal.online_gaming;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -10,12 +10,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.ichhabschonmal.CreatePlayers;
 import com.example.ichhabschonmal.R;
 import com.example.ichhabschonmal.adapter.HostOnlineGameAdapter;
 import com.example.ichhabschonmal.server_client_communication.ServerSocketEndPoint;
 import com.example.ichhabschonmal.server_client_communication.SocketCommunicator;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 @SuppressLint("SetTextI18n")
 public class HostOnlineGame extends AppCompatActivity {
@@ -29,10 +31,13 @@ public class HostOnlineGame extends AppCompatActivity {
     private TextView tvIP, connectedClients;
     private Button continues;
 
+    HashMap<String, String> players;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.host_online_game);
+
 
         // TextViews
         tvIP = findViewById(R.id.tvIP);
@@ -53,6 +58,8 @@ public class HostOnlineGame extends AppCompatActivity {
             e.printStackTrace();
         }
 
+        players = new HashMap<>();
+
         // Set TextViews
         tvIP.setText("Host-IP:\t\t" + serverEndPoint.getServerIP());
         connectedClients.setText("Verbunden:\t\t0 / " + (maxPlayerNumber - 1));
@@ -60,12 +67,15 @@ public class HostOnlineGame extends AppCompatActivity {
         // Create actions for receiving messaging
         receiverAction = new SocketCommunicator(null, null, null, null, null).new Receiver() {
 
+
             @Override
             public void action() {
                 if (serverEndPoint.sizeOfClients() > 0) {
                     int clientIndex = serverEndPoint.sizeOfClients() - 1;
                     String clientInfo = serverEndPoint.getClientsMessage(clientIndex);
                     String[] s = cutClientInfo(clientInfo);
+
+                    players.put(s[0], s[1]);
 
                     serverEndPoint.setClientsIPAddress(clientIndex, s[0]);
                     serverEndPoint.setClientsDeviceName(clientIndex, s[1]);
@@ -90,6 +100,15 @@ public class HostOnlineGame extends AppCompatActivity {
 
         // Create connection to Socket
         serverEndPoint.createConnection(maxPlayerNumber - 1, receiverAction);
+
+        continues.setOnClickListener(view -> {
+            Intent createPlayer = new Intent(this, CreatePlayers.class);
+            Bundle playerInfo = new Bundle();
+            playerInfo.putSerializable("hashmapofplayers", players);
+            createPlayer.putExtra("playerinfo", playerInfo);
+            startActivity(createPlayer);
+        });
+
     }
 
     private static String[] cutClientInfo(String clientInfo) {

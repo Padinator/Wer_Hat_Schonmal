@@ -5,19 +5,16 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
 import android.view.WindowManager.LayoutParams;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -97,7 +94,7 @@ public class CreatePlayers extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
 
         // Showing the back button in action bar
-        actionBar.setDisplayHomeAsUpEnabled(true);
+        //actionBar.setDisplayHomeAsUpEnabled(true);
 
         viewYourStories.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -126,13 +123,10 @@ public class CreatePlayers extends AppCompatActivity {
             }
         });
 
-        rules.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent rules = new Intent(CreatePlayers.this, Rules.class);
-                rules.putExtra("GameIsLoaded", false);
-                startActivity(rules);
-            }
+        rules.setOnClickListener(view -> {
+            Intent rules1 = new Intent(CreatePlayers.this, Rules.class);
+            rules1.putExtra("GameIsLoaded", false);
+            startActivity(rules1);
         });
 
         saveAndNextStory.setOnClickListener(v -> {
@@ -174,8 +168,7 @@ public class CreatePlayers extends AppCompatActivity {
             else if (!alreadySadOne && !writeStories.getText().toString().equals("")) {
                 Toast.makeText(this, "Die letzte Story wurde noch nicht gespeichert, einmaliger Hinweis!", Toast.LENGTH_SHORT).show();
                 alreadySadOne = true;
-            }
-            else if (playerName.getText().toString().isEmpty()) {
+            } else if (playerName.getText().toString().isEmpty()) {
                 Toast.makeText(CreatePlayers.this, "Spielername darf nicht leer sein!", Toast.LENGTH_SHORT).show();
             } else if (playerName.getText().toString().length() < 2)
                 Toast.makeText(CreatePlayers.this, "Spielername muss aus mindestens 2 Zeichen bestehen!", Toast.LENGTH_SHORT).show();
@@ -334,7 +327,7 @@ public class CreatePlayers extends AppCompatActivity {
 
             // Definitions and initializations
             LayoutInflater inflater = activity.getLayoutInflater();
-            @SuppressLint({"ViewHolder", "InflateParams"}) View rowView= inflater.inflate(R.layout.view_your_stories_list_item, null, true);
+            @SuppressLint({"ViewHolder", "InflateParams"}) View rowView = inflater.inflate(R.layout.view_your_stories_list_item, null, true);
             EditText storyText = rowView.findViewById(R.id.storyText);
             ImageButton deleteStory = rowView.findViewById(R.id.deleteStory);
 

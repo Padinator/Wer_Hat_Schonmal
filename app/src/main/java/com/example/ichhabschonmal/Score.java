@@ -71,7 +71,7 @@ public class Score extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
 
         // showing the back button in action bar
-        actionBar.setDisplayHomeAsUpEnabled(true);
+       // actionBar.setDisplayHomeAsUpEnabled(true);
 
     }
 
