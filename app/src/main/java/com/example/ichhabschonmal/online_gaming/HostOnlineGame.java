@@ -17,7 +17,8 @@ import com.example.ichhabschonmal.server_client_communication.ServerSocketEndPoi
 import com.example.ichhabschonmal.server_client_communication.SocketCommunicator;
 
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 
 @SuppressLint("SetTextI18n")
 public class HostOnlineGame extends AppCompatActivity {
@@ -31,7 +32,7 @@ public class HostOnlineGame extends AppCompatActivity {
     private TextView tvIP, connectedClients;
     private Button continues;
 
-    HashMap<String, String> players;
+    List<PlayerInfo> playersInfo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +59,7 @@ public class HostOnlineGame extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        players = new HashMap<>();
+        playersInfo = new ArrayList<>();
 
         // Set TextViews
         tvIP.setText("Host-IP:\t\t" + serverEndPoint.getServerIP());
@@ -75,7 +76,7 @@ public class HostOnlineGame extends AppCompatActivity {
                     String clientInfo = serverEndPoint.getClientsMessage(clientIndex);
                     String[] s = cutClientInfo(clientInfo);
 
-                    players.put(s[0], s[1]);
+                    playersInfo.add(new PlayerInfo(s[0], s[1]));
 
                     serverEndPoint.setClientsIPAddress(clientIndex, s[0]);
                     serverEndPoint.setClientsDeviceName(clientIndex, s[1]);
@@ -102,13 +103,14 @@ public class HostOnlineGame extends AppCompatActivity {
         serverEndPoint.createConnection(maxPlayerNumber - 1, receiverAction);
 
         continues.setOnClickListener(view -> {
-            Intent createPlayer = new Intent(this, CreatePlayers.class);
-            Bundle playerInfo = new Bundle();
-            playerInfo.putSerializable("hashmapofplayers", players);
-            createPlayer.putExtra("playerinfo", playerInfo);
+            serverEndPoint.sendMessage("start");
+            Intent createPlayer = new Intent(getApplicationContext(), CreatePlayers.class);
+            createPlayer.putExtra("playerinfo", (ArrayList<PlayerInfo>)playersInfo);
+
+            //bundle.putSerializable("hashmapofplayers", playersIP);
+            //createPlayer.putExtra("playerIP", playerInfo);
             startActivity(createPlayer);
         });
-
     }
 
     private static String[] cutClientInfo(String clientInfo) {

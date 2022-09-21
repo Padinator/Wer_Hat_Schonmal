@@ -34,6 +34,7 @@ import com.example.ichhabschonmal.database.Game;
 import com.example.ichhabschonmal.database.Player;
 import com.example.ichhabschonmal.database.Story;
 import com.example.ichhabschonmal.exceptions.GamerException;
+import com.example.ichhabschonmal.online_gaming.PlayerInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,6 +54,8 @@ public class CreatePlayers extends AppCompatActivity {
     private Button backButton, saveEditedStories;
     private ViewYourStoriesListAdapter adapter;
     private TextView storyNumber;
+
+    List<PlayerInfo> playerInfo;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -83,6 +86,13 @@ public class CreatePlayers extends AppCompatActivity {
         playerID = findViewById(R.id.playerID);
         storyNumber = findViewById(R.id.storyNumber);
         charsLeft = findViewById(R.id.charsLeft);
+
+        playerInfo = new ArrayList<>();
+
+        playerInfo = (ArrayList<PlayerInfo>)getIntent().getSerializableExtra("playerinfo");
+
+        Log.e("playerinfo", playerInfo.toString());
+
 
         // Set used variables
         minStoryNumber = getIntent().getExtras().getInt("MinStoryNumber");
