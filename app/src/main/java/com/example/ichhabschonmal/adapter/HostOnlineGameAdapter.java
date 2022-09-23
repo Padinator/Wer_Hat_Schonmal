@@ -74,18 +74,27 @@ public class HostOnlineGameAdapter extends RecyclerView.Adapter<HostOnlineGameAd
                     // Try notifying the client about the disconnecting a maximum of 5 times
                     boolean clientIsDisconnected = serverEndPoint.sendMessageToClient(getLayoutPosition(), SocketEndPoint.CLOSE_CONNECTION); // Inform client to close connection
 
-                    for (int i = 0; !clientIsDisconnected && i < 4; i++)
+                    for (int i = 0; !clientIsDisconnected && i < 4; i++) {
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+
                         clientIsDisconnected = serverEndPoint.sendMessageToClient(getLayoutPosition(), SocketEndPoint.CLOSE_CONNECTION);
+                    }
 
                     serverEndPoint.disconnectClientFromServer(getLayoutPosition()); // Works correct with all Threads? How many Thread are running???
                     notifyDataSetChanged();
                     connectedClients.setText("Verbunden:\t\t" + serverEndPoint.sizeOfClients() + " / " + (maxClientNumber - 1));
                 } catch (IOException e) {
                     e.printStackTrace();
+                } finally { // Start another connection for a new client
+                    if (serverEndPoint.isAConnectionThreadRunning()) // Extend existing "<Socket>.accept()'s"
+                        serverEndPoint.incrementCountOfRequestedClients();
+                    else // Create new connection with new "<Socket>.accept()"
+                        serverEndPoint.createConnection(1, receiverAction);
                 }
-
-                // Start another connection for a new client
-                serverEndPoint.createConnection(1, receiverAction);
             });
         }
     }

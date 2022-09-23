@@ -6,18 +6,23 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 
+import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-public class SocketEndPoint {
+public abstract class SocketEndPoint implements Serializable {
     protected final Activity activity;
     protected final Context context;
 
     protected String serverIP;
+    protected Thread connectionThread;
+    protected SocketCommunicator.Receiver receiverAction;
+
     public static final int SERVER_PORT = 8080;
     public static final String CLOSE_CONNECTION = "CLOSE_CONNECTION";
+    public static final String CREATE_PLAYER = "";
 
     public SocketEndPoint(Activity activity, Context context, String serverIP) {
         this.activity = activity;
@@ -28,6 +33,8 @@ public class SocketEndPoint {
     public String getServerIP() {
         return serverIP;
     }
+
+    public abstract void receiveMessages(SocketCommunicator.Receiver receiverAction);
 
     /*
      *
@@ -51,6 +58,10 @@ public class SocketEndPoint {
         } else {
             return capitalize(manufacturer) + " " + model;
         }
+    }
+
+    public boolean isAConnectionThreadRunning() {
+        return connectionThread != null && connectionThread.getState() != Thread.State.TERMINATED;
     }
 
     private String capitalize(String s) {

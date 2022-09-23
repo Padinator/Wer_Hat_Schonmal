@@ -20,9 +20,7 @@ public class ClientSocketEndPoint extends SocketEndPoint {
     private final Context context;
 
     private Client client;
-    private Thread connectionThread;
-    private SocketCommunicator.Receiver receiverAction;
-    private Semaphore connected;
+    private final Semaphore semConnection = new Semaphore(0); // Connect client with host
 
     public static final String STATUS_CONNECTED = "Warten auf Host";
     public static final String STATUS_NOT_CONNECTED = "Nicht verbunden";
@@ -95,7 +93,7 @@ public class ClientSocketEndPoint extends SocketEndPoint {
     /*
      *
      * Creates connection between host and client and starts receiving messages.
-     * Returns, if connection could be created -> automatically synchronization
+     * Returns, if connection could be created -> automatically synchronization with return value
      *
      */
     public boolean createConnection(SocketCommunicator.Receiver receiverAction) throws InterruptedException {
@@ -109,14 +107,10 @@ public class ClientSocketEndPoint extends SocketEndPoint {
 
             connectionThread = new Thread(new ClientConnector());
             connectionThread.start();
-
-            connected = new Semaphore(0); // Connect client with host
-            connected.acquire();
-
-            return client != null && client.isConnected();
+            semConnection.acquire();
         }
 
-        return false;
+        return !isConnected;
     }
 
     /*
@@ -124,7 +118,7 @@ public class ClientSocketEndPoint extends SocketEndPoint {
      * Start Receiving messages from server.
      *
      */
-    public void receiveMessages(SocketCommunicator.Receiver receiverAction) throws NullPointerException {
+    public void receiveMessages(SocketCommunicator.Receiver receiverAction) {
         if (client != null)
             client.receiveMessages(receiverAction);
         else
@@ -184,27 +178,28 @@ public class ClientSocketEndPoint extends SocketEndPoint {
                 BufferedReader input;
                 PrintWriter output;
                 Socket clientEndPoint;
-                SocketCommunicator socketCommunicatorToServer;
 
-                Log.e("Server-Port", "Server-IP: " + serverIP + ", Server-Port: " + SERVER_PORT + "");
+                Log.e("Client sees Server", "Server-IP: " + serverIP + ", Server-Port: " + SERVER_PORT + "");
 
                 clientEndPoint = new Socket(serverIP, SERVER_PORT);
                 //clientEndPoint = new Socket("192.168.1.38", 8080);
                 input = new BufferedReader(new InputStreamReader(clientEndPoint.getInputStream()));
                 output = new PrintWriter(clientEndPoint.getOutputStream());
-                socketCommunicatorToServer = new SocketCommunicator(activity, context, clientEndPoint, input, output);
-                client = new Client(socketCommunicatorToServer, receiverAction, getNameOfDevice(), getLocalIpAddress());
-                Log.e("Client", client.toString());
+                client = new Client(activity, context, clientEndPoint, input, output, getNameOfDevice(), getLocalIpAddress());
+                Log.e("ClientConnector", client.toString());
 
-                if (client.getReceiver() != null)
+                if (receiverAction != null)
                     client.receiveMessages(receiverAction);
-            } catch (NoRouteToHostException | ConnectException e) {
+            } catch (NoRouteToHostException e) {
                 Log.e("NoRouteToHostException", "No Host is waiting for a connection!");
-                activity.runOnUiThread(() -> Toast.makeText(context, "No Host is waiting for a connection!", Toast.LENGTH_SHORT).show());
+                activity.runOnUiThread(() -> Toast.makeText(context, "Kein Host wartet auf andere Spieler!", Toast.LENGTH_SHORT).show());
+            } catch (ConnectException e) {
+                Log.e("ConnectException", "An error occurred, while attempting to connect a socket to a remote address and port!");
+                activity.runOnUiThread(() -> Toast.makeText(context, "Verbindung zum Host fehlgeschlagen!", Toast.LENGTH_SHORT).show());
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
-                connected.release();
+                semConnection.release();
             }
         }
     }

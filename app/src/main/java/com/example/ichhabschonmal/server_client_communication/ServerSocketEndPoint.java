@@ -3,7 +3,10 @@ package com.example.ichhabschonmal.server_client_communication;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.os.Build;
 import android.util.Log;
+
+import androidx.annotation.RequiresApi;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -13,17 +16,17 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.concurrent.Semaphore;
 
 public class ServerSocketEndPoint extends SocketEndPoint {
     private final Activity activity;
     private final Context context;
 
     private final ServerSocket serverSocket;
-    private Thread connectionThread;
-    private SocketCommunicator.Receiver receiverAction;
 
     private final LinkedList<Client> clients = new LinkedList<>();
-    private int countOfClients;
+    private int countOfRequestedClients = 0;
+    private final Semaphore semCountOfRequestedClients = new Semaphore(1);
 
     /*
      *
@@ -70,8 +73,14 @@ public class ServerSocketEndPoint extends SocketEndPoint {
         if (index < 0 || index >= clients.size())
             throw new IndexOutOfBoundsException("Class ServerSocketEndPoint, no client (get IP) found, invalid index: " + index);
 
-        Log.e("Client index", index + "");
         return clients.get(index).getIPAddress();
+    }
+
+    public int getClientsPlayerNumber(int index) {
+        if (index < 0 || index >= clients.size())
+            throw new IndexOutOfBoundsException("Class ServerSocketEndPoint, no client (get Player-Number) found, invalid index: " + index);
+
+        return clients.get(index).getPlayerNumber();
     }
 
     public String getClientsDeviceName(int index) {
@@ -79,6 +88,20 @@ public class ServerSocketEndPoint extends SocketEndPoint {
             throw new IndexOutOfBoundsException("Class ServerSocketEndPoint, no client (get Device) found, invalid index: " + index);
 
         return clients.get(index).getDeviceName();
+    }
+
+    public int getCountOfRequestedClients() {
+        int tmp = 0;
+
+        try {
+            semCountOfRequestedClients.acquire();
+            tmp = countOfRequestedClients;
+            semCountOfRequestedClients.release();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        return tmp;
     }
 
     public void setClientsDeviceName(int index, String deviceName) {
@@ -95,8 +118,25 @@ public class ServerSocketEndPoint extends SocketEndPoint {
         clients.get(index).setIPAddress(IPAddress);
     }
 
+    public void setClientsPlayerNumber(int index, int playerNumber) {
+        if (index < 0 || index >= clients.size())
+            throw new IndexOutOfBoundsException("Class ServerSocketEndPoint, no client (set Player-Number) found, invalid index: " + index);
+
+        clients.get(index).setPlayerNumber(playerNumber);
+    }
+
     public int sizeOfClients() {
         return clients.size();
+    }
+
+    public void incrementCountOfRequestedClients() {
+        try {
+            semCountOfRequestedClients.acquire();
+            countOfRequestedClients++;
+            semCountOfRequestedClients.release();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     /*
@@ -113,8 +153,8 @@ public class ServerSocketEndPoint extends SocketEndPoint {
      * Creates connection between host and clients and starts receiving messages.
      *
      */
-    public void createConnection(int countOfClients, SocketCommunicator.Receiver receiverAction) {
-        this.countOfClients = countOfClients;
+    public void createConnection(int countOfRequestedClients, SocketCommunicator.Receiver receiverAction) {
+        this.countOfRequestedClients = countOfRequestedClients;
         this.receiverAction = receiverAction;
 
         connectionThread = new Thread(new ServerConnector()); // Thread is running until connection is canceled
@@ -173,12 +213,18 @@ public class ServerSocketEndPoint extends SocketEndPoint {
 
     /*
      *
-     * Send messages to all clients.
+     * Send messages to all clients. Return indices of clients for failed sending.
      *
      */
-    public void sendMessage(String message) {
-        for (Client client : clients)
-            client.sendMessage(message);
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public LinkedList<Integer> sendMessage(String message) {
+        LinkedList<Integer> responses = new LinkedList<>();
+
+        for (int i = 0; i < clients.size(); i++)
+            if (!clients.get(i).sendMessage(message))
+                responses.add(i);
+
+        return responses; // Works not on every device!!!
     }
 
     /*
@@ -220,26 +266,23 @@ public class ServerSocketEndPoint extends SocketEndPoint {
             serverSocket.close();
     }
 
-
     private class ServerConnector implements Runnable {
 
         @Override
         public void run() {
             try {
-                for (int i = 0; i < countOfClients; i++) {
+                for (int i = 0; i < getCountOfRequestedClients(); i++) {
                     BufferedReader input;
                     PrintWriter output;
                     Socket serverEndPoint;
-                    SocketCommunicator socketCommunicatorToClient;
 
                     serverEndPoint = serverSocket.accept(); // Searches for clients always
                     input = new BufferedReader(new InputStreamReader(serverEndPoint.getInputStream()));
                     output = new PrintWriter(serverEndPoint.getOutputStream());
-                    socketCommunicatorToClient = new SocketCommunicator(activity, context, serverEndPoint, input, output);
-                    clients.add(new Client(socketCommunicatorToClient, receiverAction));
+                    clients.add(new Client(activity, context, serverEndPoint, input, output));
                     Log.e("ServerConnector", clients.toString());
 
-                    if (clients.getLast().getReceiver() != null)
+                    if (receiverAction != null)
                         clients.getLast().receiveMessages(receiverAction);
                 }
             } catch (IOException e) {

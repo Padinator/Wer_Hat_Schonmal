@@ -129,11 +129,14 @@ public class NewGame extends AppCompatActivity {
                 else
                     intent = new Intent(getApplicationContext(), HostOnlineGame.class);
 
+                // Pass to next intent
+                intent.putExtra("OnlineGame", playMode.isChecked());
                 intent.putExtra("MinStoryNumber", Integer.parseInt(storyMinNumber));     // Give storyMinNumber
                 intent.putExtra("MaxStoryNumber", Integer.parseInt(storyMaxNumber));     // Give storyMaxNumber
                 intent.putExtra("PlayerNumber", Integer.parseInt(playerNumber));     // Give number of players
                 intent.putExtra("GameName", gameName.getText().toString());     // Give the name of the game
                 intent.putExtra("DrinkOfTheGame", drinkOfTheGame);
+
                 startActivity(intent);
             }
         });

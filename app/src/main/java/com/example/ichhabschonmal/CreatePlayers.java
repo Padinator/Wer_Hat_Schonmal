@@ -23,7 +23,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
@@ -34,28 +33,38 @@ import com.example.ichhabschonmal.database.Game;
 import com.example.ichhabschonmal.database.Player;
 import com.example.ichhabschonmal.database.Story;
 import com.example.ichhabschonmal.exceptions.GamerException;
-import com.example.ichhabschonmal.online_gaming.PlayerInfo;
+import com.example.ichhabschonmal.server_client_communication.ClientSocketEndPoint;
+import com.example.ichhabschonmal.server_client_communication.ServerSocketEndPoint;
+import com.example.ichhabschonmal.server_client_communication.SocketCommunicator;
+import com.example.ichhabschonmal.server_client_communication.SocketEndPoint;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 public class CreatePlayers extends AppCompatActivity {
 
     private Gamer[] listOfPlayers = new Gamer[]{new Gamer(1)};
+    private List<String> newListOfStories = new ArrayList<>();          // Is used for deleting/replacing stories in viewYourStories
+
     private int actualPlayer = 0, minStoryNumber, maxStoryNumber, maxPlayerNumber;
     private int idOfFirstPlayer = -1, countOfPlayers = 0, idOfFirstStory = -1, countOfStories = 0;
-    private boolean alreadySadOne = false;          // Check, if a player has saved his last story
-    private boolean alreadySadTwo = false;          // Check, if a player has saved changes of all stories
+    private boolean alreadySavedOne = false;          // Check, if a player has saved his last story
+    private boolean alreadySavedTwo = false;          // Check, if a player has saved changes of all stories
 
-    private List<String> newListOfStories = new ArrayList<>();          // Is used for deleting/replacing stories in viewYourStories
+    private boolean onlineGame = false;     // Check, if actual game is an online game
+    private boolean serverSide = false;     // Check, if actual device is the host/server
+    private Serializable serializable;
+    private SocketEndPoint endPoint;
+    private SocketCommunicator.Receiver receiverAction;
+
+
 
     private AppDatabase db;
     private ListView listView;
     private Button backButton, saveEditedStories;
     private ViewYourStoriesListAdapter adapter;
     private TextView storyNumber;
-
-    List<PlayerInfo> playerInfo;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -67,7 +76,7 @@ public class CreatePlayers extends AppCompatActivity {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
 
         // Definitions
-        Button saveAndNextStory, nextPerson, viewYourStories, next, rules;
+        Button saveAndNextStory, nextPerson, viewYourStories, btnContinue, rules;
         EditText writeStories, playerName;
         TextView playerID, charsLeft;
 
@@ -76,7 +85,7 @@ public class CreatePlayers extends AppCompatActivity {
         nextPerson = findViewById(R.id.nextPerson);
         viewYourStories = findViewById(R.id.viewYourStories);
         rules = findViewById(R.id.rules);
-        next = findViewById(R.id.next);
+        btnContinue = findViewById(R.id.next);
 
         // EditTexts:
         writeStories = findViewById(R.id.writeStories);
@@ -87,31 +96,53 @@ public class CreatePlayers extends AppCompatActivity {
         storyNumber = findViewById(R.id.storyNumber);
         charsLeft = findViewById(R.id.charsLeft);
 
-        playerInfo = new ArrayList<>();
+        // Get from last intent
+        //setItemsCanFocus(true);
+        onlineGame = getIntent().getExtras().getBoolean("OnlineGame");
 
-        playerInfo = (ArrayList<PlayerInfo>)getIntent().getSerializableExtra("playerinfo");
+        if (onlineGame) {
+            actualPlayer  = getIntent().getExtras().getInt("PlayersIndex");
+            playerID.setText("Du bist Spieler " + (actualPlayer + 1) + ":");
+            serializable = getIntent().getSerializableExtra("EndPoint");
 
-        Log.e("playerinfo", playerInfo.toString());
+            if (serializable instanceof ServerSocketEndPoint)
+                serverSide = true;
 
+            // Define a new action for receiving messages
+            receiverAction = new SocketCommunicator(null, null, null, null, null).new Receiver() {
 
-        // Set used variables
+                @SuppressLint("NotifyDataSetChanged")
+                @Override
+                public void action() {
+                    if (serializable instanceof ServerSocketEndPoint) { // Receive message from all clients
+                        ServerSocketEndPoint serverEndPoint = (ServerSocketEndPoint) serializable;
+
+                        // Dependent on clients messages
+                    } else if (serializable instanceof ClientSocketEndPoint) { // Receive message from host
+                        ClientSocketEndPoint clientEndPoint = (ClientSocketEndPoint) serializable;
+
+                        // Actually nothing to receive (request response for connection checks??? -> always)
+                    }
+                }
+
+            };
+
+            endPoint.receiveMessages(receiverAction);
+        }
+
         minStoryNumber = getIntent().getExtras().getInt("MinStoryNumber");
         maxStoryNumber = getIntent().getExtras().getInt("MaxStoryNumber");
         maxPlayerNumber = getIntent().getExtras().getInt("PlayerNumber");
-        //setItemsCanFocus(true);
 
+        /*
         // Calling the action bar
         ActionBar actionBar = getSupportActionBar();
 
         // Showing the back button in action bar
-        //actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        */
 
-        viewYourStories.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openDialog(v);
-            }
-        });
+        viewYourStories.setOnClickListener(v -> openDialog(v));
 
         writeStories.addTextChangedListener(new TextWatcher() {
             @Override
@@ -160,9 +191,10 @@ public class CreatePlayers extends AppCompatActivity {
                         Toast.LENGTH_LONG).show();
 
                 // Set used variable
-                alreadySadOne = false;
+                alreadySavedOne = false;
             }
         });
+
         nextPerson.setOnClickListener(v -> {
             // Check inserting a new player
             if (listOfPlayers.length == maxPlayerNumber)
@@ -175,9 +207,9 @@ public class CreatePlayers extends AppCompatActivity {
                     Toast.makeText(this, "Die letzte Story wurde noch nicht gespeichert!", Toast.LENGTH_SHORT).show();
             } else if (listOfPlayers.length > maxPlayerNumber)
                 Toast.makeText(CreatePlayers.this, "Zu viele eingeloggte Spieler!", Toast.LENGTH_LONG).show();
-            else if (!alreadySadOne && !writeStories.getText().toString().equals("")) {
+            else if (!alreadySavedOne && !writeStories.getText().toString().equals("")) {
                 Toast.makeText(this, "Die letzte Story wurde noch nicht gespeichert, einmaliger Hinweis!", Toast.LENGTH_SHORT).show();
-                alreadySadOne = true;
+                alreadySavedOne = true;
             } else if (playerName.getText().toString().isEmpty()) {
                 Toast.makeText(CreatePlayers.this, "Spielername darf nicht leer sein!", Toast.LENGTH_SHORT).show();
             } else if (playerName.getText().toString().length() < 2)
@@ -206,7 +238,7 @@ public class CreatePlayers extends AppCompatActivity {
             }
         });
 
-        next.setOnClickListener(view -> {
+        btnContinue.setOnClickListener(view -> {
 
             // Check, if all players meet all conditions
             if (listOfPlayers.length < maxPlayerNumber)
@@ -217,11 +249,11 @@ public class CreatePlayers extends AppCompatActivity {
                 Toast.makeText(CreatePlayers.this, "Spieler " + listOfPlayers.length + " besitzt zu wenig Storys!", Toast.LENGTH_SHORT).show();
                 if (!writeStories.getText().toString().equals(""))
                     Toast.makeText(this, "Die letzte Story wurde noch nicht gespeichert!", Toast.LENGTH_SHORT).show();
-            } else if (maxStoryNumber < listOfPlayers[listOfPlayers.length - 1].getCountOfStories())
+            } else if (listOfPlayers[listOfPlayers.length - 1].getCountOfStories() > maxStoryNumber)
                 Toast.makeText(CreatePlayers.this, "Spieler " + listOfPlayers.length + " besitzt zu viele Storys!", Toast.LENGTH_SHORT).show();
-            else if (!alreadySadOne && !writeStories.getText().toString().equals("")) {
+            else if (!alreadySavedOne && !writeStories.getText().toString().equals("")) {
                 Toast.makeText(this, "Die letzte Story wurde noch nicht gespeichert, einmaliger Hinweis!", Toast.LENGTH_SHORT).show();
-                alreadySadOne = true;
+                alreadySavedOne = true;
             } else if (playerName.getText().toString().isEmpty())     // Check last player's name
                 Toast.makeText(CreatePlayers.this, "Spielername darf nicht leer sein", Toast.LENGTH_SHORT).show();
             else if (playerName.getText().toString().length() < 2)      // Check last player's name
@@ -320,9 +352,23 @@ public class CreatePlayers extends AppCompatActivity {
                 finish();
             }
         });
+
+        // Deactivate nextPerson-Button
+        if (onlineGame) {
+            // 1. possibility: Deactivate nextPerson and reset layout btnContinue
+            /*
+            nextPerson.setVisibility(View.GONE);
+            */
+
+            // 2. possibility: Deactivate btnContinue and use onclick-action of bntContinue for nextPerson
+            btnContinue.setVisibility(View.GONE);
+            nextPerson.setBackgroundColor(getResources().getColor(R.color.orange_one));
+            nextPerson.setText(btnContinue.getText());
+            nextPerson.setOnClickListener(view -> btnContinue.callOnClick());
+        }
     }
 
-    public class ViewYourStoriesListAdapter extends ArrayAdapter<String> {
+    private class ViewYourStoriesListAdapter extends ArrayAdapter<String> {
         private final Activity activity;
         private final List<EditText> editTexts = new ArrayList<>();
 
@@ -430,12 +476,12 @@ public class CreatePlayers extends AppCompatActivity {
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!alreadySadTwo) {
+                if (!alreadySavedTwo) {
                     Toast.makeText(CreatePlayers.this, "Nicht gespeicherte \u00c4nderungen gehen verloren!", Toast.LENGTH_SHORT).show();
-                    alreadySadTwo = true;
+                    alreadySavedTwo = true;
                 } else {
                     dialog.cancel();
-                    alreadySadTwo = false;
+                    alreadySavedTwo = false;
                 }
             }
         });

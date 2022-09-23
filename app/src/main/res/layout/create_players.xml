@@ -132,29 +132,21 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/saveAndNextStory"
+                    android:layout_toLeftOf="@+id/orientationOne"
                     android:layout_centerHorizontal="true"
                     android:layout_marginRight="10dp"
                     android:layout_marginBottom="15dp"
-                    android:layout_toLeftOf="@+id/orientationTwo"
                     android:backgroundTint="@color/normalBlue"
                     android:text="Nächster"
                     android:textColor="@color/white" />
-
-                <TextView
-                    android:id="@+id/orientationTwo"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/nextPerson"
-                    android:layout_centerHorizontal="true"
-                    android:visibility="invisible" />
 
                 <Button
                     android:id="@+id/rules"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/saveAndNextStory"
+                    android:layout_toRightOf="@+id/orientationOne"
                     android:layout_marginLeft="10dp"
-                    android:layout_toRightOf="@+id/orientationTwo"
                     android:backgroundTint="@color/normalBlue"
                     android:padding="10dp"
                     android:text="Regeln"
