@@ -66,7 +66,7 @@ public class ClientSocketEndPoint extends SocketEndPoint {
      *
      */
     @SuppressLint("LongLogTag")
-    public boolean isConnected() {
+    public boolean isConnected() { // Undecided about exception handling
         /*
         if (client != null)
             return client.isConnected();

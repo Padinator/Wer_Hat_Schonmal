@@ -90,10 +90,7 @@ public class HostOnlineGameAdapter extends RecyclerView.Adapter<HostOnlineGameAd
                 } catch (IOException e) {
                     e.printStackTrace();
                 } finally { // Start another connection for a new client
-                    if (serverEndPoint.isAConnectionThreadRunning()) // Extend existing "<Socket>.accept()'s"
-                        serverEndPoint.incrementCountOfRequestedClients();
-                    else // Create new connection with new "<Socket>.accept()"
-                        serverEndPoint.createConnection(1, receiverAction);
+                    serverEndPoint.createConnection(1, receiverAction);
                 }
             });
         }

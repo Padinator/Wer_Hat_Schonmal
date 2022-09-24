@@ -129,16 +129,6 @@ public class ServerSocketEndPoint extends SocketEndPoint {
         return clients.size();
     }
 
-    public void incrementCountOfRequestedClients() {
-        try {
-            semCountOfRequestedClients.acquire();
-            countOfRequestedClients++;
-            semCountOfRequestedClients.release();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
     /*
      *
      * Creates connection between host and clients.
@@ -154,11 +144,26 @@ public class ServerSocketEndPoint extends SocketEndPoint {
      *
      */
     public void createConnection(int countOfRequestedClients, SocketCommunicator.Receiver receiverAction) {
+
         this.countOfRequestedClients = countOfRequestedClients;
         this.receiverAction = receiverAction;
 
-        connectionThread = new Thread(new ServerConnector()); // Thread is running until connection is canceled
-        connectionThread.start();
+        try {
+            semCountOfRequestedClients.acquire();
+
+            if (connectionThread != null && connectionThread.getState() != Thread.State.TERMINATED) {// Extend existing "<Socket>.accept()'s"
+                this.countOfRequestedClients += countOfRequestedClients;
+                Log.e("Test123", "1");
+            }else {  // Create new connection with new "<Socket>.accept()"
+                Log.e("Test123", "12");
+                connectionThread = new Thread(new ServerConnector()); // Thread is running until connection is canceled
+                connectionThread.start();
+            }
+
+            semCountOfRequestedClients.release();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     /*

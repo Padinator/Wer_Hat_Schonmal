@@ -104,7 +104,17 @@ public class HostOnlineGame extends AppCompatActivity {
         recyclerView.setAdapter(hostOnlineGameAdapter);
 
         // Create connection to Socket
-        serverEndPoint.createConnection(maxPlayerNumber - 1, receiverAction);
+        serverEndPoint.createConnection(1, receiverAction);
+
+        new Thread(() -> {
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            serverEndPoint.createConnection(1, receiverAction);
+        }).start();
 
         // Set set OnClickListener for btnContinue
         continues.setOnClickListener(this::onClick);
