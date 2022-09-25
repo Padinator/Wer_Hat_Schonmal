@@ -12,19 +12,18 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.io.Serializable;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.concurrent.Semaphore;
 
-public class ServerSocketEndPoint extends SocketEndPoint {
-    private final Activity activity;
-    private final Context context;
-
+public class ServerSocketEndPoint extends SocketEndPoint implements Serializable {
     private final ServerSocket serverSocket;
 
-    private final LinkedList<Client> clients = new LinkedList<>();
+    private LinkedList<Client> clients = new LinkedList<>();
     private int countOfRequestedClients = 0;
     private final Semaphore semCountOfRequestedClients = new Semaphore(1);
 
@@ -59,35 +58,15 @@ public class ServerSocketEndPoint extends SocketEndPoint {
         return messages;
     }
 
-    /*
-     *
-     * Returns a client's message.
-     *
-     */
-    public String getClientsMessage(int index) {
-        return clients.get(index).getMessage();
+    public Client getAClient(int index) {
+        if (index < 0 || index >= clients.size())
+            throw new IndexOutOfBoundsException("Class ServerSocketEndPoint, no client found, invalid index: " + index);
+
+        return clients.get(index);
     }
 
-
-    public String getClientsIPAddress(int index) {
-        if (index < 0 || index >= clients.size())
-            throw new IndexOutOfBoundsException("Class ServerSocketEndPoint, no client (get IP) found, invalid index: " + index);
-
-        return clients.get(index).getIPAddress();
-    }
-
-    public int getClientsPlayerNumber(int index) {
-        if (index < 0 || index >= clients.size())
-            throw new IndexOutOfBoundsException("Class ServerSocketEndPoint, no client (get Player-Number) found, invalid index: " + index);
-
-        return clients.get(index).getPlayerNumber();
-    }
-
-    public String getClientsDeviceName(int index) {
-        if (index < 0 || index >= clients.size())
-            throw new IndexOutOfBoundsException("Class ServerSocketEndPoint, no client (get Device) found, invalid index: " + index);
-
-        return clients.get(index).getDeviceName();
+    public LinkedList<Client> getClients() {
+        return clients;
     }
 
     public int getCountOfRequestedClients() {
@@ -104,25 +83,8 @@ public class ServerSocketEndPoint extends SocketEndPoint {
         return tmp;
     }
 
-    public void setClientsDeviceName(int index, String deviceName) {
-        if (index < 0 || index >= clients.size())
-            throw new IndexOutOfBoundsException("Class ServerSocketEndPoint, no client (set Device) found, invalid index: " + index);
-
-        clients.get(index).setDeviceName(deviceName);
-    }
-
-    public void setClientsIPAddress(int index, String IPAddress) {
-        if (index < 0 || index >= clients.size())
-            throw new IndexOutOfBoundsException("Class ServerSocketEndPoint, no client (set IP) found, invalid index: " + index);
-
-        clients.get(index).setIPAddress(IPAddress);
-    }
-
-    public void setClientsPlayerNumber(int index, int playerNumber) {
-        if (index < 0 || index >= clients.size())
-            throw new IndexOutOfBoundsException("Class ServerSocketEndPoint, no client (set Player-Number) found, invalid index: " + index);
-
-        clients.get(index).setPlayerNumber(playerNumber);
+    public void setClients(LinkedList<Client> clients) {
+        this.clients = clients;
     }
 
     public int sizeOfClients() {
@@ -151,11 +113,9 @@ public class ServerSocketEndPoint extends SocketEndPoint {
         try {
             semCountOfRequestedClients.acquire();
 
-            if (connectionThread != null && connectionThread.getState() != Thread.State.TERMINATED) {// Extend existing "<Socket>.accept()'s"
+            if (connectionThread != null && connectionThread.getState() != Thread.State.TERMINATED) // Extend existing "<Socket>.accept()'s"
                 this.countOfRequestedClients += countOfRequestedClients;
-                Log.e("Test123", "1");
-            }else {  // Create new connection with new "<Socket>.accept()"
-                Log.e("Test123", "12");
+            else { // Create new connection with new "<Socket>.accept()"
                 connectionThread = new Thread(new ServerConnector()); // Thread is running until connection is canceled
                 connectionThread.start();
             }
@@ -261,14 +221,13 @@ public class ServerSocketEndPoint extends SocketEndPoint {
         clients.clear();
     }
 
+    @SuppressLint("LongLogTag")
     public void disconnectServerSocket() throws IOException {
-        // Cancel connection
-        if (connectionThread != null && connectionThread.getState() != Thread.State.TERMINATED)
-            connectionThread.interrupt();
-
         // Close server socket
-        if (serverSocket != null && !serverSocket.isClosed())
-            serverSocket.close();
+        if (serverSocket != null && !serverSocket.isClosed()) {
+            serverSocket.close(); // All "<Socket>.accept(...)" will be closed automatically with an Exception
+            Log.e("Server Socket closed", serverSocket.isClosed() + "");
+        }
     }
 
     private class ServerConnector implements Runnable {
@@ -288,12 +247,15 @@ public class ServerSocketEndPoint extends SocketEndPoint {
                     Log.e("ServerConnector", clients.toString());
 
                     if (receiverAction != null)
-                        clients.getLast().receiveMessages(receiverAction);
+                        clients.get(clients.size() - 1).receiveMessages(receiverAction);
                 }
+            } catch (SocketException e) {
+                Log.e("ServerSocket was closed", "Socket was closed without sing all \"<Socket>.accepts(...)\"'s");
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
 
     }
+
 }

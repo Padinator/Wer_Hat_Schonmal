@@ -9,10 +9,13 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.ichhabschonmal.CreatePlayers;
+import com.example.ichhabschonmal.MainActivity;
 import com.example.ichhabschonmal.R;
+import com.example.ichhabschonmal.server_client_communication.ClientServerHandler;
 import com.example.ichhabschonmal.server_client_communication.ClientSocketEndPoint;
 import com.example.ichhabschonmal.server_client_communication.SocketCommunicator;
 import com.example.ichhabschonmal.server_client_communication.SocketEndPoint;
@@ -42,9 +45,8 @@ public class JoinGame extends AppCompatActivity {
 
             @Override
             public void action() {
-
-                String clientsMessage = clientEndPoint.getClientsMessage();
-                String[] lines = clientsMessage.split("\n");
+                String clientsMessage = clientEndPoint.getClient().getMessage();
+                String[] lines = clientsMessage.split(";");
                 clientsMessage = lines[0];
 
                 // Work off a client's message
@@ -61,26 +63,31 @@ public class JoinGame extends AppCompatActivity {
                     }
                     case (SocketEndPoint.CREATE_PLAYER): {
                         Intent createPlayers = new Intent(getApplicationContext(), CreatePlayers.class);
+                        String gameName = "", drinkOfTheGame = "";
+                        int minStoryNumber = 0, maxStoryNumber = 0, playersIndex = 0;
 
                         // Terminate receiving Thread, while loading new intent
-                        clientEndPoint.stopReceivingMessages();
+                        //clientEndPoint.stopReceivingMessages();
+
+                        // Set serverSocketEndPoint
+                        ClientServerHandler.setClientEndPoint(clientEndPoint); // Pass to all other intents
 
                         // Pass to next intent
-                        createPlayers.putExtra("EndPoint", clientEndPoint);
                         createPlayers.putExtra("OnlineGame", true);
-                        createPlayers.putExtra("MinStoryNumber", lines[1]);     // Pass storyMinNumber
-                        createPlayers.putExtra("MaxStoryNumber", lines[2]);     // Pass storyMaxNumber
+                        createPlayers.putExtra("ServerSide", false);
+                        createPlayers.putExtra("MinStoryNumber", Integer.parseInt(lines[1]));     // Pass storyMinNumber
+                        createPlayers.putExtra("MaxStoryNumber", Integer.parseInt(lines[2]));     // Pass storyMaxNumber
                         createPlayers.putExtra("PlayerNumber", 1);     // Pass number of players
                         createPlayers.putExtra("GameName", lines[3]);     // Pass the name of the game
                         createPlayers.putExtra("DrinkOfTheGame", lines[4]);
-                        createPlayers.putExtra("PlayersIndex", lines[5]);  // Pass the player's number
+                        createPlayers.putExtra("PlayersIndex", Integer.parseInt(lines[5]));   // Pass the player's number
+
                         startActivity(createPlayers);
+                        finish();
                         break;
                     }
                     default: {
-                        Log.e("Client receives outside", Arrays.toString(lines));
-                        runOnUiThread(() -> Toast.makeText(getApplicationContext(), "Client receives outside: " + Arrays.toString(lines), Toast.LENGTH_LONG).show());
-                        clientEndPoint.sendMessage("clients sends 123");
+                        Log.e("Client receives outside", clientsMessage);
                         break;
                     }
                 }
@@ -99,13 +106,11 @@ public class JoinGame extends AppCompatActivity {
                     Log.e("Client-Connection", connected + ", " + clientEndPoint.isConnected());
 
                     if (connected && clientEndPoint.isConnected()) {
-                        Log.e("Test1", "1");
                         connectionStatusInfo.setText("Status:\t\t" + ClientSocketEndPoint.STATUS_CONNECTED);
-                        clientEndPoint.sendMessage(clientEndPoint.getNameOfDevice() + " " + clientEndPoint.getClientIpAddress());
-                    } else if (!clientEndPoint.isConnected()) {
-                        Log.e("Test1", "2");
+                        clientEndPoint.sendMessage(clientEndPoint.getNameOfDevice() + " " + clientEndPoint.getClient().getIPAddress());
+                    } else if (!clientEndPoint.isConnected())
                         connectionStatusInfo.setText("Status:\t\t" + ClientSocketEndPoint.STATUS_NOT_CONNECTED);
-                    } else
+                    else
                         Log.e("Connect-Button of client", "No connection created, but one is already active");
                 } else {
                     connectionStatusInfo.setText("Status:\t\t" + ClientSocketEndPoint.STATUS_CONNECTED);
@@ -116,4 +121,36 @@ public class JoinGame extends AppCompatActivity {
             }
         });
     }
+
+    public void onBackPressed() {       // Catch back button
+        if (clientEndPoint != null) {
+            try {
+                clientEndPoint.disconnectClient(); // Disconnect client, clientside
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        if (clientEndPoint != null && clientEndPoint.isConnected()) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Spielererstellung")
+                    .setMessage("M\u00f6chtest du wirkklich zur\u00fcck gehen?")
+                    .setPositiveButton("Zur\u00fcck", (dialog, which) -> {
+                        Intent mainActivity = new Intent(JoinGame.this, MainActivity.class);
+
+                        startActivity(mainActivity);
+                        finish();
+                    })
+                    .setNegativeButton("Abbrechen", (dialogInterface, i) -> {
+
+                    });
+
+            builder.create().show();
+        } else {
+            Intent mainActivity = new Intent(JoinGame.this, MainActivity.class);
+
+            startActivity(mainActivity);
+            finish();
+        }
+    }
+
 }

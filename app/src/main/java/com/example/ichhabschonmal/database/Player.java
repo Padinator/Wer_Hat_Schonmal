@@ -24,14 +24,14 @@ public class Player {
     public int gameId;              // Every player belongs to a game
 
     @ColumnInfo(name = "score")
-    public int score;
+    public int score = 0;
 
     @ColumnInfo(name = "countOfBeers")
-    public int countOfBeers;
+    public int countOfBeers = 0;
 
     @ColumnInfo(name = "countOfVodka")
-    public int countOfVodka;
+    public int countOfVodka = 0;
 
     @ColumnInfo(name = "countOfTequila")
-    public int countOfTequila;
+    public int countOfTequila = 0;
 }

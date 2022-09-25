@@ -5,6 +5,8 @@ import android.content.Context;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import java.io.Serializable;
 import java.net.InetAddress;
@@ -12,9 +14,9 @@ import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-public abstract class SocketEndPoint implements Serializable {
-    protected final Activity activity;
-    protected final Context context;
+public abstract class SocketEndPoint {
+    protected Activity activity;
+    protected Context context;
 
     protected String serverIP;
     protected Thread connectionThread;
@@ -22,7 +24,9 @@ public abstract class SocketEndPoint implements Serializable {
 
     public static final int SERVER_PORT = 8080;
     public static final String CLOSE_CONNECTION = "CLOSE_CONNECTION";
-    public static final String CREATE_PLAYER = "";
+    public static final String CREATE_PLAYER = "CREATE_PLAYER";
+    public static final String CREATED_PLAYER = "CREATED_PLAYER";
+    public static final String START_OF_A_STORY = "START_OF_A_STORY";
 
     public SocketEndPoint(Activity activity, Context context, String serverIP) {
         this.activity = activity;
@@ -30,11 +34,25 @@ public abstract class SocketEndPoint implements Serializable {
         this.serverIP = serverIP;
     }
 
+    public Activity getActivity() {
+        return activity;
+    }
+
+    public Context getContext() {
+        return context;
+    }
+
     public String getServerIP() {
         return serverIP;
     }
 
-    public abstract void receiveMessages(SocketCommunicator.Receiver receiverAction);
+    public void setActivity(Activity activity) {
+        this.activity = activity;
+    }
+
+    public void setContext(Context context) {
+        this.context = context;
+    }
 
     /*
      *

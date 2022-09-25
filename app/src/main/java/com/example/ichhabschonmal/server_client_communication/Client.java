@@ -1,18 +1,16 @@
 package com.example.ichhabschonmal.server_client_communication;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
-import android.util.Log;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.Serializable;
 import java.net.Socket;
-import java.util.concurrent.Semaphore;
 
-public class Client extends SocketCommunicator {
+public class Client extends SocketCommunicator implements Serializable {
 
+    private static final long serialVersionUID = 1L;
     private String deviceName, IPAddress;
     private int playerNumber = -1;
 
@@ -36,7 +34,9 @@ public class Client extends SocketCommunicator {
         return IPAddress;
     }
 
-    public int getPlayerNumber() { return playerNumber; }
+    public int getPlayerNumber() {
+        return playerNumber;
+    }
 
     public void setDeviceName(String deviceName) {
         this.deviceName = deviceName;
@@ -46,7 +46,9 @@ public class Client extends SocketCommunicator {
         this.IPAddress = IPAddress;
     }
 
-    public void setPlayerNumber(int playerNumber) { this.playerNumber = playerNumber; }
+    public void setPlayerNumber(int playerNumber) {
+        this.playerNumber = playerNumber;
+    }
 
     // @Override methods
     @Override

@@ -163,19 +163,24 @@ public class SocketCommunicator {
         return message;
     }
 
+    public String readLine() throws IOException {
+        String line = "";
+
+        try {
+            semReceiverAction.acquire();
+            line = receiverAction.readLine();
+            semReceiverAction.release();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        return line;
+    }
+
     @SuppressLint("LongLogTag")
     public void disconnectClientFromServer() throws IOException {
         // Stop receiving messages
         receiverAction.setDoneReading(true);
-
-        /*
-        if (receiverThread != null && receiverThread.getState() != Thread.State.TERMINATED)
-            receiverThread.interrupt();
-
-        // Stop sending messages
-        if (senderThread != null && senderThread.getState() != Thread.State.TERMINATED)
-            senderThread.interrupt();
-        */
 
         // Close Socket for communication
         if (!isClosed())
@@ -186,6 +191,7 @@ public class SocketCommunicator {
 
         private final Semaphore semDoneReading = new Semaphore(1); // Semaphore for start/stop receiving
         private boolean doneReading = false;
+        private String message = "";
 
         public boolean getDoneReading() {
             boolean tmp = false;
@@ -201,6 +207,10 @@ public class SocketCommunicator {
             return tmp;
         }
 
+        public String getMessage() {
+            return message;
+        }
+
         public void setDoneReading(boolean doneReading) {
             try {
                 semDoneReading.acquire();
@@ -211,12 +221,20 @@ public class SocketCommunicator {
             }
         }
 
+        public void setMessage(String message) {
+            this.message = message;
+        }
+
+        public String readLine() throws IOException {
+            return input.readLine();
+        }
+
         public abstract void action(); // Define actions of this Thread
 
         @Override
         public void run() {
             if (endPoint != null && !endPoint.isClosed()) {
-                message = ""; // Reset message
+                SocketCommunicator.this.message = ""; // Reset message
 
                 try {
                     while (!getDoneReading()) {
@@ -224,7 +242,8 @@ public class SocketCommunicator {
                             final String receivedMsg = input.readLine();
                             Log.e("Receiving ready", "Ready");
 
-                            if (message != null) {
+                            if (receivedMsg != null) {
+                                SocketCommunicator.this.message = receivedMsg;
                                 message = receivedMsg;
 
                                 // Sync action method for receiving
@@ -234,6 +253,7 @@ public class SocketCommunicator {
                                 } catch (InterruptedException e) {
                                     e.printStackTrace();
                                 }
+
                                 action(); // Do defined action
                                 semReceiverAction.release();
                             }

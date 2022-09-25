@@ -9,6 +9,8 @@ import android.util.Log;
 import android.widget.Button;
 
 import com.example.ichhabschonmal.online_gaming.JoinGame;
+import com.example.ichhabschonmal.server_client_communication.ClientSocketEndPoint;
+import com.example.ichhabschonmal.server_client_communication.ServerSocketEndPoint;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;

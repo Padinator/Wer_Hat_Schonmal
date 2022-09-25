@@ -16,9 +16,6 @@ import java.net.Socket;
 import java.util.concurrent.Semaphore;
 
 public class ClientSocketEndPoint extends SocketEndPoint {
-    private final Activity activity;
-    private final Context context;
-
     private Client client;
     private final Semaphore semConnection = new Semaphore(0); // Connect client with host
 
@@ -35,29 +32,16 @@ public class ClientSocketEndPoint extends SocketEndPoint {
     }
 
 
+    public Client getClient() {
+        return client;
+    }
+
+    public void setClient(Client client) {
+        this.client = client;
+    }
+
     public void setServerIP(String serverIP) {
         this.serverIP = serverIP;
-    }
-
-    /*
-     *
-     * Returns the client's ip address.
-     *
-     */
-    public String getClientIpAddress() {
-        return client.getIPAddress();
-    }
-
-    /*
-     *
-     * Returns the message, the client has received.
-     *
-     */
-    public String getClientsMessage() {
-        if (client != null)
-            return client.getMessage();
-        else
-            throw new NullPointerException("Cannot read message from client, no client was created!");
     }
 
     /*
@@ -156,9 +140,9 @@ public class ClientSocketEndPoint extends SocketEndPoint {
      * Send messages to the server.
      *
      */
-    public void sendMessage(String message) {
+    public boolean sendMessage(String message) {
         if (client != null)
-            client.sendMessage(message);
+            return client.sendMessage(message);
         else
             throw new NullPointerException("Class ClientSocketEndPoint, during \"sendMessage(...)\": No client defined: null");
     }

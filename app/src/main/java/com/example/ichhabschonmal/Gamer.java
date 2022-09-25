@@ -1,20 +1,23 @@
 package com.example.ichhabschonmal;
 
+import androidx.annotation.NonNull;
+
 import com.example.ichhabschonmal.exceptions.GamerException;
+import com.example.ichhabschonmal.server_client_communication.SocketEndPoint;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Gamer {        // Data entity is already named Player
-    private List<String> listOfStories = new ArrayList<>();     // Stories are saved temporary in listOfStories
+public class Gamer { // Data entity is already named Player
+    private List<String> listOfStories = new ArrayList<>(); // Stories are saved temporary in listOfStories
     private final int number;
-    private String name;
+    private String name = "";
 
-    public Gamer(int number) {       // No default-Ctor: a player/gamer always has a name and a number
+    public Gamer(int number) { // No default-Constructor: a player/gamer always has a name and a number
         this.number = number;
     }
 
-    private Gamer(int number, String name, List<String> listOfStories) {        // Copy-ctor
+    private Gamer(int number, String name, List<String> listOfStories) { // Copy-Constructor
         this.number = number;
         this.name = name;
         this.listOfStories.addAll(listOfStories);
@@ -39,15 +42,12 @@ public class Gamer {        // Data entity is already named Player
     public String getStory(int j) throws GamerException {
         if (j < 0 || j >= listOfStories.size())
             throw new GamerException("No story found to read, invalid index: " + j);
+
         return listOfStories.get(j);
     }
 
     public List<String> getAllStories() {
-        List<String> copiedListOfStories = new ArrayList<>();
-
-        copiedListOfStories.addAll(listOfStories);
-
-        return copiedListOfStories;
+        return new ArrayList<>(listOfStories);
     }
 
     public void addStory(String story) {        // Add a story to the story list of a player
@@ -55,7 +55,7 @@ public class Gamer {        // Data entity is already named Player
     }
 
     public void replaceAllStories(List<String> newListOfStories) {
-        this.listOfStories = newListOfStories;          // Flat copy
+        this.listOfStories = newListOfStories; // Flat copy
     }
 
     public void deleteStory(int j) throws GamerException {
@@ -64,13 +64,15 @@ public class Gamer {        // Data entity is already named Player
         listOfStories.remove(j);
     }
 
-    public static boolean isEmpty(Gamer[] listOfPlayers) {        // Returns true, if listOfPlayers is empty
+    public static boolean isEmpty(Gamer[] listOfPlayers) { // Returns true, if listOfPlayers is empty
         boolean check = true;
 
         // Check all players
-        for (int i = 0; check && i < listOfPlayers.length; i++) {
-            if (listOfPlayers[i] != null)
+        for (Gamer listOfPlayer : listOfPlayers) {
+            if (listOfPlayer != null) {
                 check = false;
+                break;
+            }
         }
 
         return  check;
@@ -84,5 +86,17 @@ public class Gamer {        // Data entity is already named Player
         }
 
         return newListOfPlayers;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        List<String> listOfStories = getAllStories();
+        StringBuilder string = new StringBuilder(number + "\n" + name);
+
+        for (String story : listOfStories)
+            string.append("\n" + SocketEndPoint.START_OF_A_STORY).append(story);
+
+        return String.valueOf(string);
     }
 }

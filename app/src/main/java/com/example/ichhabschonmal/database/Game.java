@@ -13,6 +13,9 @@ public class Game {
     @ColumnInfo(name = "gameName")
     public String gameName;
 
+    @ColumnInfo(name = "onlineGame")
+    public boolean onlineGame;
+
     @ColumnInfo(name = "idOfFirstPlayer")
     public int idOfFirstPlayer;
 
