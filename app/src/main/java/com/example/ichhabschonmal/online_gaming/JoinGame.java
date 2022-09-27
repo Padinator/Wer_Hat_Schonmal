@@ -63,11 +63,10 @@ public class JoinGame extends AppCompatActivity {
                     }
                     case (SocketEndPoint.CREATE_PLAYER): {
                         Intent createPlayers = new Intent(getApplicationContext(), CreatePlayers.class);
-                        String gameName = "", drinkOfTheGame = "";
-                        int minStoryNumber = 0, maxStoryNumber = 0, playersIndex = 0;
 
                         // Terminate receiving Thread, while loading new intent
-                        //clientEndPoint.stopReceivingMessages();
+                        new Thread(() -> clientEndPoint.stopReceivingMessages()).start();
+                            // Start a new thread, because method and receiverAction uses the same semaphore
 
                         // Set serverSocketEndPoint
                         ClientServerHandler.setClientEndPoint(clientEndPoint); // Pass to all other intents

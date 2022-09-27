@@ -20,14 +20,13 @@ public class SocketCommunicator {
     private final Socket endPoint;
     private final BufferedReader input;
     private final PrintWriter output;
-    private String message = "";
 
     private Thread receiverThread;
     // No sync necessary: SocketCommunicator/Client is used exactly 1 time in the host's LinkedList
     // Variable "receiverThread" is only used locally and executed by Main-Thread -> no sync necessary
     //      -> Unequal to "receiverAction": can be modified ("setReceiverAction()") and used ("action()")
     private Thread senderThread;
-    private Receiver receiverAction;
+    private Receiver receiverAction, oldReceiverAction;
     private final Semaphore semReceiverAction = new Semaphore(1); // Sync receiving action, because of setting a new one
 
     public SocketCommunicator(Activity activity, Context context, Socket endPoint, BufferedReader input, PrintWriter output) {
@@ -41,6 +40,7 @@ public class SocketCommunicator {
     protected void setReceiverAction(SocketCommunicator.Receiver receiverAction) {
         try {
             semReceiverAction.acquire();
+            oldReceiverAction = receiverAction;
             this.receiverAction = new Receiver() {
 
                 @Override
@@ -160,7 +160,7 @@ public class SocketCommunicator {
     }
 
     public String getMessage() {
-        return message;
+        return receiverAction.getMessage();
     }
 
     public String readLine() throws IOException {
@@ -190,6 +190,7 @@ public class SocketCommunicator {
     public abstract class Receiver implements Runnable {
 
         private final Semaphore semDoneReading = new Semaphore(1); // Semaphore for start/stop receiving
+        private final Semaphore semMessage = new Semaphore(1); // Semaphore for get/set messages
         private boolean doneReading = false;
         private String message = "";
 
@@ -208,7 +209,17 @@ public class SocketCommunicator {
         }
 
         public String getMessage() {
-            return message;
+            String tmp = "";
+
+            try {
+                semMessage.acquire();
+                tmp = message;
+                semMessage.release();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            return tmp;
         }
 
         public void setDoneReading(boolean doneReading) {
@@ -222,7 +233,13 @@ public class SocketCommunicator {
         }
 
         public void setMessage(String message) {
-            this.message = message;
+            try {
+                semMessage.acquire();
+                this.message = message;
+                semMessage.release();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
 
         public String readLine() throws IOException {
@@ -234,7 +251,7 @@ public class SocketCommunicator {
         @Override
         public void run() {
             if (endPoint != null && !endPoint.isClosed()) {
-                SocketCommunicator.this.message = ""; // Reset message
+                message = ""; // Reset message
 
                 try {
                     while (!getDoneReading()) {
@@ -243,23 +260,23 @@ public class SocketCommunicator {
                             Log.e("Receiving ready", "Ready");
 
                             if (receivedMsg != null) {
-                                SocketCommunicator.this.message = receivedMsg;
-                                message = receivedMsg;
+
+                                setMessage(receivedMsg);
+                                oldReceiverAction.setMessage(receivedMsg);
 
                                 // Sync action method for receiving
                                 try {
-                                    Log.e("Received", message);
+                                    Log.e("Received", receivedMsg);
                                     semReceiverAction.acquire();
+                                    action(); // Do defined action
+                                    semReceiverAction.release();
                                 } catch (InterruptedException e) {
                                     e.printStackTrace();
                                 }
-
-                                action(); // Do defined action
-                                semReceiverAction.release();
                             }
                         }
                     }
-                    Log.e("Receiving stopped", "stopped or failed reading1");
+                    Log.e("Receiving stopped", "stopped or failed reading");
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

@@ -181,7 +181,6 @@ public class ServerSocketEndPoint extends SocketEndPoint implements Serializable
      * Send messages to all clients. Return indices of clients for failed sending.
      *
      */
-    @RequiresApi(api = Build.VERSION_CODES.N)
     public LinkedList<Integer> sendMessage(String message) {
         LinkedList<Integer> responses = new LinkedList<>();
 

@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
@@ -58,6 +59,7 @@ public class HostOnlineGame extends AppCompatActivity {
 
         // Get from last intent
         maxPlayerNumber = getIntent().getExtras().getInt("PlayerNumber");
+        //maxPlayerNumber = 2;
         minStoryNumber = getIntent().getExtras().getInt("MinStoryNumber");
         maxStoryNumber = getIntent().getExtras().getInt("MaxStoryNumber");
         gameName = getIntent().getStringExtra("GameName");
@@ -139,28 +141,33 @@ public class HostOnlineGame extends AppCompatActivity {
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void onClick(View view) {
-        Intent createPlayers = new Intent(getApplicationContext(), CreatePlayers.class);
-        String messageForAllClients;
-        LinkedList<Integer> responses = new LinkedList<>();
+        if (serverEndPoint.sizeOfClients() < maxPlayerNumber - 1)
+            Toast.makeText(getApplicationContext(), "Zu wenig Spieler verbunden!", Toast.LENGTH_SHORT).show();
+        else if (serverEndPoint.sizeOfClients() > maxPlayerNumber - 1)
+            Toast.makeText(getApplicationContext(), "Zu viele Spieler sind verbunden, starte die App neu!", Toast.LENGTH_SHORT).show();
+        else {
+            Intent createPlayers = new Intent(getApplicationContext(), CreatePlayers.class);
+            String messageForAllClients;
+            LinkedList<Integer> responses = new LinkedList<>();
 
-        // Send message to all clients to inform them
-        messageForAllClients = SocketEndPoint.CREATE_PLAYER + ";";
-        messageForAllClients += minStoryNumber + ";";
-        messageForAllClients = messageForAllClients + (maxStoryNumber + ";");
-        messageForAllClients += gameName + ";";
-        messageForAllClients += drinkOfTheGame +";";
+            // Send message to all clients to inform them
+            messageForAllClients = SocketEndPoint.CREATE_PLAYER + ";";
+            messageForAllClients += minStoryNumber + ";";
+            messageForAllClients = messageForAllClients + (maxStoryNumber + ";");
+            messageForAllClients += gameName + ";";
+            messageForAllClients += drinkOfTheGame + ";";
 
-        for (int i = 0; i < serverEndPoint.sizeOfClients(); i++) {
-            // Set player number of a client/player
-            serverEndPoint.getAClient(i).setPlayerNumber(i + 1);
+            for (int i = 0; i < serverEndPoint.sizeOfClients(); i++) {
+                // Set player number of a client/player
+                serverEndPoint.getAClient(i).setPlayerNumber(i + 1);
 
-            // Send message for creating players to all clients
-            if (!serverEndPoint.sendMessageToClient(i, messageForAllClients + (i + 1))) // Pass a player's index
-                responses.add(i);
-        }
+                // Send message for creating players to all clients
+                if (!serverEndPoint.sendMessageToClient(i, messageForAllClients + (i + 1))) // Pass a player's index
+                    responses.add(i);
+            }
 
-        if (!responses.isEmpty()) {
-            Log.e("Sending to all clients", "Failed sending to " + responses.size() + " clients");
+            if (!responses.isEmpty()) {
+                Log.e("Sending to all clients", "Failed sending to " + responses.size() + " clients");
 
             /*
             // Retry sending messages 4 more times
@@ -178,33 +185,34 @@ public class HostOnlineGame extends AppCompatActivity {
                 }
             }
             */
+            }
+
+            // Terminate all Threads, while loading new intent
+            serverEndPoint.stopReceivingMessages();
+
+            // Disconnect server socket, no connection necessary
+            try {
+                serverEndPoint.disconnectServerSocket();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            // Set serverSocketEndPoint
+            ClientServerHandler.setServerEndPoint(serverEndPoint); // Pass to all other intents
+
+            // Pass to next intent
+            createPlayers.putExtra("OnlineGame", true);
+            createPlayers.putExtra("ServerSide", true);
+            createPlayers.putExtra("MinStoryNumber", minStoryNumber);     // Pass storyMinNumber
+            createPlayers.putExtra("MaxStoryNumber", maxStoryNumber);     // Pass storyMaxNumber
+            createPlayers.putExtra("PlayerNumber", maxPlayerNumber);     // Pass number of players
+            createPlayers.putExtra("GameName", gameName);     // Pass the name of the game
+            createPlayers.putExtra("DrinkOfTheGame", drinkOfTheGame);
+            createPlayers.putExtra("PlayersIndex", 0);      // Host is always first player
+
+            startActivity(createPlayers);
+            finish();
         }
-
-        // Terminate all Threads, while loading new intent
-        serverEndPoint.stopReceivingMessages();
-
-        // Disconnect server socket, no connection necessary
-        try {
-            serverEndPoint.disconnectServerSocket();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        // Set serverSocketEndPoint
-        ClientServerHandler.setServerEndPoint(serverEndPoint); // Pass to all other intents
-
-        // Pass to next intent
-        createPlayers.putExtra("OnlineGame", true);
-        createPlayers.putExtra("ServerSide", true);
-        createPlayers.putExtra("MinStoryNumber", minStoryNumber);     // Pass storyMinNumber
-        createPlayers.putExtra("MaxStoryNumber", maxStoryNumber);     // Pass storyMaxNumber
-        createPlayers.putExtra("PlayerNumber", maxPlayerNumber);     // Pass number of players
-        createPlayers.putExtra("GameName", gameName);     // Pass the name of the game
-        createPlayers.putExtra("DrinkOfTheGame", drinkOfTheGame);
-        createPlayers.putExtra("PlayersIndex", 0);      // Host is always first player
-
-        startActivity(createPlayers);
-        finish();
     }
 
     @Override

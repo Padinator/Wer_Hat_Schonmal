@@ -22,11 +22,13 @@ public abstract class SocketEndPoint {
     protected Thread connectionThread;
     protected SocketCommunicator.Receiver receiverAction;
 
+    // Constants
     public static final int SERVER_PORT = 8080;
     public static final String CLOSE_CONNECTION = "CLOSE_CONNECTION";
     public static final String CREATE_PLAYER = "CREATE_PLAYER";
     public static final String CREATED_PLAYER = "CREATED_PLAYER";
     public static final String START_OF_A_STORY = "START_OF_A_STORY";
+    public static final String PLAY_GAME = "PLAY_GAME";
 
     public SocketEndPoint(Activity activity, Context context, String serverIP) {
         this.activity = activity;

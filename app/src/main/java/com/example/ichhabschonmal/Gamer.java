@@ -92,10 +92,10 @@ public class Gamer { // Data entity is already named Player
     @Override
     public String toString() {
         List<String> listOfStories = getAllStories();
-        StringBuilder string = new StringBuilder(number + "\n" + name);
+        StringBuilder string = new StringBuilder(number + ";" + name + ";");
 
         for (String story : listOfStories)
-            string.append("\n" + SocketEndPoint.START_OF_A_STORY).append(story);
+            string.append(SocketEndPoint.START_OF_A_STORY).append(story);
 
         return String.valueOf(string);
     }
