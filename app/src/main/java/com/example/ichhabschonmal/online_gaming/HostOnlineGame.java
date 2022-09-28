@@ -1,8 +1,12 @@
 package com.example.ichhabschonmal.online_gaming;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -11,6 +15,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.ichhabschonmal.CreatePlayers;
+import com.example.ichhabschonmal.MainActivity;
+import com.example.ichhabschonmal.NewGame;
 import com.example.ichhabschonmal.R;
 import com.example.ichhabschonmal.adapter.HostOnlineGameAdapter;
 import com.example.ichhabschonmal.server_client_communication.ServerSocketEndPoint;
@@ -38,7 +44,6 @@ public class HostOnlineGame extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.host_online_game);
-
 
         // TextViews
         tvIP = findViewById(R.id.tvIP);
@@ -105,12 +110,43 @@ public class HostOnlineGame extends AppCompatActivity {
         continues.setOnClickListener(view -> {
             serverEndPoint.sendMessage("start");
             Intent createPlayer = new Intent(getApplicationContext(), CreatePlayers.class);
-            createPlayer.putExtra("playerinfo", (ArrayList<PlayerInfo>)playersInfo);
+            createPlayer.putExtra("playerinfo", (ArrayList<PlayerInfo>) playersInfo);
 
             //bundle.putSerializable("hashmapofplayers", playersIP);
             //createPlayer.putExtra("playerIP", playerInfo);
             startActivity(createPlayer);
         });
+
+        // calling the action bar
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.arrow_back);
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {       // Catch back button
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Spieleinstellungen")
+                .setMessage("Wenn du zur\u00fcck gehst, werden die Daten nicht gespeichert!")
+                .setPositiveButton("Zur\u00fcck", (dialog, id) -> {
+                    Intent mainActivity = new Intent(HostOnlineGame.this, MainActivity.class);
+                    startActivity(mainActivity);
+                    finish();
+                })
+                .setNegativeButton("Abbrechen", (dialogInterface, i) -> {
+
+                });
+        builder.create().show();
     }
 
     private static String[] cutClientInfo(String clientInfo) {

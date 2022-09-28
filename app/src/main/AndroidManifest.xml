@@ -3,9 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.ichhabschonmal">
 
-    <uses-permission android:name = "android.permission.ACCESS_WIFI_STATE" />
-    <uses-permission android:name = "android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name = "android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
@@ -29,10 +29,12 @@
         <activity android:name=".Rules" />
         <activity android:name=".Score" />
         <activity android:name=".EndScore" />
-        <activity android:name=".online_gaming.HostOnlineGame"
-            android:label="Server"/>
-        <activity android:name=".online_gaming.JoinGame"
-            android:label="Client"/>
+        <activity
+            android:name=".online_gaming.HostOnlineGame"
+            android:label="Server" />
+        <activity
+            android:name=".online_gaming.JoinGame"
+            android:label="Client" />
 
     </application>
 

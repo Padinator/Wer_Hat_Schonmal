@@ -2,8 +2,11 @@ package com.example.ichhabschonmal.online_gaming;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -32,6 +35,7 @@ public class JoinGame extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.join_game);
+
         etIP = findViewById(R.id.etIP);
         connectionStatusInfo = findViewById(R.id.connectionStatusInfo);
         btnConnect = findViewById(R.id.btnConnect);
@@ -46,8 +50,8 @@ public class JoinGame extends AppCompatActivity {
                     startActivity(createPlayer);
                 }
 
-                switch(clientEndPoint.getClientsMessage()) {
-                    case(SocketEndPoint.CLOSE_CONNECTION): {
+                switch (clientEndPoint.getClientsMessage()) {
+                    case (SocketEndPoint.CLOSE_CONNECTION): {
                         try {
                             clientEndPoint.disconnectClient();
                             runOnUiThread(() -> connectionStatusInfo.setText("Status:\t\t" + ClientSocketEndPoint.STATUS_NOT_CONNECTED));
@@ -56,7 +60,8 @@ public class JoinGame extends AppCompatActivity {
                         }
 
                         break;
-                    } default: {
+                    }
+                    default: {
                         Log.e("Client receives", clientEndPoint.getClientsMessage());
                         break;
                     }
@@ -86,5 +91,20 @@ public class JoinGame extends AppCompatActivity {
                 e.printStackTrace();
             }
         });
+        // calling the action bar
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.arrow_back);
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
     }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
 }
