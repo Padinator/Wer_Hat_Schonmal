@@ -10,13 +10,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
 
-import com.example.ichhabschonmal.adapter.EndScoreAdapter;
 import com.example.ichhabschonmal.adapter.EndScoreViewAllStoriesAdapter;
 import com.example.ichhabschonmal.database.AppDatabase;
 import com.example.ichhabschonmal.database.Game;
 import com.example.ichhabschonmal.database.Player;
 import com.example.ichhabschonmal.database.Story;
-import com.example.ichhabschonmal.database.StoryDao_Impl;
 
 import java.util.List;
 
@@ -46,7 +44,7 @@ public class EndScoreViewAllStories extends AppCompatActivity {
 
         // Create database connection
         db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
-        Game game = db.gameDao().loadAllByGameIds(new int[] {gameId}).get(0);
+        Game game = db.gameDao().loadAllByGameIds(new int[]{gameId}).get(0);
 
         // Used variables
         idOfFirstPlayer = game.idOfFirstPlayer;
