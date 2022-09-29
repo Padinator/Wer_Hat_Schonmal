@@ -3,27 +3,29 @@ package com.example.ichhabschonmal.server_client_communication;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.os.Build;
 import android.util.Log;
+
+import androidx.annotation.RequiresApi;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.io.Serializable;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.concurrent.Semaphore;
 
-public class ServerSocketEndPoint extends SocketEndPoint {
-    private final Activity activity;
-    private final Context context;
-
+public class ServerSocketEndPoint extends SocketEndPoint implements Serializable {
     private final ServerSocket serverSocket;
-    private Thread connectionThread;
-    private SocketCommunicator.Receiver receiverAction;
 
-    private final LinkedList<Client> clients = new LinkedList<>();
-    private int countOfClients;
+    private LinkedList<Client> clients = new LinkedList<>();
+    private int countOfRequestedClients = 0;
+    private final Semaphore semCountOfRequestedClients = new Semaphore(1);
 
     /*
      *
@@ -56,43 +58,33 @@ public class ServerSocketEndPoint extends SocketEndPoint {
         return messages;
     }
 
-    /*
-     *
-     * Returns a client's message.
-     *
-     */
-    public String getClientsMessage(int index) {
-        return clients.get(index).getMessage();
+    public Client getAClient(int index) {
+        if (index < 0 || index >= clients.size())
+            throw new IndexOutOfBoundsException("Class ServerSocketEndPoint, no client found, invalid index: " + index);
+
+        return clients.get(index);
     }
 
-
-    public String getClientsIPAddress(int index) {
-        if (index < 0 || index >= clients.size())
-            throw new IndexOutOfBoundsException("Class ServerSocketEndPoint, no client (get IP) found, invalid index: " + index);
-
-        Log.e("Client index", index + "");
-        return clients.get(index).getIPAddress();
+    public LinkedList<Client> getClients() {
+        return clients;
     }
 
-    public String getClientsDeviceName(int index) {
-        if (index < 0 || index >= clients.size())
-            throw new IndexOutOfBoundsException("Class ServerSocketEndPoint, no client (get Device) found, invalid index: " + index);
+    public int getCountOfRequestedClients() {
+        int tmp = 0;
 
-        return clients.get(index).getDeviceName();
+        try {
+            semCountOfRequestedClients.acquire();
+            tmp = countOfRequestedClients;
+            semCountOfRequestedClients.release();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        return tmp;
     }
 
-    public void setClientsDeviceName(int index, String deviceName) {
-        if (index < 0 || index >= clients.size())
-            throw new IndexOutOfBoundsException("Class ServerSocketEndPoint, no client (set Device) found, invalid index: " + index);
-
-        clients.get(index).setDeviceName(deviceName);
-    }
-
-    public void setClientsIPAddress(int index, String IPAddress) {
-        if (index < 0 || index >= clients.size())
-            throw new IndexOutOfBoundsException("Class ServerSocketEndPoint, no client (set IP) found, invalid index: " + index);
-
-        clients.get(index).setIPAddress(IPAddress);
+    public void setClients(LinkedList<Client> clients) {
+        this.clients = clients;
     }
 
     public int sizeOfClients() {
@@ -113,12 +105,25 @@ public class ServerSocketEndPoint extends SocketEndPoint {
      * Creates connection between host and clients and starts receiving messages.
      *
      */
-    public void createConnection(int countOfClients, SocketCommunicator.Receiver receiverAction) {
-        this.countOfClients = countOfClients;
+    public void createConnection(int countOfRequestedClients, SocketCommunicator.Receiver receiverAction) {
+
+        this.countOfRequestedClients = countOfRequestedClients;
         this.receiverAction = receiverAction;
 
-        connectionThread = new Thread(new ServerConnector()); // Thread is running until connection is canceled
-        connectionThread.start();
+        try {
+            semCountOfRequestedClients.acquire();
+
+            if (connectionThread != null && connectionThread.getState() != Thread.State.TERMINATED) // Extend existing "<Socket>.accept()'s"
+                this.countOfRequestedClients += countOfRequestedClients;
+            else { // Create new connection with new "<Socket>.accept()"
+                connectionThread = new Thread(new ServerConnector()); // Thread is running until connection is canceled
+                connectionThread.start();
+            }
+
+            semCountOfRequestedClients.release();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     /*
@@ -173,12 +178,17 @@ public class ServerSocketEndPoint extends SocketEndPoint {
 
     /*
      *
-     * Send messages to all clients.
+     * Send messages to all clients. Return indices of clients for failed sending.
      *
      */
-    public void sendMessage(String message) {
-        for (Client client : clients)
-            client.sendMessage(message);
+    public LinkedList<Integer> sendMessage(String message) {
+        LinkedList<Integer> responses = new LinkedList<>();
+
+        for (int i = 0; i < clients.size(); i++)
+            if (!clients.get(i).sendMessage(message))
+                responses.add(i);
+
+        return responses; // Works not on every device!!!
     }
 
     /*
@@ -210,42 +220,41 @@ public class ServerSocketEndPoint extends SocketEndPoint {
         clients.clear();
     }
 
+    @SuppressLint("LongLogTag")
     public void disconnectServerSocket() throws IOException {
-        // Cancel connection
-        if (connectionThread != null && connectionThread.getState() != Thread.State.TERMINATED)
-            connectionThread.interrupt();
-
         // Close server socket
-        if (serverSocket != null && !serverSocket.isClosed())
-            serverSocket.close();
+        if (serverSocket != null && !serverSocket.isClosed()) {
+            serverSocket.close(); // All "<Socket>.accept(...)" will be closed automatically with an Exception
+            Log.e("Server Socket closed", serverSocket.isClosed() + "");
+        }
     }
-
 
     private class ServerConnector implements Runnable {
 
         @Override
         public void run() {
             try {
-                for (int i = 0; i < countOfClients; i++) {
+                for (int i = 0; i < getCountOfRequestedClients(); i++) {
                     BufferedReader input;
                     PrintWriter output;
                     Socket serverEndPoint;
-                    SocketCommunicator socketCommunicatorToClient;
 
                     serverEndPoint = serverSocket.accept(); // Searches for clients always
                     input = new BufferedReader(new InputStreamReader(serverEndPoint.getInputStream()));
                     output = new PrintWriter(serverEndPoint.getOutputStream());
-                    socketCommunicatorToClient = new SocketCommunicator(activity, context, serverEndPoint, input, output);
-                    clients.add(new Client(socketCommunicatorToClient, receiverAction));
+                    clients.add(new Client(activity, context, serverEndPoint, input, output));
                     Log.e("ServerConnector", clients.toString());
 
-                    if (clients.getLast().getReceiver() != null)
-                        clients.getLast().receiveMessages(receiverAction);
+                    if (receiverAction != null)
+                        clients.get(clients.size() - 1).receiveMessages(receiverAction);
                 }
+            } catch (SocketException e) {
+                Log.e("ServerSocket was closed", "Socket was closed without sing all \"<Socket>.accepts(...)\"'s");
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
 
     }
+
 }

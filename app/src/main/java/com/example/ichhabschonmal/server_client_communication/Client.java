@@ -1,30 +1,31 @@
 package com.example.ichhabschonmal.server_client_communication;
 
-import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.Context;
 
-import java.io.IOException;
+import java.io.BufferedReader;
+import java.io.PrintWriter;
+import java.io.Serializable;
+import java.net.Socket;
 
-public class Client {
+public class Client extends SocketCommunicator implements Serializable {
 
-    private Thread receiverThread;
-    private Thread senderThread;
+    private static final long serialVersionUID = 1L;
+    private String deviceName, IPAddress;
+    private int playerNumber = -1;
 
-    private SocketCommunicator communicator;
-    private SocketCommunicator.Receiver receiver;
-    private String deviceName = "", IPAddress = "";
-
-    public Client(SocketCommunicator endPoint, SocketCommunicator.Receiver receiverAction) {
-        this.communicator = endPoint;
-        setReceiver(receiverAction);
+    public Client(Activity activity, Context context, Socket endPoint, BufferedReader input, PrintWriter output) {
+        this(activity, context, endPoint, input, output, "", "");
     }
 
-    public Client(SocketCommunicator endPoint, SocketCommunicator.Receiver receiverAction, String deviceName, String IPAddress) {
-        this.communicator = endPoint;
-        setReceiver(receiverAction);
+    public Client(Activity activity, Context context, Socket endPoint, BufferedReader input, PrintWriter output, String deviceName, String IPAddress) {
+        super(activity, context, endPoint, input, output);
+
         this.deviceName = deviceName;
         this.IPAddress = IPAddress;
     }
 
+    // Getter and setter
     public String getDeviceName() {
         return deviceName;
     }
@@ -33,8 +34,8 @@ public class Client {
         return IPAddress;
     }
 
-    public SocketCommunicator.Receiver getReceiver() {
-        return receiver;
+    public int getPlayerNumber() {
+        return playerNumber;
     }
 
     public void setDeviceName(String deviceName) {
@@ -45,99 +46,13 @@ public class Client {
         this.IPAddress = IPAddress;
     }
 
-    public void setReceiver(SocketCommunicator.Receiver receiverAction) {
-        this.receiver = communicator.new Receiver() {
-
-            @Override
-            public void action() {
-                receiverAction.action();
-            }
-
-        };
+    public void setPlayerNumber(int playerNumber) {
+        this.playerNumber = playerNumber;
     }
 
-    public String getMessage() {
-        return receiver.getMessage();
-    }
-
-    public boolean isConnected() {
-        return communicator.isConnected();
-    }
-
+    // @Override methods
     @Override
     public String toString() {
-        return "Client: Device: " + deviceName + ", IP-Address: " + IPAddress;
-    }
-
-    public void receiveMessages(SocketCommunicator.Receiver receiverAction) {
-        try {
-            setReceiver(receiverAction);
-            receiver.setDoneReading(false);
-            receiverThread = new Thread(receiver);
-            receiverThread.start();
-        } catch (NullPointerException e) {
-            throw new NullPointerException("\"Class Client, during receiveMessages(...)\": No Receiver-Action defined: null");
-        }
-    }
-
-    public void stopReceivingMessages() {
-        if (receiver != null && receiverThread != null && receiverThread.getState() != Thread.State.TERMINATED)
-            receiver.setDoneReading(true);
-        else if (receiver == null)
-            throw new NullPointerException("Class Client, during \"stopReceivingMessages(...)\" [for " + this + "]: Cannot terminate Receiver-Thread with \"setDoneReading()\"-method, no Receiver-Action defined: " + null);
-        else if (receiverThread == null)
-            throw new NullPointerException("Class Client, during \"stopReceivingMessages(...)\" [for " + this + "]: Cannot stop a null-referenced Thread, no Receiver-Thread defined: " + null);
-        else
-            throw new NullPointerException("Class Client, during \"stopReceivingMessages(...)\" [for " + this + "]: Cannot stop a terminated Receiver-Thread!");
-    }
-
-    public void continueReceivingMessages() {
-        if (receiver != null && receiverThread != null && receiverThread.getState() == Thread.State.TERMINATED)
-            receiveMessages(receiver);
-        else if (receiver == null)
-            throw new NullPointerException("Class Client, during \"continueReceivingMessages(...)\" [for " + this + "]: Cannot set \"run()\"-method of Receiver-Thread, no Receiver-Action defined: " + null);
-        else if (receiverThread == null)
-            throw new NullPointerException("Class Client, during \"continueReceivingMessages(...)\" [for " + this + "]: Cannot start a null-referenced Thread, no Receiver-Thread defined: " + null);
-        else
-            throw new NullPointerException("Class Client, during \"continueReceivingMessages(...)\" [for " + this + "]: Cannot start a running Receiver-Thread!");
-    }
-
-    /*
-     *
-     * Returns whether the message was sent successfully or not.
-     *
-     */
-    public boolean sendMessage(String message) {
-        if (message != null) {
-            SocketCommunicator.Sender sender = communicator.new Sender(message);
-            senderThread = new Thread(sender);
-            senderThread.start();
-
-            try {
-                senderThread.join();
-            } catch (InterruptedException e) {
-                return false;
-            }
-
-            return sender.getSent();
-        } else
-            throw new NullPointerException("During \"sendMessage(...)\": No message defined: " + null);
-    }
-
-    @SuppressLint("LongLogTag")
-    public void disconnectClientFromServer() throws IOException {
-        // Stop receiving messages
-        receiver.setDoneReading(true);
-
-        if (receiverThread != null && receiverThread.getState() != Thread.State.TERMINATED)
-            receiverThread.interrupt();
-
-        // Stop sending messages
-        if (senderThread != null && senderThread.getState() != Thread.State.TERMINATED)
-            senderThread.interrupt();
-
-        // Close Socket for communication
-        if (communicator != null && !communicator.isClosed())
-            communicator.close(); // "input" and "output" will be closed automatically too
+        return "Client: Player-Number: " + playerNumber + ", Device: " + deviceName + ", IP-Address: " + IPAddress;
     }
 }

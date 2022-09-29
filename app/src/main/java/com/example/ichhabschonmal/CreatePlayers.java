@@ -35,28 +35,37 @@ import com.example.ichhabschonmal.database.Game;
 import com.example.ichhabschonmal.database.Player;
 import com.example.ichhabschonmal.database.Story;
 import com.example.ichhabschonmal.exceptions.GamerException;
-import com.example.ichhabschonmal.online_gaming.PlayerInfo;
+import com.example.ichhabschonmal.server_client_communication.ClientServerHandler;
+import com.example.ichhabschonmal.server_client_communication.SocketCommunicator;
+import com.example.ichhabschonmal.server_client_communication.SocketEndPoint;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.TreeMap;
 
 public class CreatePlayers extends AppCompatActivity {
 
-    private Gamer[] listOfPlayers = new Gamer[]{new Gamer(1)};
-    private int actualPlayer = 0, minStoryNumber, maxStoryNumber, maxPlayerNumber;
-    private int idOfFirstPlayer = -1, countOfPlayers = 0, idOfFirstStory = -1, countOfStories = 0;
-    private boolean alreadySadOne = false;          // Check, if a player has saved his last story
-    private boolean alreadySadTwo = false;          // Check, if a player has saved changes of all stories
-
+    private final TreeMap<Integer, Gamer> listOfPlayers = new TreeMap<>();
     private List<String> newListOfStories = new ArrayList<>();          // Is used for deleting/replacing stories in viewYourStories
+
+    private int minStoryNumber, maxStoryNumber, maxPlayerNumber;
+    private int actualPlayersIndex = 0, idOfFirstPlayer = -1, countOfPlayers = 0, idOfFirstStory = -1, countOfStories = 0;
+    private boolean alreadySavedOne = false;          // Check, if a player has saved his last story
+    private boolean alreadySavedTwo = false;          // Check, if a player has saved changes of all stories
+
+    private boolean onlineGame = false;     // Check, if actual game is an online game
+    private boolean serverSide = false;     // Check, if actual device is the host/server
+    private SocketCommunicator.Receiver receiverAction;
+
 
     private AppDatabase db;
     private ListView listView;
     private Button backButton, saveEditedStories;
     private ViewYourStoriesListAdapter adapter;
     private TextView storyNumber;
-
-    List<PlayerInfo> playerInfo;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -68,7 +77,7 @@ public class CreatePlayers extends AppCompatActivity {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
 
         // Definitions
-        Button saveAndNextStory, nextPerson, viewYourStories, next, rules;
+        Button saveAndNextStory, nextPerson, viewYourStories, btnContinue, rules;
         EditText writeStories, playerName;
         TextView playerID, charsLeft;
 
@@ -77,7 +86,7 @@ public class CreatePlayers extends AppCompatActivity {
         nextPerson = findViewById(R.id.nextPerson);
         viewYourStories = findViewById(R.id.viewYourStories);
         rules = findViewById(R.id.rules);
-        next = findViewById(R.id.next);
+        btnContinue = findViewById(R.id.next);
 
         // EditTexts:
         writeStories = findViewById(R.id.writeStories);
@@ -88,29 +97,88 @@ public class CreatePlayers extends AppCompatActivity {
         storyNumber = findViewById(R.id.storyNumber);
         charsLeft = findViewById(R.id.charsLeft);
 
-        playerInfo = new ArrayList<>();
+        // Get from last intent
+        //setItemsCanFocus(true);
+        onlineGame = getIntent().getExtras().getBoolean("OnlineGame");
 
-        playerInfo = (ArrayList<PlayerInfo>)getIntent().getSerializableExtra("playerinfo");
+        if (!onlineGame) {
+            actualPlayersIndex = 0;
+            listOfPlayers.put(actualPlayersIndex, new Gamer(actualPlayersIndex + 1));
+        } else {
+            // Set used variables
+            actualPlayersIndex = getIntent().getExtras().getInt("PlayersIndex");
+            playerID.setText("Du bist Spieler " + (actualPlayersIndex + 1) + ":");
+            listOfPlayers.put(actualPlayersIndex, new Gamer(actualPlayersIndex + 1));
 
-        Log.e("playerinfo", playerInfo.toString());
+            // Get from last intent
+            serverSide = getIntent().getExtras().getBoolean("ServerSide");
 
+            // Define a new action for receiving messages
+            receiverAction = new SocketCommunicator(null, null, null, null, null).new Receiver() {
 
-        // Set used variables
+                @SuppressLint("NotifyDataSetChanged")
+                @Override
+                public void action() {
+                    String clientsMessage = receiverAction.getMessage();
+
+                    if (serverSide) { // Receive message from all clients
+                        String[] lines = clientsMessage.split(";");
+                        clientsMessage = lines[0];
+
+                        if (clientsMessage.equals(SocketEndPoint.CREATED_PLAYER)) {
+                            StringBuilder allStories = new StringBuilder();
+                            String[] receivedStories;
+                            Gamer receivedPlayer;
+
+                            // First 3 lines are separated by ';'
+                            receivedPlayer = new Gamer(Integer.parseInt(lines[1])); // Set a player's number
+                            receivedPlayer.setName(lines[2]); // Set a player's name
+
+                            // Stories are separated by SocketEndPoint.START_OF_A_STORY
+                            for (int i = 3; i < lines.length; i++)
+                                allStories.append(lines[i]);
+
+                            receivedStories = String.valueOf(allStories).split(SocketEndPoint.START_OF_A_STORY);
+
+                            for (int i = 1; i < receivedStories.length; i++)
+                                receivedPlayer.addStory(receivedStories[i]);
+
+                            // Last player in list is the host
+                            listOfPlayers.put(receivedPlayer.getNumber() - 1, receivedPlayer);
+                            Log.e("ListOfPlayers1", listOfPlayers.toString());
+                        }
+                    } else { // Receive message from host
+                        if (clientsMessage.equals(SocketEndPoint.PLAY_GAME)) {
+                            Intent playGame = new Intent(CreatePlayers.this, PlayGame.class);
+                            playGame.putExtra("OnlineGame", true);
+                            playGame.putExtra("ServerSide", serverSide);
+                            playGame.putExtra("GameIsLoaded", false);
+
+                            new Thread(() -> ClientServerHandler.getClientEndPoint().stopReceivingMessages()).start();
+
+                            startActivity(playGame);
+                            finish();
+                        }
+                    }
+                }
+
+            };
+
+            if (serverSide)
+                ClientServerHandler.getServerEndPoint().receiveMessages(receiverAction);
+            else
+                ClientServerHandler.getClientEndPoint().receiveMessages(receiverAction);
+        }
+
         minStoryNumber = getIntent().getExtras().getInt("MinStoryNumber");
         maxStoryNumber = getIntent().getExtras().getInt("MaxStoryNumber");
         maxPlayerNumber = getIntent().getExtras().getInt("PlayerNumber");
-        //setItemsCanFocus(true);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.arrow_back);
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
-        viewYourStories.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openDialog(v);
-            }
-        });
+        viewYourStories.setOnClickListener(this::openDialog);
 
         writeStories.addTextChangedListener(new TextWatcher() {
             @Override
@@ -141,101 +209,114 @@ public class CreatePlayers extends AppCompatActivity {
         saveAndNextStory.setOnClickListener(v -> {
 
             // Add a players story
-            if (listOfPlayers[actualPlayer].getCountOfStories() == maxStoryNumber)
-                Toast.makeText(CreatePlayers.this, "Spieler hat bereits genug Stories " +
+            if (Objects.requireNonNull(listOfPlayers.get(actualPlayersIndex)).getCountOfStories() == maxStoryNumber)
+                Toast.makeText(CreatePlayers.this, "Du hast bereits genug Stories " +
                         "aufgeschrieben!", Toast.LENGTH_LONG).show();
-            else if (writeStories.getText().toString().isEmpty())
+            else if (writeStories.getText().toString().trim().isEmpty())
                 Toast.makeText(CreatePlayers.this, "Kein Text zum speichern!",
                         Toast.LENGTH_LONG).show();
             else if (writeStories.getText().toString().length() < 25)
-                Toast.makeText(CreatePlayers.this, "Story muss aus mindestens 25 zeichen " +
-                        "bestehen.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(CreatePlayers.this,
+                        "Eine Story muss aus mindestens 25 zeichen " + "bestehen.",
+                        Toast.LENGTH_SHORT).show();
             else {          // Text field is okay
-                listOfPlayers[actualPlayer].addStory(writeStories.getText().toString());
+                Objects.requireNonNull(listOfPlayers.get(actualPlayersIndex)).addStory(writeStories.getText().toString().trim());
                 writeStories.setText("");
-                storyNumber.setText("Story " + (listOfPlayers[actualPlayer].getCountOfStories() + 1) + ":");
+                storyNumber.setText("Story " + (Objects.requireNonNull(listOfPlayers.get(actualPlayersIndex)).getCountOfStories() + 1) + ":");
 
-                Toast.makeText(CreatePlayers.this, "Story " + listOfPlayers[actualPlayer].getCountOfStories() + " gespeichert",
+                Toast.makeText(CreatePlayers.this,
+                        "Story " + Objects.requireNonNull(listOfPlayers.get(actualPlayersIndex)).getCountOfStories() + " gespeichert",
                         Toast.LENGTH_LONG).show();
 
                 // Set used variable
-                alreadySadOne = false;
+                alreadySavedOne = false;
             }
         });
+
         nextPerson.setOnClickListener(v -> {
             // Check inserting a new player
-            if (listOfPlayers.length == maxPlayerNumber)
+            if (listOfPlayers.size() == maxPlayerNumber)
                 Toast.makeText(CreatePlayers.this, "Es k\u00f6nnen keine weiteren Spieler teilnehmen!",
                         Toast.LENGTH_LONG).show();
-            else if (listOfPlayers[actualPlayer].getCountOfStories() < minStoryNumber) {
+            else if (Objects.requireNonNull(listOfPlayers.get(actualPlayersIndex)).getCountOfStories() < minStoryNumber) {
                 Toast.makeText(CreatePlayers.this, "Spieler muss mindestens " + minStoryNumber + " Stories besitzen!",
                         Toast.LENGTH_LONG).show();
                 if (!writeStories.getText().toString().equals(""))
                     Toast.makeText(this, "Die letzte Story wurde noch nicht gespeichert!", Toast.LENGTH_SHORT).show();
-            } else if (listOfPlayers.length > maxPlayerNumber)
+            } else if (listOfPlayers.size() > maxPlayerNumber)
                 Toast.makeText(CreatePlayers.this, "Zu viele eingeloggte Spieler!", Toast.LENGTH_LONG).show();
-            else if (!alreadySadOne && !writeStories.getText().toString().equals("")) {
+            else if (!alreadySavedOne && !writeStories.getText().toString().equals("")) {
                 Toast.makeText(this, "Die letzte Story wurde noch nicht gespeichert, einmaliger Hinweis!", Toast.LENGTH_SHORT).show();
-                alreadySadOne = true;
-            } else if (playerName.getText().toString().isEmpty()) {
+                alreadySavedOne = true;
+            } else if (playerName.getText().toString().trim().isEmpty()) {
                 Toast.makeText(CreatePlayers.this, "Spielername darf nicht leer sein!", Toast.LENGTH_SHORT).show();
-            } else if (playerName.getText().toString().length() < 2)
+            } else if (playerName.getText().toString().trim().length() < 2)
                 Toast.makeText(CreatePlayers.this, "Spielername muss aus mindestens 2 Zeichen bestehen!", Toast.LENGTH_SHORT).show();
             else {
+                Gamer player;
 
                 // Set name of a player
-                listOfPlayers[actualPlayer].setName(playerName.getText().toString());
+                Objects.requireNonNull(listOfPlayers.get(actualPlayersIndex)).setName(playerName.getText().toString().trim());
 
-                Toast.makeText(CreatePlayers.this, "Spieler " + listOfPlayers[actualPlayer].getNumber() + " erfolgreich gespeichert",
+                Toast.makeText(CreatePlayers.this, "Spieler " + Objects.requireNonNull(listOfPlayers.lastEntry()).getValue().getNumber() + " erfolgreich gespeichert",
                         Toast.LENGTH_LONG).show();
 
                 // Insert a new player
-                actualPlayer++;
-                Gamer[] tmpListOfPlayers = new Gamer[listOfPlayers.length + 1];
-
-                System.arraycopy(listOfPlayers, 0, tmpListOfPlayers, 0, listOfPlayers.length);      // Flat copy
-                tmpListOfPlayers[listOfPlayers.length] = new Gamer(actualPlayer + 1);       // New player with no stories inserted
-                listOfPlayers = tmpListOfPlayers;
+                player = new Gamer(++actualPlayersIndex + 1); // Equal to 'listOfPlayers.size()'
+                listOfPlayers.put(actualPlayersIndex, player);
 
                 // Reset Text fields in new_game.xml
-                playerID.setText("Du bist Spieler " + (actualPlayer + 1) + ":");
+                playerID.setText("Du bist Spieler " + (actualPlayersIndex + 1) + ":");
                 playerName.setText("");
                 storyNumber.setText("Story 1:");
                 writeStories.setText("");
             }
         });
 
-        next.setOnClickListener(view -> {
+        btnContinue.setOnClickListener(view -> {
 
             // Check, if all players meet all conditions
-            if (listOfPlayers.length < maxPlayerNumber)
+            if (listOfPlayers.size() < maxPlayerNumber)
                 Toast.makeText(CreatePlayers.this, "Zu wenig eingeloggte Spieler", Toast.LENGTH_SHORT).show();
-            else if (listOfPlayers.length > maxPlayerNumber)
+            else if (listOfPlayers.size() > maxPlayerNumber)
                 Toast.makeText(CreatePlayers.this, "Zu viele eingeloggte Spieler", Toast.LENGTH_SHORT).show();
-            else if (listOfPlayers[listOfPlayers.length - 1].getCountOfStories() < minStoryNumber) {
-                Toast.makeText(CreatePlayers.this, "Spieler " + listOfPlayers.length + " besitzt zu wenig Storys!", Toast.LENGTH_SHORT).show();
+            else if (Objects.requireNonNull(listOfPlayers.lastEntry()).getValue().getCountOfStories() < minStoryNumber) {
+                Toast.makeText(CreatePlayers.this, "Spieler " + listOfPlayers.size() + " besitzt zu wenig Storys!", Toast.LENGTH_SHORT).show();
                 if (!writeStories.getText().toString().equals(""))
                     Toast.makeText(this, "Die letzte Story wurde noch nicht gespeichert!", Toast.LENGTH_SHORT).show();
-            } else if (maxStoryNumber < listOfPlayers[listOfPlayers.length - 1].getCountOfStories())
-                Toast.makeText(CreatePlayers.this, "Spieler " + listOfPlayers.length + " besitzt zu viele Storys!", Toast.LENGTH_SHORT).show();
-            else if (!alreadySadOne && !writeStories.getText().toString().equals("")) {
+            } else if (Objects.requireNonNull(listOfPlayers.get(actualPlayersIndex)).getCountOfStories() > maxStoryNumber)
+                Toast.makeText(CreatePlayers.this, "Spieler " + listOfPlayers.size() + " besitzt zu viele Storys!", Toast.LENGTH_SHORT).show();
+            else if (!alreadySavedOne && !writeStories.getText().toString().equals("")) {
                 Toast.makeText(this, "Die letzte Story wurde noch nicht gespeichert, einmaliger Hinweis!", Toast.LENGTH_SHORT).show();
-                alreadySadOne = true;
-            } else if (playerName.getText().toString().isEmpty())     // Check last player's name
+                alreadySavedOne = true;
+            } else if (playerName.getText().toString().trim().isEmpty())     // Check last player's name
                 Toast.makeText(CreatePlayers.this, "Spielername darf nicht leer sein", Toast.LENGTH_SHORT).show();
-            else if (playerName.getText().toString().length() < 2)      // Check last player's name
+            else if (playerName.getText().toString().trim().length() < 2)      // Check last player's name
                 Toast.makeText(CreatePlayers.this, "Spielername muss aus mindestens 2 Zeichen bestehen", Toast.LENGTH_SHORT).show();
-            else {
+            else if (onlineGame && !serverSide) { // Client sends player to host
+                if (listOfPlayers.size() != 1)
+                    Log.e("CreatePlayer as client", "More than one player in list!");
+                else {
+                    Objects.requireNonNull(listOfPlayers.get(actualPlayersIndex)).setName(playerName.getText().toString().trim()); // Name is not set
+                    ClientServerHandler.getClientEndPoint().sendMessage(SocketEndPoint.CREATED_PLAYER + ";" +
+                            Objects.requireNonNull(listOfPlayers.get(actualPlayersIndex))); // Client has only one Gamer object
+                    Toast.makeText(getApplicationContext(),"Spieler "
+                                    + Objects.requireNonNull(listOfPlayers.get(actualPlayersIndex)).getNumber()
+                                    + " erfolgreich gespeichert", Toast.LENGTH_SHORT).show();
+                }
+            } else { // Local game or online gamer on serverside
 
                 // Definitions
                 Intent playGame;
                 int actualGameId;
 
                 // Set name of the last player
-                listOfPlayers[actualPlayer].setName(playerName.getText().toString());
+                Objects.requireNonNull(listOfPlayers.get(actualPlayersIndex)).setName(playerName.getText().toString().trim());
+                Log.e("ListOfPlayers2", listOfPlayers.toString());
 
-                Toast.makeText(CreatePlayers.this, "Spieler " + listOfPlayers[actualPlayer].getNumber() + " erfolgreich gespeichert",
-                        Toast.LENGTH_LONG).show();
+                Toast.makeText(CreatePlayers.this, "Spieler "
+                                + Objects.requireNonNull(listOfPlayers.get(actualPlayersIndex)).getNumber()
+                                + " erfolgreich gespeichert", Toast.LENGTH_LONG).show();
 
                 // Create database connection:
                 db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
@@ -244,6 +325,7 @@ public class CreatePlayers extends AppCompatActivity {
                 Game newGame = new Game();
                 // newGame.gameId = newGame.gameId;         // Game id are set with autoincrement
                 newGame.gameName = getIntent().getStringExtra("GameName");
+                newGame.onlineGame = onlineGame;
                 newGame.roundNumber = 1;
                 newGame.actualDrinkOfTheGame = getIntent().getStringExtra("DrinkOfTheGame");
                 db.gameDao().insert(newGame);
@@ -252,19 +334,14 @@ public class CreatePlayers extends AppCompatActivity {
                 actualGameId = db.gameDao().getAll().get(db.gameDao().getAll().size() - 1).gameId;
 
                 // Insert all players and their stories
-                for (int i = 0; i < listOfPlayers.length; i++) {
+                for (int i = 0; i < listOfPlayers.size(); i++) {
 
                     // Create a player
                     Player newPlayer = new Player();
                     //listOfNewPlayers[i].playerId = listOfNewPlayers[i].playerId;      // Player id is set with autoincrement
-                    newPlayer.name = listOfPlayers[i].getName();
-                    newPlayer.playerNumber = listOfPlayers[i].getNumber();
+                    newPlayer.name = Objects.requireNonNull(listOfPlayers.get(i)).getName();
+                    newPlayer.playerNumber = Objects.requireNonNull(listOfPlayers.get(i)).getNumber();
                     newPlayer.gameId = actualGameId;
-                    newPlayer.score = 0;
-                    newPlayer.countOfBeers = 0;
-                    newPlayer.countOfVodka = 0;
-                    newPlayer.countOfTequila = 0;
-                    newPlayer.countOfGin = 0;
 
                     // Insert the player
                     db.playerDao().insert(newPlayer);
@@ -274,16 +351,16 @@ public class CreatePlayers extends AppCompatActivity {
                     if (i == 0)
                         idOfFirstPlayer = db.playerDao().getAll().get(db.playerDao().getAll().size() - 1).playerId;
 
-                    for (int j = 0; j < listOfPlayers[i].getCountOfStories(); j++) {
+                    for (int j = 0; j < Objects.requireNonNull(listOfPlayers.get(i)).getCountOfStories(); j++) {
 
                         // Create a player's story
                         Story newStory = new Story();
                         //listOfStories[i].storyId = listOfStories[i].storyId;        // Story id is set with autoincrement
                         try {
-                            newStory.content = listOfPlayers[i].getStory(j);
+                            newStory.content = Objects.requireNonNull(listOfPlayers.get(i)).getStory(j);
                         } catch (GamerException ex) {
                             ex.printStackTrace();
-                            Log.e("SaveInDatabaseFailed", ex.getStackTrace() + ", Message: " + ex.getMessage());
+                            Log.e("SaveInDatabaseFailed", Arrays.toString(ex.getStackTrace()) + ", Message: " + ex.getMessage());
                             newStory.content = ex.toString();
                         }
                         newStory.status = false;
@@ -296,6 +373,7 @@ public class CreatePlayers extends AppCompatActivity {
 
                         // Set used variable for newGame
                         countOfStories++;
+
                         if (i == 0 && j == 0)
                             idOfFirstStory = db.storyDao().getAll().get(db.storyDao().getAll().size() - 1).storyId;
                     }
@@ -312,17 +390,42 @@ public class CreatePlayers extends AppCompatActivity {
                 // Close database connection
                 db.close();
 
-                // Start new activity
+                // Start next activity
                 playGame = new Intent(CreatePlayers.this, PlayGame.class);
+                playGame.putExtra("OnlineGame", true);
+                playGame.putExtra("ServerSide", serverSide);
                 playGame.putExtra("GameId", actualGameId);
                 playGame.putExtra("GameIsLoaded", false);
+
+                if (onlineGame) {
+                    // Inform all clients to start game
+                    ClientServerHandler.getServerEndPoint().sendMessage(SocketEndPoint.PLAY_GAME);
+
+                    // Stop receiving messages from all clients
+                    new Thread(() -> ClientServerHandler.getServerEndPoint().stopReceivingMessages()).start();
+                }
+
                 startActivity(playGame);
                 finish();
             }
         });
+
+        // Deactivate nextPerson-Button
+        if (onlineGame) {
+            // 1. possibility: Deactivate nextPerson and reset layout btnContinue
+            /*
+            nextPerson.setVisibility(View.GONE);
+            */
+
+            // 2. possibility: Deactivate btnContinue and use onclick-action of bntContinue for nextPerson
+            btnContinue.setVisibility(View.GONE);
+            nextPerson.setBackgroundColor(getResources().getColor(R.color.orange_one));
+            nextPerson.setText(btnContinue.getText());
+            nextPerson.setOnClickListener(view -> btnContinue.callOnClick());
+        }
     }
 
-    public class ViewYourStoriesListAdapter extends ArrayAdapter<String> {
+    private class ViewYourStoriesListAdapter extends ArrayAdapter<String> {
         private final Activity activity;
         private final List<EditText> editTexts = new ArrayList<>();
 
@@ -346,40 +449,33 @@ public class CreatePlayers extends AppCompatActivity {
             // Set story text in the listview-item
             storyText.setText(newListOfStories.get(position));
 
-            storyText.setOnTouchListener(new View.OnTouchListener() {
-                @SuppressLint("ClickableViewAccessibility")
-                @Override
-                public boolean onTouch(View view, MotionEvent motionEvent) {
-                    if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
-                        if (view.requestFocus()) {
-                            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                            imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
-                        }
-
-                        return true;
+            storyText.setOnTouchListener((view12, motionEvent) -> {
+                if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                    if (view12.requestFocus()) {
+                        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                        imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
                     }
 
-                    return false;
+                    return true;
                 }
+
+                return false;
             });
 
-            deleteStory.setOnClickListener(new View.OnClickListener() {     // Give delete button a function
-                @SuppressLint("SetTextI18n")
-                @Override
-                public void onClick(View view) {
-
-                    // Delete story
-                    newListOfStories.remove(position);
-                    editTexts.remove(position);
-                    listView.invalidateViews();
-                }
+            // Give delete button a function (delete a story)
+            deleteStory.setOnClickListener(view1 -> {
+                newListOfStories.remove(position);
+                editTexts.remove(position);
+                listView.invalidateViews();
             });
 
             return rowView;
         }
+
     }
 
 
+    @SuppressLint({"InflateParams", "SetTextI18n"})
     public void openDialog(View v) {
 
         // Definitions
@@ -388,7 +484,7 @@ public class CreatePlayers extends AppCompatActivity {
         View row;
 
         // Initializations
-        newListOfStories = listOfPlayers[actualPlayer].getAllStories();
+        newListOfStories = Objects.requireNonNull(listOfPlayers.get(actualPlayersIndex)).getAllStories();
         builder = new AlertDialog.Builder(this);
         row = getLayoutInflater().inflate(R.layout.view_your_stories, null);
         listView = row.findViewById(R.id.myStories);
@@ -406,37 +502,31 @@ public class CreatePlayers extends AppCompatActivity {
         saveEditedStories = row.findViewById(R.id.saveEditedStories);
         backButton = row.findViewById(R.id.backButton);
 
-        saveEditedStories.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                List<String> newListOfStories = new ArrayList<>();
+        saveEditedStories.setOnClickListener(view -> {
+            List<String> newListOfStories = new ArrayList<>();
 
-                // Get all stories
-                for (int i = 0; i < listView.getAdapter().getCount(); i++) {
-                    newListOfStories.add(adapter.editTexts.get(i).getText().toString());
-                }
-
-                // Replace all stories
-                listOfPlayers[actualPlayer].replaceAllStories(newListOfStories);
-
-                // Actualize layout
-                storyNumber.setText("Story " + (listOfPlayers[actualPlayer].getCountOfStories() + 1) + ":");
-                //listView.invalidateViews();
-
-                Toast.makeText(CreatePlayers.this, "Stories wurden erfolgreich \u00fcberarbeitet", Toast.LENGTH_SHORT).show();
+            // Get all stories
+            for (int i = 0; i < listView.getAdapter().getCount(); i++) {
+                newListOfStories.add(adapter.editTexts.get(i).getText().toString());
             }
+
+            // Replace all stories
+            Objects.requireNonNull(listOfPlayers.get(actualPlayersIndex)).replaceAllStories(newListOfStories);
+
+            // Actualize layout
+            storyNumber.setText("Story " + (Objects.requireNonNull(listOfPlayers.get(actualPlayersIndex)).getCountOfStories() + 1) + ":");
+            //listView.invalidateViews();
+
+            Toast.makeText(CreatePlayers.this, "Stories wurden erfolgreich \u00fcberarbeitet", Toast.LENGTH_SHORT).show();
         });
 
-        backButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (!alreadySadTwo) {
-                    Toast.makeText(CreatePlayers.this, "Nicht gespeicherte \u00c4nderungen gehen verloren!", Toast.LENGTH_SHORT).show();
-                    alreadySadTwo = true;
-                } else {
-                    dialog.cancel();
-                    alreadySadTwo = false;
-                }
+        backButton.setOnClickListener(view -> {
+            if (!alreadySavedTwo) {
+                Toast.makeText(CreatePlayers.this, "Nicht gespeicherte \u00c4nderungen gehen verloren!", Toast.LENGTH_SHORT).show();
+                alreadySavedTwo = true;
+            } else {
+                dialog.cancel();
+                alreadySavedTwo = false;
             }
         });
     }
@@ -449,6 +539,17 @@ public class CreatePlayers extends AppCompatActivity {
                 .setMessage("Wenn du zur\u00fcck gehst, werden die Daten nicht gespeichert!")
                 .setPositiveButton("Zur\u00fcck", (dialog, which) -> {
                     Intent mainActivity = new Intent(CreatePlayers.this, MainActivity.class);
+
+                    try {
+                        if (onlineGame && serverSide) {
+                            ClientServerHandler.getServerEndPoint().disconnectClientsFromServer(); // Disconnect all clients from serve, serverside
+                            ClientServerHandler.getServerEndPoint().disconnectServerSocket(); // Disconnect socket of server
+                        } else if (onlineGame)
+                            ClientServerHandler.getClientEndPoint().disconnectClient(); // Disconnect client from server, clientside
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
                     startActivity(mainActivity);
                     finish();
                 })
@@ -462,10 +563,9 @@ public class CreatePlayers extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                onBackPressed();
-                return true;
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
