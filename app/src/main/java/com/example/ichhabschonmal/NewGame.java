@@ -1,7 +1,6 @@
 package com.example.ichhabschonmal;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -12,7 +11,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -29,8 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class NewGame extends AppCompatActivity {
-
-    private Spinner drinkVariantsOne;
 
     // meine ergaenzung
     private AlertDialog dialog;
@@ -105,7 +101,7 @@ public class NewGame extends AppCompatActivity {
             else if (exists(fileName, listOfGames))
                 Toast.makeText(NewGame.this, "Dateiname darf nicht mehrfach verwendet werden!", Toast.LENGTH_LONG).show();
             else if (playerNumber.isEmpty())
-                    Toast.makeText(NewGame.this, "Spielerzahlfeld darf nicht leer sein!", Toast.LENGTH_LONG).show();
+                Toast.makeText(NewGame.this, "Spielerzahlfeld darf nicht leer sein!", Toast.LENGTH_LONG).show();
             else if (playerNumber.contains("."))
                 Toast.makeText(NewGame.this, "Spielerzahl darf keinen Punkt enthalten!", Toast.LENGTH_LONG).show();
             else if (storyMinNumber.isEmpty())
@@ -195,7 +191,8 @@ public class NewGame extends AppCompatActivity {
             });
 
             back.setOnClickListener(v -> {
-                dialog.dismiss();;
+                dialog.dismiss();
+                ;
             });
         });
 
