@@ -51,7 +51,6 @@
             android:id="@+id/drinkIconOne"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/playerName"
             android:layout_centerVertical="true"
             android:layout_marginLeft="2dp"
             android:layout_toRightOf="@id/xOne"/>
@@ -86,7 +85,6 @@
             android:id="@+id/drinkIconTwo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/playerName"
             android:layout_centerVertical="true"
             android:layout_marginLeft="2dp"
             android:layout_toRightOf="@id/xTwo"/>
@@ -121,12 +119,78 @@
             android:id="@+id/drinkIconThree"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/playerName"
             android:layout_centerVertical="true"
             android:layout_marginLeft="2dp"
             android:layout_toRightOf="@id/xThree"/>
 
     </RelativeLayout>
 
+    <RelativeLayout
+        android:id="@+id/drinkFour"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/playerName"
+        android:layout_toRightOf="@id/drinkThree"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="20dp">
+
+        <TextView
+            android:id="@+id/countOfDrinksFour"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="22dp" />
+
+        <ImageView
+            android:id="@+id/xFour"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="2dp"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@id/countOfDrinksFour"
+            android:src="@drawable/multipilcator"/>
+
+        <ImageView
+            android:id="@+id/drinkIconFour"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="2dp"
+            android:layout_toRightOf="@id/xFour"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/drinkFive"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/playerName"
+        android:layout_toRightOf="@id/drinkFour"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="20dp">
+
+        <TextView
+            android:id="@+id/countOfDrinksFive"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="22dp" />
+
+        <ImageView
+            android:id="@+id/xFive"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="2dp"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@id/countOfDrinksFive"
+            android:src="@drawable/multipilcator"/>
+
+        <ImageView
+            android:id="@+id/drinkIconFive"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="2dp"
+            android:layout_toRightOf="@id/xFive"/>
+
+    </RelativeLayout>
 
 </RelativeLayout>

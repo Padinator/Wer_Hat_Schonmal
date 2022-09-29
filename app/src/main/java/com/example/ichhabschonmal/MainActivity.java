@@ -1,21 +1,18 @@
 package com.example.ichhabschonmal;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDelegate;
-
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Button;
 
 import com.example.ichhabschonmal.online_gaming.JoinGame;
 import com.example.ichhabschonmal.server_client_communication.ClientSocketEndPoint;
 import com.example.ichhabschonmal.server_client_communication.ServerSocketEndPoint;
 
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.ichhabschonmal.online_gaming.JoinGame;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -23,9 +20,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        // Set dark mode to none
-        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
 
         // Definitions
         Button newGame, loadGame, joinGame;
@@ -52,5 +46,15 @@ public class MainActivity extends AppCompatActivity {
             startActivity(loadGame1);
             finish();
         });
+
+        // calling the action bar
+        /*ActionBar actionBar = getSupportActionBar();
+        assert actionBar != null;
+        actionBar.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));*/
+
+
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.LTGRAY));
+
+
     }
 }

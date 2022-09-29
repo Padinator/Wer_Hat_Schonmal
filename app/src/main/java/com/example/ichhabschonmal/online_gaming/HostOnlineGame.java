@@ -1,11 +1,15 @@
 package com.example.ichhabschonmal.online_gaming;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,6 +22,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.ichhabschonmal.CreatePlayers;
 import com.example.ichhabschonmal.MainActivity;
+
+import com.example.ichhabschonmal.NewGame;
+
 import com.example.ichhabschonmal.R;
 import com.example.ichhabschonmal.adapter.HostOnlineGameAdapter;
 import com.example.ichhabschonmal.server_client_communication.ClientServerHandler;
@@ -48,7 +55,6 @@ public class HostOnlineGame extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.host_online_game);
-
 
         // TextViews
         tvIP = findViewById(R.id.tvIP);

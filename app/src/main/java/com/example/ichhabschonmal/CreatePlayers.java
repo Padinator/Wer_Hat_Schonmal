@@ -4,6 +4,8 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -172,13 +174,9 @@ public class CreatePlayers extends AppCompatActivity {
         maxStoryNumber = getIntent().getExtras().getInt("MaxStoryNumber");
         maxPlayerNumber = getIntent().getExtras().getInt("PlayerNumber");
 
-        /*
-        // Calling the action bar
-        ActionBar actionBar = getSupportActionBar();
-
-        // Showing the back button in action bar
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        */
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.arrow_back);
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
         viewYourStories.setOnClickListener(this::openDialog);
 
