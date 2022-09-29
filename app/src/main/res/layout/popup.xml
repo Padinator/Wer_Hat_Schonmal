@@ -22,20 +22,19 @@
         android:layout_below="@id/listDrink">
 
         <Button
-            android:id="@+id/save"
-            android:text="Sichern"
+            android:id="@+id/back"
+            android:text="Zurück"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/listDrink"
             android:layout_margin="20dp"/>
 
         <Button
-            android:id="@+id/back"
-            android:text="Zurück"
+            android:id="@+id/save"
+            android:text="Speichern"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/listDrink"
-            android:layout_toRightOf="@id/save"
             android:layout_margin="20dp"/>
 
     </LinearLayout>
