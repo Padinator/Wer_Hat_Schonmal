@@ -4,20 +4,19 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
 import android.view.WindowManager.LayoutParams;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -26,7 +25,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
@@ -37,6 +35,7 @@ import com.example.ichhabschonmal.database.Game;
 import com.example.ichhabschonmal.database.Player;
 import com.example.ichhabschonmal.database.Story;
 import com.example.ichhabschonmal.exceptions.GamerException;
+import com.example.ichhabschonmal.online_gaming.PlayerInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,6 +55,8 @@ public class CreatePlayers extends AppCompatActivity {
     private Button backButton, saveEditedStories;
     private ViewYourStoriesListAdapter adapter;
     private TextView storyNumber;
+
+    List<PlayerInfo> playerInfo;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -87,17 +88,22 @@ public class CreatePlayers extends AppCompatActivity {
         storyNumber = findViewById(R.id.storyNumber);
         charsLeft = findViewById(R.id.charsLeft);
 
+        playerInfo = new ArrayList<>();
+
+        playerInfo = (ArrayList<PlayerInfo>)getIntent().getSerializableExtra("playerinfo");
+
+        Log.e("playerinfo", playerInfo.toString());
+
+
         // Set used variables
         minStoryNumber = getIntent().getExtras().getInt("MinStoryNumber");
         maxStoryNumber = getIntent().getExtras().getInt("MaxStoryNumber");
-        maxPlayerNumber = getIntent().getExtras().getInt("playerNumber");
+        maxPlayerNumber = getIntent().getExtras().getInt("PlayerNumber");
         //setItemsCanFocus(true);
 
-        // Calling the action bar
-        ActionBar actionBar = getSupportActionBar();
-
-        // Showing the back button in action bar
-        actionBar.setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.arrow_back);
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
         viewYourStories.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -126,13 +132,10 @@ public class CreatePlayers extends AppCompatActivity {
             }
         });
 
-        rules.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent rules = new Intent(CreatePlayers.this, Rules.class);
-                rules.putExtra("GameIsLoaded", false);
-                startActivity(rules);
-            }
+        rules.setOnClickListener(view -> {
+            Intent rules1 = new Intent(CreatePlayers.this, Rules.class);
+            rules1.putExtra("GameIsLoaded", false);
+            startActivity(rules1);
         });
 
         saveAndNextStory.setOnClickListener(v -> {
@@ -174,8 +177,7 @@ public class CreatePlayers extends AppCompatActivity {
             else if (!alreadySadOne && !writeStories.getText().toString().equals("")) {
                 Toast.makeText(this, "Die letzte Story wurde noch nicht gespeichert, einmaliger Hinweis!", Toast.LENGTH_SHORT).show();
                 alreadySadOne = true;
-            }
-            else if (playerName.getText().toString().isEmpty()) {
+            } else if (playerName.getText().toString().isEmpty()) {
                 Toast.makeText(CreatePlayers.this, "Spielername darf nicht leer sein!", Toast.LENGTH_SHORT).show();
             } else if (playerName.getText().toString().length() < 2)
                 Toast.makeText(CreatePlayers.this, "Spielername muss aus mindestens 2 Zeichen bestehen!", Toast.LENGTH_SHORT).show();
@@ -334,7 +336,7 @@ public class CreatePlayers extends AppCompatActivity {
 
             // Definitions and initializations
             LayoutInflater inflater = activity.getLayoutInflater();
-            @SuppressLint({"ViewHolder", "InflateParams"}) View rowView= inflater.inflate(R.layout.view_your_stories_list_item, null, true);
+            @SuppressLint({"ViewHolder", "InflateParams"}) View rowView = inflater.inflate(R.layout.view_your_stories_list_item, null, true);
             EditText storyText = rowView.findViewById(R.id.storyText);
             ImageButton deleteStory = rowView.findViewById(R.id.deleteStory);
 
