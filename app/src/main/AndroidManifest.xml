@@ -16,26 +16,42 @@
         android:theme="@style/Theme.IchHabSchonMal">
         <activity
             android:name=".MainActivity"
-            android:exported="true">
+            android:exported="true"
+            android:theme="@style/NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".NewGame" />
-        <activity android:name=".CreatePlayers" />
-        <activity android:name=".PlayGame" />
-        <activity android:name=".LoadGame" />
-        <activity android:name=".Rules" />
-        <activity android:name=".Score" />
-        <activity android:name=".EndScore" />
+        <activity
+            android:name=".NewGame"
+            android:theme="@style/IchHabSchonMal" />
+        <activity
+            android:name=".CreatePlayers"
+            android:theme="@style/IchHabSchonMal" />
+        <activity
+            android:name=".PlayGame"
+            android:theme="@style/IchHabSchonMal" />
+        <activity
+            android:name=".LoadGame"
+            android:theme="@style/IchHabSchonMal" />
+        <activity
+            android:name=".Rules"
+            android:theme="@style/IchHabSchonMal" />
+        <activity
+            android:name=".Score"
+            android:theme="@style/IchHabSchonMal" />
+        <activity
+            android:name=".EndScore"
+            android:theme="@style/IchHabSchonMal" />
         <activity
             android:name=".online_gaming.HostOnlineGame"
-            android:label="Server" />
+            android:label="Server"
+            android:theme="@style/IchHabSchonMal" />
         <activity
             android:name=".online_gaming.JoinGame"
-            android:label="Client" />
-
+            android:label="Client"
+            android:theme="@style/IchHabSchonMal" />
     </application>
 
 </manifest>
