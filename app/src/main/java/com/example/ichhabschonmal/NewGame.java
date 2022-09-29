@@ -1,13 +1,10 @@
 package com.example.ichhabschonmal;
 
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDelegate;
-import androidx.room.Room;
-
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,15 +17,16 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.room.Room;
+
 import com.example.ichhabschonmal.database.AppDatabase;
 import com.example.ichhabschonmal.database.Game;
 import com.example.ichhabschonmal.online_gaming.HostOnlineGame;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class NewGame extends AppCompatActivity {
 
@@ -58,9 +56,6 @@ public class NewGame extends AppCompatActivity {
         Switch playMode;
         AppDatabase db;
         List<Game> listOfGames;
-
-
-
 
         // EditTexts
         gameName = findViewById(R.id.gameName);
@@ -148,25 +143,25 @@ public class NewGame extends AppCompatActivity {
             else if (Integer.parseInt(storyMinNumber) > Integer.parseInt(storyMaxNumber))          // Casts are valid, because of if-cases before
                 Toast.makeText(NewGame.this, "Minimum-Storyzahl muss kleiner oder gleich der Maximum-Storyzahl sein!", Toast.LENGTH_LONG).show();
             else {
-                 if (!playMode.isChecked()) {       // One phone for all player, only one counter
-                     Intent newGameIntent = new Intent(getApplicationContext(), CreatePlayers.class);
-                     newGameIntent.putExtra("MinStoryNumber", Integer.parseInt(storyMinNumber));     // Give storyMinNumber
-                     newGameIntent.putExtra("MaxStoryNumber", Integer.parseInt(storyMaxNumber));     // Give storyMaxNumber
-                     newGameIntent.putExtra("playerNumber", Integer.parseInt(playerNumber));     // Give number of players
-                     newGameIntent.putExtra("GameName", gameName.getText().toString());     // Give the name of the game
-                     newGameIntent.putExtra("DrinkOfTheGame", drinkOfTheGame);
-                     startActivity(newGameIntent);
-                 } else {
-                    Intent newGameMultipleDevicesIntent = new Intent(getApplicationContext(), HostOnlineGame.class);
-                    startActivity(newGameMultipleDevicesIntent);
-                }
+                Intent intent;
+
+                if (!playMode.isChecked())        // One phone for all player, only one counter
+                    intent = new Intent(getApplicationContext(), CreatePlayers.class);
+                else
+                    intent = new Intent(getApplicationContext(), HostOnlineGame.class);
+
+                intent.putExtra("MinStoryNumber", Integer.parseInt(storyMinNumber));     // Give storyMinNumber
+                intent.putExtra("MaxStoryNumber", Integer.parseInt(storyMaxNumber));     // Give storyMaxNumber
+                intent.putExtra("PlayerNumber", Integer.parseInt(playerNumber));     // Give number of players
+                intent.putExtra("GameName", gameName.getText().toString());     // Give the name of the game
+                intent.putExtra("DrinkOfTheGame", drinkOfTheGame);
+                startActivity(intent);
             }
         });
         // calling the action bar
-        ActionBar actionBar = getSupportActionBar();
-
-        // showing the back button in action bar
-        actionBar.setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.arrow_back);
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
     }
 
@@ -210,10 +205,11 @@ public class NewGame extends AppCompatActivity {
     }
 
     private boolean exists(String fileName, List<Game> games) {         // Check, if file name exists
-        for (int i = 0; i < games.size(); i++) {
+        for (int i = 0; i < games.size(); i++)
             if (fileName.equals(games.get(i).gameName))
                 return true;        // File name already exists
-        }
+
+
         return false;       // File name exists not yet
     }
 

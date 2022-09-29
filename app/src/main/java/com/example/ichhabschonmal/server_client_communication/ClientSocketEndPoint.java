@@ -1,5 +1,6 @@
 package com.example.ichhabschonmal.server_client_communication;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
@@ -21,7 +22,10 @@ public class ClientSocketEndPoint extends SocketEndPoint {
     private Client client;
     private Thread connectionThread;
     private SocketCommunicator.Receiver receiverAction;
-    Semaphore connection;
+    private Semaphore connected;
+
+    public static final String STATUS_CONNECTED = "Warten auf Host";
+    public static final String STATUS_NOT_CONNECTED = "Nicht verbunden";
 
 
     public ClientSocketEndPoint(Activity activity, Context context, String serverIP) {
@@ -32,10 +36,24 @@ public class ClientSocketEndPoint extends SocketEndPoint {
         this.serverIP = serverIP;
     }
 
+
+    public void setServerIP(String serverIP) {
+        this.serverIP = serverIP;
+    }
+
     /*
-    *
-    * Returns the message, the client has received.
-    *
+     *
+     * Returns the client's ip address.
+     *
+     */
+    public String getClientIpAddress() {
+        return client.getIPAddress();
+    }
+
+    /*
+     *
+     * Returns the message, the client has received.
+     *
      */
     public String getClientsMessage() {
         if (client != null)
@@ -45,15 +63,24 @@ public class ClientSocketEndPoint extends SocketEndPoint {
     }
 
     /*
-    *
-    * Returns the client's connection status.
-    *
+     *
+     * Returns the client's connection status.
+     *
      */
+    @SuppressLint("LongLogTag")
     public boolean isConnected() {
+        /*
         if (client != null)
             return client.isConnected();
         else
             throw new NullPointerException("Cannot check connection status of client, when no one was created!");
+         */
+
+        if (client != null)
+            return client.isConnected();
+
+        Log.e("ClientSocketEndPoint", "Cannot check connection status of client, when no one was created");
+        return false;
     }
 
     /*
@@ -72,15 +99,24 @@ public class ClientSocketEndPoint extends SocketEndPoint {
      *
      */
     public boolean createConnection(SocketCommunicator.Receiver receiverAction) throws InterruptedException {
-        this.receiverAction = receiverAction;
+        boolean isConnected = false;
 
-        connectionThread = new Thread(new ClientConnector());
-        connectionThread.start();
+        if (client != null)
+            isConnected = isConnected();
 
-        connection = new Semaphore(0); // Connect client with host
-        connection.acquire();
+        if (!isConnected) {
+            this.receiverAction = receiverAction;
 
-        return client != null && client.isConnected();
+            connectionThread = new Thread(new ClientConnector());
+            connectionThread.start();
+
+            connected = new Semaphore(0); // Connect client with host
+            connected.acquire();
+
+            return client != null && client.isConnected();
+        }
+
+        return false;
     }
 
     /*
@@ -88,14 +124,11 @@ public class ClientSocketEndPoint extends SocketEndPoint {
      * Start Receiving messages from server.
      *
      */
-    public void receiveMessages(SocketCommunicator.Receiver receiverAction) {
-        try {
-            this.receiverAction = receiverAction;
-
+    public void receiveMessages(SocketCommunicator.Receiver receiverAction) throws NullPointerException {
+        if (client != null)
             client.receiveMessages(receiverAction);
-        } catch (NullPointerException e) {
-            throw new NullPointerException("\"During receiveMessages(...)\": No Receiver-Action defined: " + this.receiverAction);
-        }
+        else
+            throw new NullPointerException("\"Class ClientSocketEndPoint, during receiveMessages(...)\": No client defined: null");
     }
 
     /*
@@ -109,7 +142,7 @@ public class ClientSocketEndPoint extends SocketEndPoint {
         if (receiverAction != null)
             receiverAction.setDoneReading(true);
         else
-            throw new NullPointerException("During \"stopReceivingMessages(...)\": No Receiver-Action defined: " + null);
+            throw new NullPointerException("Class ClientSocketEndPoint, during \"stopReceivingMessages(...)\": No Receiver-Action defined: null");
     }
 
     /*
@@ -118,7 +151,10 @@ public class ClientSocketEndPoint extends SocketEndPoint {
      *
      */
     public void continueReceivingMessages() {
-        client.continueReceivingMessages();
+        if (client != null)
+            client.continueReceivingMessages();
+        else
+            throw new NullPointerException("Class ClientSocketEndPoint, during \"continueReceivingMessages(...)\": No client defined: null");
     }
 
     /*
@@ -127,11 +163,17 @@ public class ClientSocketEndPoint extends SocketEndPoint {
      *
      */
     public void sendMessage(String message) {
-        client.sendMessage(message);
+        if (client != null)
+            client.sendMessage(message);
+        else
+            throw new NullPointerException("Class ClientSocketEndPoint, during \"sendMessage(...)\": No client defined: null");
     }
 
     public void disconnectClient() throws IOException {
-        client.disconnectClientFromServer();
+        if (client != null)
+            client.disconnectClientFromServer();
+        else
+            throw new NullPointerException("Class ClientSocketEndPoint, during \"disconnectClient(...)\": No client defined: null");
     }
 
     private class ClientConnector implements Runnable {
@@ -148,14 +190,10 @@ public class ClientSocketEndPoint extends SocketEndPoint {
 
                 clientEndPoint = new Socket(serverIP, SERVER_PORT);
                 //clientEndPoint = new Socket("192.168.1.38", 8080);
-                Log.e("Server-Port", "1");
                 input = new BufferedReader(new InputStreamReader(clientEndPoint.getInputStream()));
-                Log.e("Server-Port", "2");
                 output = new PrintWriter(clientEndPoint.getOutputStream());
-                Log.e("Server-Port", "3");
                 socketCommunicatorToServer = new SocketCommunicator(activity, context, clientEndPoint, input, output);
-                Log.e("Server-Port", "4");
-                client = new Client(socketCommunicatorToServer, receiverAction, getNameOfDevice(),getLocalIpAddress());
+                client = new Client(socketCommunicatorToServer, receiverAction, getNameOfDevice(), getLocalIpAddress());
                 Log.e("Client", client.toString());
 
                 if (client.getReceiver() != null)
@@ -166,7 +204,7 @@ public class ClientSocketEndPoint extends SocketEndPoint {
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
-                connection.release();
+                connected.release();
             }
         }
     }

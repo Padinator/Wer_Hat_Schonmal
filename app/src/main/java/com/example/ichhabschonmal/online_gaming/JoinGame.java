@@ -1,30 +1,32 @@
 package com.example.ichhabschonmal.online_gaming;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.os.Bundle;
-
-import com.example.ichhabschonmal.R;
-import com.example.ichhabschonmal.server_client_communication.ClientSocketEndPoint;
-import com.example.ichhabschonmal.server_client_communication.SocketCommunicator;
-
 import android.annotation.SuppressLint;
+import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import java.io.BufferedReader;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.ichhabschonmal.CreatePlayers;
+import com.example.ichhabschonmal.R;
+import com.example.ichhabschonmal.server_client_communication.ClientSocketEndPoint;
+import com.example.ichhabschonmal.server_client_communication.SocketCommunicator;
+import com.example.ichhabschonmal.server_client_communication.SocketEndPoint;
+
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.Socket;
 
 @SuppressLint("SetTextI18n")
 public class JoinGame extends AppCompatActivity {
     private EditText etIP;
-    private TextView tvMessages;
-    private EditText etMessage;
-    private Button btnSend;
+    private TextView connectionStatusInfo;
+    private Button btnConnect;
 
     private ClientSocketEndPoint clientEndPoint;
     private SocketCommunicator.Receiver receiverAction;
@@ -33,43 +35,76 @@ public class JoinGame extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.join_game);
+
         etIP = findViewById(R.id.etIP);
-        tvMessages = findViewById(R.id.tvMessages);
-        etMessage = findViewById(R.id.etMessage);
-        btnSend = findViewById(R.id.btnSend);
-        Button btnConnect = findViewById(R.id.btnConnect);
+        connectionStatusInfo = findViewById(R.id.connectionStatusInfo);
+        btnConnect = findViewById(R.id.btnConnect);
 
         receiverAction = new SocketCommunicator(null, null, null, null, null).new Receiver() {
 
             @Override
             public void action() {
-                tvMessages.setText("server: " + clientEndPoint.getClientsMessage());
+
+                if (clientEndPoint.getClientsMessage().equals("start")) {
+                    Intent createPlayer = new Intent(getApplicationContext(), CreatePlayers.class);
+                    startActivity(createPlayer);
+                }
+
+                switch (clientEndPoint.getClientsMessage()) {
+                    case (SocketEndPoint.CLOSE_CONNECTION): {
+                        try {
+                            clientEndPoint.disconnectClient();
+                            runOnUiThread(() -> connectionStatusInfo.setText("Status:\t\t" + ClientSocketEndPoint.STATUS_NOT_CONNECTED));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+                        break;
+                    }
+                    default: {
+                        Log.e("Client receives", clientEndPoint.getClientsMessage());
+                        break;
+                    }
+                }
+                Log.e("Client receives2", clientEndPoint.getClientsMessage());
             }
 
         };
 
         btnConnect.setOnClickListener(v -> {
-            clientEndPoint = new ClientSocketEndPoint(this, getApplicationContext(), etIP.getText().toString().trim());
-
             try {
-                if (clientEndPoint.createConnection(receiverAction))
-                    tvMessages.setText("Connected");
-                else
-                    tvMessages.setText("Not Connected");
+                if (clientEndPoint == null || !clientEndPoint.isConnected()) {
+                    clientEndPoint = new ClientSocketEndPoint(this, getApplicationContext(), etIP.getText().toString().trim());
+                    clientEndPoint.createConnection(receiverAction);
+
+                    if (clientEndPoint.isConnected())
+                        connectionStatusInfo.setText("Status:\t\t" + ClientSocketEndPoint.STATUS_CONNECTED);
+                    else
+                        connectionStatusInfo.setText("Status:\t\t" + ClientSocketEndPoint.STATUS_NOT_CONNECTED);
+
+                    clientEndPoint.sendMessage(clientEndPoint.getNameOfDevice() + " " + clientEndPoint.getClientIpAddress());
+                } else {
+                    connectionStatusInfo.setText("Status:\t\t" + ClientSocketEndPoint.STATUS_CONNECTED);
+                    Toast.makeText(getApplicationContext(), "Du bist bereits verbunden!", Toast.LENGTH_SHORT);
+                }
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         });
-
-        btnSend.setOnClickListener(v -> {
-            String message = etMessage.getText().toString().trim();
-
-            if (!message.isEmpty()) {
-                clientEndPoint.sendMessage(message);
-                tvMessages.append("server sent this: " + message);
-            }
-
-            etMessage.setText("");
-        });
+        // calling the action bar
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.arrow_back);
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
     }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
 }

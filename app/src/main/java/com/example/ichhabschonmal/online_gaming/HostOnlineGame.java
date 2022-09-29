@@ -1,38 +1,61 @@
 package com.example.ichhabschonmal.online_gaming;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.MenuItem;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.ichhabschonmal.CreatePlayers;
+import com.example.ichhabschonmal.MainActivity;
+import com.example.ichhabschonmal.NewGame;
 import com.example.ichhabschonmal.R;
+import com.example.ichhabschonmal.adapter.HostOnlineGameAdapter;
 import com.example.ichhabschonmal.server_client_communication.ServerSocketEndPoint;
 import com.example.ichhabschonmal.server_client_communication.SocketCommunicator;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @SuppressLint("SetTextI18n")
 public class HostOnlineGame extends AppCompatActivity {
     private ServerSocketEndPoint serverEndPoint;
     private SocketCommunicator.Receiver receiverAction;
+    private int minStoryNumber, maxStoryNumber, maxPlayerNumber, connectedPlayers = 0;
 
-    private String message;
+    private RecyclerView recyclerView;
+    private HostOnlineGameAdapter hostOnlineGameAdapter;
+
+    private TextView tvIP, connectedClients;
+    private Button continues;
+
+    List<PlayerInfo> playersInfo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.host_online_game);
 
-        // Define and initialize TextViews, EditTexts and Buttons
-        TextView tvIP = findViewById(R.id.tvIP);
-        TextView tvPort = findViewById(R.id.tvPort);
-        TextView tvMessages = findViewById(R.id.tvMessages);
-        EditText etMessage = findViewById(R.id.etMessage);
-        Button btnSend = findViewById(R.id.btnSend);
+        // TextViews
+        tvIP = findViewById(R.id.tvIP);
+        connectedClients = findViewById(R.id.connectedClients);
+
+        // Buttons
+        continues = findViewById(R.id.btnSend);
+
+        // Get from last intent
+        minStoryNumber = getIntent().getExtras().getInt("MinStoryNumber");
+        maxStoryNumber = getIntent().getExtras().getInt("MaxStoryNumber");
+        maxPlayerNumber = getIntent().getExtras().getInt("PlayerNumber");
 
         // Initialize server endpoint
         try {
@@ -41,62 +64,114 @@ public class HostOnlineGame extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        // Set TextViews
-        tvIP.setText("Host-IP: " + serverEndPoint.getServerIP());
-        tvPort.setText("Host-Port: " + ServerSocketEndPoint.SERVER_PORT);
+        playersInfo = new ArrayList<>();
 
-        // Create actions after messaging
+        // Set TextViews
+        tvIP.setText("Host-IP:\t\t" + serverEndPoint.getServerIP());
+        connectedClients.setText("Verbunden:\t\t0 / " + (maxPlayerNumber - 1));
+
+        // Create actions for receiving messaging
         receiverAction = new SocketCommunicator(null, null, null, null, null).new Receiver() {
+
 
             @Override
             public void action() {
-                runOnUiThread(() -> {
-                    tvMessages.append("client: " + serverEndPoint.getClientsMessage(0) + "\n");
-                });
-            }
+                if (serverEndPoint.sizeOfClients() > 0) {
+                    int clientIndex = serverEndPoint.sizeOfClients() - 1;
+                    String clientInfo = serverEndPoint.getClientsMessage(clientIndex);
+                    String[] s = cutClientInfo(clientInfo);
 
+                    playersInfo.add(new PlayerInfo(s[0], s[1]));
+
+                    serverEndPoint.setClientsIPAddress(clientIndex, s[0]);
+                    serverEndPoint.setClientsDeviceName(clientIndex, s[1]);
+
+                    runOnUiThread(() -> connectedClients.setText("Verbunden:\t\t" + serverEndPoint.sizeOfClients() + " / " + (maxPlayerNumber - 1)));
+
+                    runOnUiThread(() -> {
+                        hostOnlineGameAdapter.notifyDataSetChanged();
+                        recyclerView.setAdapter(hostOnlineGameAdapter);
+                    });
+                }
+            }
         };
 
+        // RecyclerView
+        recyclerView = findViewById(R.id.recyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        //ClientAdapter
+        hostOnlineGameAdapter = new HostOnlineGameAdapter(this, serverEndPoint, receiverAction, connectedClients, maxPlayerNumber);
+        recyclerView.setAdapter(hostOnlineGameAdapter);
+
         // Create connection to Socket
-        serverEndPoint.createConnection(1, receiverAction);
+        serverEndPoint.createConnection(maxPlayerNumber - 1, receiverAction);
 
-        // Receive messages
-        //serverEndPoint.receiveMessages(receiverAction);
+        continues.setOnClickListener(view -> {
+            serverEndPoint.sendMessage("start");
+            Intent createPlayer = new Intent(getApplicationContext(), CreatePlayers.class);
+            createPlayer.putExtra("playerinfo", (ArrayList<PlayerInfo>) playersInfo);
 
-        // Disconnect from Socket
-        new Thread(() -> {
-            try {
-                Thread.sleep(5000);
-                Log.e("Test1", "Stop");
-                serverEndPoint.stopReceivingMessages();
-                Log.e("Test1", "Stopped");
-
-                new Thread(() -> {
-                    try {
-                        Thread.sleep(5000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    Log.e("Test1", "Start");
-                    serverEndPoint.continueReceivingMessages();
-                    Log.e("Test1", "Started");
-                }).start();
-
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }).start();
-
-
-        // Set OnClickListener, send messages
-        btnSend.setOnClickListener(v -> {
-            message = etMessage.getText().toString().trim();
-
-            if (!message.isEmpty()) {
-                serverEndPoint.sendMessage(message);
-                tvMessages.append("server sent this: " + message + "\n");
-                etMessage.setText("");
-            }
+            //bundle.putSerializable("hashmapofplayers", playersIP);
+            //createPlayer.putExtra("playerIP", playerInfo);
+            startActivity(createPlayer);
         });
+
+        // calling the action bar
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.arrow_back);
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
     }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {       // Catch back button
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Spieleinstellungen")
+                .setMessage("Wenn du zur\u00fcck gehst, werden die Daten nicht gespeichert!")
+                .setPositiveButton("Zur\u00fcck", (dialog, id) -> {
+                    Intent mainActivity = new Intent(HostOnlineGame.this, MainActivity.class);
+                    startActivity(mainActivity);
+                    finish();
+                })
+                .setNegativeButton("Abbrechen", (dialogInterface, i) -> {
+
+                });
+        builder.create().show();
+    }
+
+    private static String[] cutClientInfo(String clientInfo) {
+        String[] s = new String[2];
+        int currentIndex = 0;
+        boolean gotIp = false;
+        for (int i = clientInfo.length() - 1; i > 0; i--) {
+            if (clientInfo.charAt(i) != ' ' && !gotIp) {
+                s[0] += clientInfo.charAt(i);
+            } else {
+                if (!gotIp) {
+                    gotIp = true;
+                    currentIndex = i;
+                }
+            }
+        }
+        s[0] = s[0].substring(4);
+        String temp = "";
+        for (int i = s[0].length() - 1; i >= 0; i--) {
+            temp += s[0].charAt(i);
+        }
+        s[0] = temp;
+        s[1] = clientInfo.substring(0, currentIndex);
+        return s;
+    }
+
 }
+
