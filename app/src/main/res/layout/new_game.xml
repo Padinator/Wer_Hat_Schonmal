@@ -41,6 +41,7 @@
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
             android:padding="8dp"
+            android:textSize="18dp"
             android:hint="Lokal oder Online" />
 
 
@@ -50,7 +51,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
             android:background="@drawable/textview_story_border"
-            android:hint="Minimale story Anzahl"
+            android:hint="Minimale Story-Zahl"
             android:inputType="numberDecimal"
             android:padding="8dp" />
 
@@ -61,7 +62,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
             android:background="@drawable/textview_story_border"
-            android:hint="Maximale story Anzahl"
+            android:hint="Maximale Story-Zahl"
             android:inputType="numberDecimal"
             android:padding="8dp" />
 
