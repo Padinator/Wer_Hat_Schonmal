@@ -4,6 +4,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 
+import com.example.ichhabschonmal.online_gaming.JoinGame;
+import com.example.ichhabschonmal.server_client_communication.ClientSocketEndPoint;
+import com.example.ichhabschonmal.server_client_communication.ServerSocketEndPoint;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.ichhabschonmal.online_gaming.JoinGame;

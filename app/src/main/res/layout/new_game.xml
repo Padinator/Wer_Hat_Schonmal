@@ -65,16 +65,45 @@
             android:inputType="numberDecimal"
             android:padding="8dp" />
 
-
-        <Spinner
-            android:id="@+id/drinkVariantsOne"
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/chooseDrink"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp"
+            android:layout_below="@id/storyMaxCount"
+            android:layout_marginLeft="30dp"
+            android:text="Ausgewählter Drink:"
+            android:textSize="20dp" />
 
-            android:autofillHints="Select Drink"
+        <!--<Spinner
+            android:id="@+id/drinkVariantsOne"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/storyMaxCount"
+            android:layout_toRightOf="@id/chooseDrink"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            android:layout_marginBottom="15dp"
             android:background="@android:drawable/btn_dropdown"
             android:spinnerMode="dropdown" />
+            -->
+        <Button
+            android:id="@+id/anotherDrink"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/chooseDrink"
+            android:layout_margin="20dp"
+            android:layout_centerHorizontal="true"
+            android:text="Drink"/>
+
+        <TextView
+            android:id="@+id/currentDrink"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/chooseDrink"
+            android:layout_below="@id/storyMaxCount"
+            android:textSize="20dp"
+            android:paddingHorizontal="10dp"/>
+
     </LinearLayout>
 
     <Button
@@ -86,4 +115,6 @@
         android:backgroundTint="@color/orange_one"
         android:text="Weiter" />
 
-</RelativeLayout>
+
+    </RelativeLayout>
+
