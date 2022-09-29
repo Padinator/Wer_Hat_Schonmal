@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,21 +32,26 @@ import java.util.List;
 
 public class PlayGame extends AppCompatActivity {
     private Gamer[] players, editedPlayers;         // players contains all players of the actual game
-                                                    // editedPlayers contains all players, who have not guessed yet
+    // editedPlayers contains all players, who have not guessed yet
     private Gamer chosenPlayer, otherPlayer;        // Define the two playing players here, to proof in button solution, who is which one
     private Game actualGame;
     private List<Player> listOfPlayers;             // Contains all players of the actual game, listOfPlayers has access to the database
     private List<Story> listOfStories;              // Contains lal stories of the actual game, listOfStories has access to the database
     private TextView player, story, round, drinkOfTheGameTextView;
-    private Spinner chooseAPlayer, drinkVariantsTwo;        // spin is used to select a player
+    private Spinner chooseAPlayer; //, drinkVariantsTwo;        // spin is used to select a player
     private AppDatabase db;
-    private String actualDrinkOfTheGame;
+    private String actualDrinkOfTheGame, newDrinkOfTheGame;
     private int[] playerIds, storyIds;
     private boolean solutionPressed = false, allPlayersGuessed = false;
-                    // solutionPressed: before next round begins, Button solution may not been pressed
-                    // allPlayersGuessed: true means that all players guessed one time
+    // solutionPressed: before next round begins, Button solution may not been pressed
+    // allPlayersGuessed: true means that all players guessed one time
     private int idOfFirstPlayer, countOfPlayers, idOfFirstStory, countOfStories, gameId, roundNumber;
     private int actualStoryNumberInList, actualStoryNumber;     // actualStoryNumber is a counter to set stories to used
+    private AlertDialog dialog;
+    private Button save, back;
+    private ListView listDrink;
+    private AlertDialog.Builder dialogBuilder;
+    private ArrayAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +66,6 @@ public class PlayGame extends AppCompatActivity {
         Button solution/*, nextRound*/;
         List<String> listOfPlayersForSpinner;
         ArrayAdapter<String> adapter;
-        ArrayList<String> drinks = new ArrayList<>();
         boolean gameIsLoaded;
 
         // Buttons
@@ -108,6 +113,7 @@ public class PlayGame extends AppCompatActivity {
 
             // Set used variable
             setDrinkOfTheGame(actualGame.actualDrinkOfTheGame);
+            newDrinkOfTheGame = actualGame.actualDrinkOfTheGame;
 
             listOfStories = db.storyDao().loadAllByStoryIds(storyIds);
             countOfStories = storyIds.length;
@@ -129,14 +135,6 @@ public class PlayGame extends AppCompatActivity {
             adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, listOfPlayersForSpinner);
             chooseAPlayer.setAdapter(adapter);
 
-            // Create drop down menu for choosing a drink
-            drinkVariantsTwo = findViewById(R.id.drinkVariantsTwo);
-            drinks.add("Bier");
-            drinks.add("Vodka Shots");
-            drinks.add("Tequila");
-            adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, drinks);
-            drinkVariantsTwo.setAdapter(adapter);
-
             if (checkRound()) {             // Play a game
                 playGame();
             } else {
@@ -152,7 +150,6 @@ public class PlayGame extends AppCompatActivity {
             finish();
         }
 
-
         solution.setOnClickListener(view -> {
             if (!solutionPressed) {     // Solution may not been pressed
                 String correctInput = "Spieler " + otherPlayer.getNumber() + ", " + otherPlayer.getName();
@@ -160,8 +157,8 @@ public class PlayGame extends AppCompatActivity {
                 int i = 0;
 
                 if (allPlayersGuessed) {            // Change actual drink of the game, if all players guessed one time
-                    changeDrink(drinkVariantsTwo.getSelectedItem().toString());
-                    setDrinkOfTheGame(drinkVariantsTwo.getSelectedItem().toString());
+                    changeDrink(newDrinkOfTheGame);
+                    setDrinkOfTheGame(newDrinkOfTheGame);
                     Log.e("actualDrinkOfTheGame", actualGame.actualDrinkOfTheGame + ", " + actualDrinkOfTheGame);
                     allPlayersGuessed = false;
                 }
@@ -173,13 +170,19 @@ public class PlayGame extends AppCompatActivity {
                             // Update a player in the database
                             switch (actualGame.actualDrinkOfTheGame) {
                                 case "Bier":
-                                    updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers + 1, listOfPlayers.get(i).countOfVodka, listOfPlayers.get(i).countOfTequila);
+                                    updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers + 1, listOfPlayers.get(i).countOfVodka, listOfPlayers.get(i).countOfTequila, listOfPlayers.get(i).countOfGin, listOfPlayers.get(i).countOfLiqueur);
                                     break;
                                 case "Vodka Shots":
-                                    updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers, listOfPlayers.get(i).countOfVodka + 1, listOfPlayers.get(i).countOfTequila);
+                                    updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers, listOfPlayers.get(i).countOfVodka + 1, listOfPlayers.get(i).countOfTequila, listOfPlayers.get(i).countOfGin, listOfPlayers.get(i).countOfLiqueur);
                                     break;
                                 case "Tequila":
-                                    updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers, listOfPlayers.get(i).countOfVodka, listOfPlayers.get(i).countOfTequila + 1);
+                                    updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers, listOfPlayers.get(i).countOfVodka, listOfPlayers.get(i).countOfTequila + 1, listOfPlayers.get(i).countOfGin, listOfPlayers.get(i).countOfLiqueur);
+                                    break;
+                                case "Gin Shot":
+                                    updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers, listOfPlayers.get(i).countOfVodka, listOfPlayers.get(i).countOfTequila, listOfPlayers.get(i).countOfGin + 1, listOfPlayers.get(i).countOfLiqueur);
+                                    break;
+                                case "Jaegermeister":
+                                    updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers, listOfPlayers.get(i).countOfVodka, listOfPlayers.get(i).countOfTequila, listOfPlayers.get(i).countOfGin, listOfPlayers.get(i).countOfLiqueur + 1);
                                     break;
                             }
 
@@ -197,13 +200,19 @@ public class PlayGame extends AppCompatActivity {
                             // Update a player in the database
                             switch (actualGame.actualDrinkOfTheGame) {
                                 case "Bier":
-                                    updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers + 1, listOfPlayers.get(i).countOfVodka, listOfPlayers.get(i).countOfTequila);
+                                    updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers + 1, listOfPlayers.get(i).countOfVodka, listOfPlayers.get(i).countOfTequila, listOfPlayers.get(i).countOfGin, listOfPlayers.get(i).countOfLiqueur);
                                     break;
                                 case "Vodka Shots":
-                                    updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers, listOfPlayers.get(i).countOfVodka + 1, listOfPlayers.get(i).countOfTequila);
+                                    updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers, listOfPlayers.get(i).countOfVodka + 1, listOfPlayers.get(i).countOfTequila, listOfPlayers.get(i).countOfGin, listOfPlayers.get(i).countOfLiqueur);
                                     break;
                                 case "Tequila":
-                                    updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers, listOfPlayers.get(i).countOfVodka, listOfPlayers.get(i).countOfTequila + 1);
+                                    updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers, listOfPlayers.get(i).countOfVodka, listOfPlayers.get(i).countOfTequila + 1, listOfPlayers.get(i).countOfGin, listOfPlayers.get(i).countOfLiqueur);
+                                    break;
+                                case "Gin Shot":
+                                    updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers, listOfPlayers.get(i).countOfVodka, listOfPlayers.get(i).countOfTequila, listOfPlayers.get(i).countOfGin + 1, listOfPlayers.get(i).countOfLiqueur);
+                                    break;
+                                case "Jaegermeister":
+                                    updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers, listOfPlayers.get(i).countOfVodka, listOfPlayers.get(i).countOfTequila, listOfPlayers.get(i).countOfGin, listOfPlayers.get(i).countOfLiqueur + 1);
                                     break;
                             }
 
@@ -360,7 +369,7 @@ public class PlayGame extends AppCompatActivity {
         for (int i = 0; i < countOfPlayers; i++) {
 
             if (storyCounter < listOfStories.size())
-            Log.e("saveInNewDataStructure", "Spieler" + listOfPlayers.get(i).playerNumber + ", " + listOfPlayers.get(i).name + ", aktuell erste Story, dessen PlayerId: " + listOfStories.get(storyCounter).playerId);
+                Log.e("saveInNewDataStructure", "Spieler" + listOfPlayers.get(i).playerNumber + ", " + listOfPlayers.get(i).name + ", aktuell erste Story, dessen PlayerId: " + listOfStories.get(storyCounter).playerId);
             // Create a new player in the list
             players[i] = new Gamer(listOfPlayers.get(i).playerNumber);
             players[i].setName(listOfPlayers.get(i).name);
@@ -458,7 +467,7 @@ public class PlayGame extends AppCompatActivity {
             else if (chosenPlayer.getNumber() == playerNumber)
                 Log.e("endlosschleife", "Endlosschleife2, playerNumber == chosenPlayer.getNumber(): " + "playerNumber: " + playerNumber + ", chosenPlayerNumber: " + chosenPlayer.getNumber() + ", Storyzahl: " + players[chosenPlayer.getNumber() - 1].getCountOfStories());
             //else
-                //Log.e("endlosschleife", "Endlosschleife2, Bedingungen passen nicht, zufaellige Spielerauswahl will nicht mehr: " + playerNumber);
+            //Log.e("endlosschleife", "Endlosschleife2, Bedingungen passen nicht, zufaellige Spielerauswahl will nicht mehr: " + playerNumber);
         } while (playerNumber == chosenPlayer.getNumber() || playerNumber <= 0 || playerNumber > players.length
                 || players[playerNumber - 1].getCountOfStories() == 0);     // If a player has no stories, he can not be chosen to be guessed
 
@@ -532,7 +541,7 @@ public class PlayGame extends AppCompatActivity {
     }
 
     // Adjust later
-    private void updateAPlayer(int playerNumber, int score, int countOfBeers, int countOfVodka, int countOfTequila) {     // Add later: "int typeOfDrink
+    private void updateAPlayer(int playerNumber, int score, int countOfBeers, int countOfVodka, int countOfTequila, int countOfGin, int countOfLiqueur) {     // Add later: "int typeOfDrink
 
         // Create database connection
         db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
@@ -541,6 +550,8 @@ public class PlayGame extends AppCompatActivity {
         listOfPlayers.get(playerNumber).countOfBeers = countOfBeers;          // Adjust later
         listOfPlayers.get(playerNumber).countOfVodka = countOfVodka;
         listOfPlayers.get(playerNumber).countOfTequila = countOfTequila;
+        listOfPlayers.get(playerNumber).countOfGin = countOfGin;
+        listOfPlayers.get(playerNumber).countOfLiqueur = countOfLiqueur;
         db.playerDao().updatePlayer(listOfPlayers.get(playerNumber));
 
         // Close database connection
@@ -571,7 +582,8 @@ public class PlayGame extends AppCompatActivity {
         builder.setTitle("Getr\u00e4nk wechseln")
                 .setMessage("Soll der Drink des Spiels gewechselt werden?\nBei Aufl\u00f6sung der n\u00e4chsten Story wird der Drink gewechselt.")
                 .setPositiveButton("Ja", (dialog, which) -> {
-                    drinkVariantsTwo.setVisibility(View.VISIBLE);
+                    // drinkVariantsTwo.setVisibility(View.VISIBLE);
+                    showDrinkSelection(NewGame.drinks);
                 })
                 .setNegativeButton("Nein", (dialogInterface, i) -> {
 
@@ -581,7 +593,6 @@ public class PlayGame extends AppCompatActivity {
 
     private void changeDrink(String drink) {
         updateAGame(actualGame.roundNumber, drink);
-        drinkVariantsTwo.setVisibility(View.INVISIBLE);
     }
 
     private void setDrinkOfTheGame(String drink) {
@@ -595,6 +606,12 @@ public class PlayGame extends AppCompatActivity {
             case "Tequila":
                 actualDrinkOfTheGame = "einen Tequila";
                 break;
+            case "Gin Shot":
+                actualDrinkOfTheGame = "einen Gin Shot";
+                break;
+            case "Jaegermeister":
+                actualDrinkOfTheGame = "einen Jaegermeister Shot";
+                break;
             default:
                 actualDrinkOfTheGame = "Error Index zu hoch, dieser Drink ist nicht vorhanden!";
                 break;
@@ -604,11 +621,39 @@ public class PlayGame extends AppCompatActivity {
         drinkOfTheGameTextView.setText(drink);
     }
 
+    public void showDrinkSelection(ArrayList<String> drinks) {
+        dialogBuilder = new AlertDialog.Builder(this);
+        final View popUpView = getLayoutInflater().inflate(R.layout.popup, null);
+        listDrink = (ListView) popUpView.findViewById(R.id.listDrink);
+        save = (Button) popUpView.findViewById(R.id.save);
+        back = (Button) popUpView.findViewById(R.id.back);
+
+        // set list
+        adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, drinks);
+        listDrink.setAdapter(adapter);
+
+        listDrink.setOnItemClickListener((adapterView, view, i, l) -> {
+
+            save.setOnClickListener(v -> {
+                newDrinkOfTheGame = drinks.get(i);
+                dialog.dismiss();
+            });
+
+            back.setOnClickListener(v -> {
+                dialog.dismiss();;
+            });
+        });
+
+        dialogBuilder.setView(popUpView);
+        dialog = dialogBuilder.create();
+        dialog.show();
+    }
+
     @SuppressLint("LongLogTag")
     private boolean checkRound() {      // Checks if at least one player has an unused story
         boolean nextRound = false, proofCheckPlayer = false;        // nextRound = true: another round can be played
-                                        // proofCheckPlayer: proof, whether checkPlayer is different to the last
-                                        // remaining players in editedPlayers (case: storyPlayer = 1)
+        // proofCheckPlayer: proof, whether checkPlayer is different to the last
+        // remaining players in editedPlayers (case: storyPlayer = 1)
         int storyPlayers = 0;      // storyPlayer = count of players with at least one story
         Gamer checkPlayer = null;
 
