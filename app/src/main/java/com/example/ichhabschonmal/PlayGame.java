@@ -300,6 +300,7 @@ public class PlayGame extends AppCompatActivity {
         });*/
         // calling the action bar
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.arrow_back);
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
