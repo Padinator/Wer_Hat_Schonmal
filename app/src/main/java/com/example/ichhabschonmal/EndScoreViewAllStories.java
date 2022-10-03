@@ -10,13 +10,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
 
-import com.example.ichhabschonmal.adapter.EndScoreAdapter;
 import com.example.ichhabschonmal.adapter.EndScoreViewAllStoriesAdapter;
 import com.example.ichhabschonmal.database.AppDatabase;
 import com.example.ichhabschonmal.database.Game;
 import com.example.ichhabschonmal.database.Player;
 import com.example.ichhabschonmal.database.Story;
-import com.example.ichhabschonmal.database.StoryDao_Impl;
 
 import java.util.List;
 
