@@ -9,7 +9,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Spinner;
@@ -38,9 +40,8 @@ public class PlayGame extends AppCompatActivity {
     private List<Player> listOfPlayers;             // Contains all players of the actual game, listOfPlayers has access to the database
     private List<Story> listOfStories;              // Contains lal stories of the actual game, listOfStories has access to the database
     private TextView player, story, round, drinkOfTheGameTextView;
-    private Spinner chooseAPlayer; //, drinkVariantsTwo;        // spin is used to select a player
     private AppDatabase db;
-    private String actualDrinkOfTheGame, newDrinkOfTheGame;
+    private String actualDrinkOfTheGame, newDrinkOfTheGame, selectedPlayer;
     private int[] playerIds, storyIds;
     private boolean solutionPressed = false, allPlayersGuessed = false;
     // solutionPressed: before next round begins, Button solution may not been pressed
@@ -52,6 +53,7 @@ public class PlayGame extends AppCompatActivity {
     private ListView listDrink;
     private AlertDialog.Builder dialogBuilder;
     private ArrayAdapter adapter;
+    private AutoCompleteTextView autoCompleteText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -130,10 +132,17 @@ public class PlayGame extends AppCompatActivity {
             players = saveInNewDataStructure(listOfPlayers, listOfStories);
             editedPlayers = saveInNewDataStructure(listOfPlayers, listOfStories);
 
-            // Create drop down menu for choosing a player
-            chooseAPlayer = findViewById(R.id.chooseAPlayer);
-            adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, listOfPlayersForSpinner);
-            chooseAPlayer.setAdapter(adapter);
+            // new drop down menu for selecting a player
+            autoCompleteText = findViewById(R.id.auto_complete);
+            ArrayAdapter adapterItems = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, listOfPlayersForSpinner);
+            autoCompleteText.setAdapter(adapterItems);
+
+            autoCompleteText.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                    selectedPlayer = adapterView.getItemAtPosition(i).toString();
+                }
+            });
 
             if (checkRound()) {             // Play a game
                 playGame();
@@ -163,7 +172,7 @@ public class PlayGame extends AppCompatActivity {
                     allPlayersGuessed = false;
                 }
 
-                if (chooseAPlayer.getSelectedItem().toString().equals(correctInput)) {       // chosenPlayer has guessed correctly
+                if (selectedPlayer.equals(correctInput)) {       // chosenPlayer has guessed correctly
                     for (; i < listOfPlayers.size(); i++) {
                         if (listOfPlayers.get(i).playerNumber == otherPlayer.getNumber()) {
 
@@ -425,10 +434,6 @@ public class PlayGame extends AppCompatActivity {
             if (listOfPlayers.get(i).playerNumber != chosenPlayer.getNumber())
                 listOfPlayersForSpinner.add("Spieler " + listOfPlayers.get(i).playerNumber + ", " + listOfPlayers.get(i).name);
         }
-
-        // Set Spinner
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, listOfPlayersForSpinner);
-        chooseAPlayer.setAdapter(adapter);
 
         // chosenPlayer may guess again, when all players have guessed
         editedPlayers[chosenPlayer.getNumber() - 1] = null;

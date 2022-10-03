@@ -138,6 +138,7 @@
                     android:layout_marginBottom="15dp"
                     android:backgroundTint="@color/normalBlue"
                     android:text="Nächster"
+                    android:padding="5dp"
                     android:textColor="@color/white" />
 
                 <Button
@@ -147,6 +148,7 @@
                     android:layout_below="@+id/saveAndNextStory"
                     android:layout_toRightOf="@+id/orientationOne"
                     android:layout_marginLeft="10dp"
+                    android:padding="5dp"
                     android:backgroundTint="@color/normalBlue"
                     android:text="Regeln"
                     android:textColor="@color/white" />

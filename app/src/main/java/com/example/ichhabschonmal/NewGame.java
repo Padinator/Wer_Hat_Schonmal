@@ -200,6 +200,11 @@ public class NewGame extends AppCompatActivity {
             });
         });
 
+        back.setOnClickListener(v -> {
+            dialog.dismiss();
+            ;
+        });
+
         dialogBuilder.setView(popUpView);
         dialog = dialogBuilder.create();
         dialog.show();

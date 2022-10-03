@@ -45,7 +45,7 @@ public class EndScoreViewAllStories extends AppCompatActivity {
 
         // Create database connection
         db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
-        Game game = db.gameDao().loadAllByGameIds(new int[]{gameId}).get(0);
+        Game game = db.gameDao().loadAllByGameIds(new int[] {gameId}).get(0);
 
         // Used variables
         idOfFirstPlayer = game.idOfFirstPlayer;

@@ -9,7 +9,8 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:theme="@style/Theme.MaterialComponents.DayNight.DarkActionBar">
 
             <TextView
                 android:id="@+id/round"
@@ -69,6 +70,7 @@
                               Hier sollte eine Story drin stehen."
                 android:textSize="23dp"/>
 
+            <!--
             <Spinner
                 android:id="@+id/chooseAPlayer"
                 android:layout_width="260dp"
@@ -77,12 +79,31 @@
                 android:layout_centerHorizontal="true"
                 android:background="@android:drawable/btn_dropdown"
                 android:spinnerMode="dropdown" />
+                -->
+            
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/menu"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:layout_below="@id/story"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
+                <AutoCompleteTextView
+                    android:id="@+id/auto_complete"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:focusable="false"
+                    android:focusableInTouchMode="false"
+                    android:inputType="none|textNoSuggestions"
+                    android:cursorVisible="false"
+                    android:hint="Select Player"/>
+            </com.google.android.material.textfield.TextInputLayout>
 
             <Button
                 android:id="@+id/solution"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/story"
+                android:layout_below="@+id/menu"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="80dp"
                 android:layout_marginBottom="15dp"
