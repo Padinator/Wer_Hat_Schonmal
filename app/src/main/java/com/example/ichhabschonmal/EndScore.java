@@ -71,6 +71,7 @@ public class EndScore extends AppCompatActivity {
         viewAllStories.setOnClickListener(view -> onViewAllStories());
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.arrow_back);
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
@@ -104,7 +105,7 @@ public class EndScore extends AppCompatActivity {
     }
 
     public void onViewAllStories() {
-        Intent endScoreViewAllStories = new Intent(EndScore.this, EndScoreViewAllStories.class);
+        Intent endScoreViewAllStories = new Intent(getApplicationContext(), EndScoreViewAllStories.class);
         endScoreViewAllStories.putExtra("GameId", gameId);
         startActivity(endScoreViewAllStories);
     }

@@ -7,24 +7,17 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.ichhabschonmal.CreatePlayers;
 import com.example.ichhabschonmal.MainActivity;
-
-import com.example.ichhabschonmal.NewGame;
-
 import com.example.ichhabschonmal.R;
 import com.example.ichhabschonmal.adapter.HostOnlineGameAdapter;
 import com.example.ichhabschonmal.server_client_communication.ClientServerHandler;
@@ -33,9 +26,7 @@ import com.example.ichhabschonmal.server_client_communication.SocketCommunicator
 import com.example.ichhabschonmal.server_client_communication.SocketEndPoint;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 
 @SuppressLint("SetTextI18n")
 public class HostOnlineGame extends AppCompatActivity {
@@ -48,7 +39,7 @@ public class HostOnlineGame extends AppCompatActivity {
     private Button continues;
 
     private int minStoryNumber, maxStoryNumber, maxPlayerNumber;
-    private String gameName,drinkOfTheGame;
+    private String gameName, drinkOfTheGame;
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
@@ -97,7 +88,7 @@ public class HostOnlineGame extends AppCompatActivity {
                     serverEndPoint.getAClient(clientIndex).setIPAddress(s[0]);
                     serverEndPoint.getAClient(clientIndex).setDeviceName(s[1]);
 
-                    runOnUiThread(() ->  {
+                    runOnUiThread(() -> {
                         connectedClients.setText("Verbunden:\t\t" + serverEndPoint.sizeOfClients() + " / " + (maxPlayerNumber - 1)); // Better: (serverEndPoint.getCountOfRequestedClients())
                         hostOnlineGameAdapter.notifyDataSetChanged();
                         recyclerView.setAdapter(hostOnlineGameAdapter);

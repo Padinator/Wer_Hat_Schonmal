@@ -10,12 +10,6 @@
         android:id="@+id/name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="3dp"
-        android:layout_marginLeft="3dp"
-        android:layout_marginTop="3dp"
-        android:layout_marginEnd="3dp"
-        android:layout_marginRight="3dp"
-        android:layout_marginBottom="3dp"
         android:text="Spiel1"
         android:textSize="20dp" />
 
@@ -30,19 +24,21 @@
         android:layout_marginEnd="3dp"
         android:layout_marginRight="3dp"
         android:layout_marginBottom="3dp"
+        android:background="@drawable/button_border"
         android:text="Laden" />
 
-    <Button
+    <ImageButton
         android:id="@+id/delete"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/name"
-        android:layout_marginLeft="69dp"
-        android:layout_marginBottom="3dp"
         android:layout_marginTop="3dp"
+        android:layout_marginLeft="72dp"
+        android:layout_toEndOf="@+id/load"
         android:layout_toRightOf="@+id/load"
-        android:text="X"
-        android:layout_toEndOf="@+id/load" />
+        android:background="@drawable/button_border"
+
+        android:src="@drawable/delete_icon" />
 
 
 </RelativeLayout>
