@@ -48,7 +48,7 @@
         android:layout_below="@id/playMode"
         android:layout_margin="8dp"
         android:background="@drawable/textview_story_border"
-        android:hint="Minimale story Anzahl"
+        android:hint="Minimale Story-Zahl"
         android:inputType="numberDecimal"
         android:padding="8dp" />
 
@@ -60,7 +60,7 @@
         android:layout_below="@id/storyMinCount"
         android:layout_margin="8dp"
         android:background="@drawable/textview_story_border"
-        android:hint="Maximale story Anzahl"
+        android:hint="Maximale Story-Zahl"
         android:inputType="numberDecimal"
         android:padding="8dp" />
 

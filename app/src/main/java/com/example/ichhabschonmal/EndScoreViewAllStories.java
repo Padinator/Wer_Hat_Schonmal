@@ -1,22 +1,21 @@
 package com.example.ichhabschonmal;
 
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.MenuItem;
 
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
 
-import com.example.ichhabschonmal.adapter.EndScoreAdapter;
 import com.example.ichhabschonmal.adapter.EndScoreViewAllStoriesAdapter;
 import com.example.ichhabschonmal.database.AppDatabase;
 import com.example.ichhabschonmal.database.Game;
 import com.example.ichhabschonmal.database.Player;
 import com.example.ichhabschonmal.database.Story;
-//import com.example.ichhabschonmal.database.StoryDao_Impl;
 
 import java.util.List;
 
@@ -68,10 +67,10 @@ public class EndScoreViewAllStories extends AppCompatActivity {
         recyclerView.setAdapter(endScoreViewAllStoriesAdapter);
 
         // calling the action bar
-        ActionBar actionBar = getSupportActionBar();
-
-        // showing the back button in action bar
-        actionBar.setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.arrow_back);
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
     }
 
     @Override
