@@ -59,7 +59,7 @@ public class HostOnlineGame extends AppCompatActivity {
 
         // Get from last intent
         maxPlayerNumber = getIntent().getExtras().getInt("PlayerNumber");
-        //maxPlayerNumber = 2;
+        maxPlayerNumber = 2;
         minStoryNumber = getIntent().getExtras().getInt("MinStoryNumber");
         maxStoryNumber = getIntent().getExtras().getInt("MaxStoryNumber");
         gameName = getIntent().getStringExtra("GameName");
@@ -208,7 +208,7 @@ public class HostOnlineGame extends AppCompatActivity {
             createPlayers.putExtra("PlayerNumber", maxPlayerNumber);     // Pass number of players
             createPlayers.putExtra("GameName", gameName);     // Pass the name of the game
             createPlayers.putExtra("DrinkOfTheGame", drinkOfTheGame);
-            createPlayers.putExtra("PlayersIndex", 0);      // Host is always first player
+            //createPlayers.putExtra("PlayersIndex", 0);      // Host is always first player
 
             startActivity(createPlayers);
             finish();

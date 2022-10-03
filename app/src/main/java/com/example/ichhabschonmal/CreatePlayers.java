@@ -43,10 +43,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.TreeMap;
+import java.util.concurrent.Semaphore;
 
 public class CreatePlayers extends AppCompatActivity {
 
-    private final TreeMap<Integer, Gamer> listOfPlayers = new TreeMap<>();
+    private final TreeMap<Integer, Gamer> mapOfPlayers = new TreeMap<>(); // <Index in list, Player>
     private List<String> newListOfStories = new ArrayList<>();          // Is used for deleting/replacing stories in viewYourStories
 
     private int minStoryNumber, maxStoryNumber, maxPlayerNumber;
@@ -58,6 +59,8 @@ public class CreatePlayers extends AppCompatActivity {
     private boolean serverSide = false;     // Check, if actual device is the host/server
     private SocketCommunicator.Receiver receiverAction;
 
+    private int respondingClients = 0; // Count of responding clients to go in PlayGame (Host)
+    private Semaphore semRespondingClient = new Semaphore(1);
 
     private AppDatabase db;
     private ListView listView;
@@ -101,12 +104,13 @@ public class CreatePlayers extends AppCompatActivity {
 
         if (!onlineGame) {
             actualPlayersIndex = 0;
-            listOfPlayers.put(actualPlayersIndex, new Gamer(actualPlayersIndex + 1));
+            mapOfPlayers.put(actualPlayersIndex, new Gamer(actualPlayersIndex + 1));
         } else {
             // Set used variables
-            actualPlayersIndex = getIntent().getExtras().getInt("PlayersIndex");
+            actualPlayersIndex = (ClientServerHandler.getClientEndPoint() != null) ? ClientServerHandler.getClientEndPoint().getClient().getPlayerNumber() - 1 : 0;
+            //actualPlayersIndex = getIntent().getExtras().getInt("PlayersIndex");
             playerID.setText("Du bist Spieler " + (actualPlayersIndex + 1) + ":");
-            listOfPlayers.put(actualPlayersIndex, new Gamer(actualPlayersIndex + 1));
+            mapOfPlayers.put(actualPlayersIndex, new Gamer(actualPlayersIndex + 1));
 
             // Get from last intent
             serverSide = getIntent().getExtras().getBoolean("ServerSide");
@@ -114,45 +118,68 @@ public class CreatePlayers extends AppCompatActivity {
             // Define a new action for receiving messages
             receiverAction = new SocketCommunicator(null, null, null, null, null).new Receiver() {
 
-                @SuppressLint("NotifyDataSetChanged")
+                @SuppressLint({"NotifyDataSetChanged", "LongLogTag"})
                 @Override
                 public void action() {
-                    String clientsMessage = receiverAction.getMessage();
+                    String receivedMessage = receiverAction.getMessage();
 
                     if (serverSide) { // Receive message from all clients
-                        String[] lines = clientsMessage.split(";");
-                        clientsMessage = lines[0];
+                        String[] lines = receivedMessage.split(SocketEndPoint.SEPARATOR);
+                        receivedMessage = lines[0];
+                        Log.e("CreatePlayers, received message outside", Arrays.toString(lines));
 
-                        if (clientsMessage.equals(SocketEndPoint.CREATED_PLAYER)) {
-                            StringBuilder allStories = new StringBuilder();
-                            String[] receivedStories;
-                            Gamer receivedPlayer;
+                        switch (receivedMessage) {
+                            case (SocketEndPoint.CREATED_PLAYER): {
+                                Gamer receivedPlayer;
 
-                            // First 3 lines are separated by ';'
-                            receivedPlayer = new Gamer(Integer.parseInt(lines[1])); // Set a player's number
-                            receivedPlayer.setName(lines[2]); // Set a player's name
+                                // First 3 lines are separated by ';'
+                                receivedPlayer = new Gamer(Integer.parseInt(lines[1])); // Set a player's number
+                                receivedPlayer.setName(lines[2]); // Set a player's name
 
-                            // Stories are separated by SocketEndPoint.START_OF_A_STORY
-                            for (int i = 3; i < lines.length; i++)
-                                allStories.append(lines[i]);
+                                for (int i = 3; i < lines.length; i++)
+                                    receivedPlayer.addStory(lines[i]);
 
-                            receivedStories = String.valueOf(allStories).split(SocketEndPoint.START_OF_A_STORY);
+                                // Last player in list is the host
+                                mapOfPlayers.put(receivedPlayer.getNumber() - 1, receivedPlayer);
+                                Log.e("ListOfPlayers1", mapOfPlayers.toString());
 
-                            for (int i = 1; i < receivedStories.length; i++)
-                                receivedPlayer.addStory(receivedStories[i]);
+                                break;
+                            }
+                            case (SocketEndPoint.PLAY_GAME_HOST): {
+                                int tmp = 0;
 
-                            // Last player in list is the host
-                            listOfPlayers.put(receivedPlayer.getNumber() - 1, receivedPlayer);
-                            Log.e("ListOfPlayers1", listOfPlayers.toString());
+                                try {
+                                    semRespondingClient.acquire();
+                                    respondingClients++;
+                                    tmp = respondingClients;
+                                    semRespondingClient.release();
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+
+                                // Stop receiving messages from each client
+                                new Thread(() -> ClientServerHandler.getServerEndPoint().stopReceivingMessages(Integer.parseInt(lines[1]))).start();
+
+                                // Start next activity (PlayGame)
+                                if (tmp + 1 == mapOfPlayers.size())
+                                    btnContinue.callOnClick();
+
+                                break;
+                            }
+                            default: {
+                                Log.e("CreatePlayers, received message", Arrays.toString(lines));
+                                break;
+                            }
                         }
                     } else { // Receive message from host
-                        if (clientsMessage.equals(SocketEndPoint.PLAY_GAME)) {
+                        if (receivedMessage.equals(SocketEndPoint.PLAY_GAME_CLIENTS)) {
                             Intent playGame = new Intent(CreatePlayers.this, PlayGame.class);
+                            new Thread(() -> ClientServerHandler.getClientEndPoint().stopReceivingMessages()).start();
+
+                            // Pass to next intent
                             playGame.putExtra("OnlineGame", true);
                             playGame.putExtra("ServerSide", serverSide);
                             playGame.putExtra("GameIsLoaded", false);
-
-                            new Thread(() -> ClientServerHandler.getClientEndPoint().stopReceivingMessages()).start();
 
                             startActivity(playGame);
                             finish();
@@ -211,7 +238,7 @@ public class CreatePlayers extends AppCompatActivity {
         saveAndNextStory.setOnClickListener(v -> {
 
             // Add a players story
-            if (Objects.requireNonNull(listOfPlayers.get(actualPlayersIndex)).getCountOfStories() == maxStoryNumber)
+            if (Objects.requireNonNull(mapOfPlayers.get(actualPlayersIndex)).getCountOfStories() == maxStoryNumber)
                 Toast.makeText(CreatePlayers.this, "Du hast bereits genug Stories " +
                         "aufgeschrieben!", Toast.LENGTH_LONG).show();
             else if (writeStories.getText().toString().trim().isEmpty())
@@ -222,12 +249,12 @@ public class CreatePlayers extends AppCompatActivity {
                         "Eine Story muss aus mindestens 25 zeichen " + "bestehen.",
                         Toast.LENGTH_SHORT).show();
             else {          // Text field is okay
-                Objects.requireNonNull(listOfPlayers.get(actualPlayersIndex)).addStory(writeStories.getText().toString().trim());
+                Objects.requireNonNull(mapOfPlayers.get(actualPlayersIndex)).addStory(writeStories.getText().toString().trim());
                 writeStories.setText("");
-                storyNumber.setText("Story " + (Objects.requireNonNull(listOfPlayers.get(actualPlayersIndex)).getCountOfStories() + 1) + ":");
+                storyNumber.setText("Story " + (Objects.requireNonNull(mapOfPlayers.get(actualPlayersIndex)).getCountOfStories() + 1) + ":");
 
                 Toast.makeText(CreatePlayers.this,
-                        "Story " + Objects.requireNonNull(listOfPlayers.get(actualPlayersIndex)).getCountOfStories() + " gespeichert",
+                        "Story " + Objects.requireNonNull(mapOfPlayers.get(actualPlayersIndex)).getCountOfStories() + " gespeichert",
                         Toast.LENGTH_LONG).show();
 
                 // Set used variable
@@ -237,35 +264,35 @@ public class CreatePlayers extends AppCompatActivity {
 
         nextPerson.setOnClickListener(v -> {
             // Check inserting a new player
-            if (listOfPlayers.size() == maxPlayerNumber)
+            if (mapOfPlayers.size() == maxPlayerNumber)
                 Toast.makeText(CreatePlayers.this, "Es k\u00f6nnen keine weiteren Spieler teilnehmen!",
                         Toast.LENGTH_LONG).show();
-            else if (Objects.requireNonNull(listOfPlayers.get(actualPlayersIndex)).getCountOfStories() < minStoryNumber) {
+            else if (Objects.requireNonNull(mapOfPlayers.get(actualPlayersIndex)).getCountOfStories() < minStoryNumber) {
                 Toast.makeText(CreatePlayers.this, "Spieler muss mindestens " + minStoryNumber + " Stories besitzen!",
                         Toast.LENGTH_LONG).show();
                 if (!writeStories.getText().toString().equals(""))
                     Toast.makeText(this, "Die letzte Story wurde noch nicht gespeichert!", Toast.LENGTH_SHORT).show();
-            } else if (listOfPlayers.size() > maxPlayerNumber)
+            } else if (mapOfPlayers.size() > maxPlayerNumber)
                 Toast.makeText(CreatePlayers.this, "Zu viele eingeloggte Spieler!", Toast.LENGTH_LONG).show();
             else if (!alreadySavedOne && !writeStories.getText().toString().equals("")) {
                 Toast.makeText(this, "Die letzte Story wurde noch nicht gespeichert, einmaliger Hinweis!", Toast.LENGTH_SHORT).show();
                 alreadySavedOne = true;
             } else if (playerName.getText().toString().trim().isEmpty()) {
-                Toast.makeText(CreatePlayers.this, "Spielername darf nicht leer sein!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(CreatePlayers.this, "Gib einen Spielernamen ein!", Toast.LENGTH_SHORT).show();
             } else if (playerName.getText().toString().trim().length() < 2)
                 Toast.makeText(CreatePlayers.this, "Spielername muss aus mindestens 2 Zeichen bestehen!", Toast.LENGTH_SHORT).show();
             else {
                 Gamer player;
 
                 // Set name of a player
-                Objects.requireNonNull(listOfPlayers.get(actualPlayersIndex)).setName(playerName.getText().toString().trim());
+                Objects.requireNonNull(mapOfPlayers.get(actualPlayersIndex)).setName(playerName.getText().toString().trim());
 
-                Toast.makeText(CreatePlayers.this, "Spieler " + Objects.requireNonNull(listOfPlayers.lastEntry()).getValue().getNumber() + " erfolgreich gespeichert",
+                Toast.makeText(CreatePlayers.this, "Spieler " + Objects.requireNonNull(mapOfPlayers.lastEntry()).getValue().getNumber() + " erfolgreich gespeichert",
                         Toast.LENGTH_LONG).show();
 
                 // Insert a new player
                 player = new Gamer(++actualPlayersIndex + 1); // Equal to 'listOfPlayers.size()'
-                listOfPlayers.put(actualPlayersIndex, player);
+                mapOfPlayers.put(actualPlayersIndex, player);
 
                 // Reset Text fields in new_game.xml
                 playerID.setText("Du bist Spieler " + (actualPlayersIndex + 1) + ":");
@@ -278,47 +305,49 @@ public class CreatePlayers extends AppCompatActivity {
         btnContinue.setOnClickListener(view -> {
 
             // Check, if all players meet all conditions
-            if (listOfPlayers.size() < maxPlayerNumber)
-                Toast.makeText(CreatePlayers.this, "Zu wenig eingeloggte Spieler", Toast.LENGTH_SHORT).show();
-            else if (listOfPlayers.size() > maxPlayerNumber)
-                Toast.makeText(CreatePlayers.this, "Zu viele eingeloggte Spieler", Toast.LENGTH_SHORT).show();
-            else if (Objects.requireNonNull(listOfPlayers.lastEntry()).getValue().getCountOfStories() < minStoryNumber) {
-                Toast.makeText(CreatePlayers.this, "Spieler " + listOfPlayers.size() + " besitzt zu wenig Storys!", Toast.LENGTH_SHORT).show();
+            if (mapOfPlayers.size() < maxPlayerNumber)
+                Toast.makeText(CreatePlayers.this, "Zu wenig eingeloggte Spieler!", Toast.LENGTH_SHORT).show();
+            else if (mapOfPlayers.size() > maxPlayerNumber)
+                Toast.makeText(CreatePlayers.this, "Zu viele eingeloggte Spieler!", Toast.LENGTH_SHORT).show();
+            else if (Objects.requireNonNull(mapOfPlayers.lastEntry()).getValue().getCountOfStories() < minStoryNumber) {
+                Toast.makeText(CreatePlayers.this, "Spieler " + mapOfPlayers.size() + " besitzt zu wenig Storys!", Toast.LENGTH_SHORT).show();
                 if (!writeStories.getText().toString().equals(""))
                     Toast.makeText(this, "Die letzte Story wurde noch nicht gespeichert!", Toast.LENGTH_SHORT).show();
-            } else if (Objects.requireNonNull(listOfPlayers.get(actualPlayersIndex)).getCountOfStories() > maxStoryNumber)
-                Toast.makeText(CreatePlayers.this, "Spieler " + listOfPlayers.size() + " besitzt zu viele Storys!", Toast.LENGTH_SHORT).show();
+            } else if (Objects.requireNonNull(mapOfPlayers.get(actualPlayersIndex)).getCountOfStories() > maxStoryNumber)
+                Toast.makeText(CreatePlayers.this, "Spieler " + mapOfPlayers.size() + " besitzt zu viele Storys!", Toast.LENGTH_SHORT).show();
             else if (!alreadySavedOne && !writeStories.getText().toString().equals("")) {
                 Toast.makeText(this, "Die letzte Story wurde noch nicht gespeichert, einmaliger Hinweis!", Toast.LENGTH_SHORT).show();
                 alreadySavedOne = true;
             } else if (playerName.getText().toString().trim().isEmpty())     // Check last player's name
-                Toast.makeText(CreatePlayers.this, "Spielername darf nicht leer sein", Toast.LENGTH_SHORT).show();
+                Toast.makeText(CreatePlayers.this, "Gib einen Spielernamen ein!", Toast.LENGTH_SHORT).show();
             else if (playerName.getText().toString().trim().length() < 2)      // Check last player's name
-                Toast.makeText(CreatePlayers.this, "Spielername muss aus mindestens 2 Zeichen bestehen", Toast.LENGTH_SHORT).show();
+                Toast.makeText(CreatePlayers.this, "Spielername muss aus mindestens 2 Zeichen bestehen!", Toast.LENGTH_SHORT).show();
             else if (onlineGame && !serverSide) { // Client sends player to host
-                if (listOfPlayers.size() != 1)
+                if (mapOfPlayers.size() != 1)
                     Log.e("CreatePlayer as client", "More than one player in list!");
                 else {
-                    Objects.requireNonNull(listOfPlayers.get(actualPlayersIndex)).setName(playerName.getText().toString().trim()); // Name is not set
-                    ClientServerHandler.getClientEndPoint().sendMessage(SocketEndPoint.CREATED_PLAYER + ";" +
-                            Objects.requireNonNull(listOfPlayers.get(actualPlayersIndex))); // Client has only one Gamer object
-                    Toast.makeText(getApplicationContext(),"Spieler "
-                                    + Objects.requireNonNull(listOfPlayers.get(actualPlayersIndex)).getNumber()
-                                    + " erfolgreich gespeichert", Toast.LENGTH_SHORT).show();
+                    Objects.requireNonNull(mapOfPlayers.get(actualPlayersIndex)).setName(playerName.getText().toString().trim()); // Name is not set
+                    ClientServerHandler.getClientEndPoint().sendMessage(SocketEndPoint.CREATED_PLAYER
+                            + SocketEndPoint.SEPARATOR
+                            + Objects.requireNonNull(mapOfPlayers.get(actualPlayersIndex))); // Client has only one Gamer object
+                    Toast.makeText(getApplicationContext(), "Spieler "
+                            + Objects.requireNonNull(mapOfPlayers.get(actualPlayersIndex)).getNumber()
+                            + " erfolgreich gespeichert", Toast.LENGTH_SHORT).show();
                 }
-            } else { // Local game or online gamer on serverside
+            } else if (onlineGame && getRespondingClients() + 1 != mapOfPlayers.size()) // Inform all clients to start game
+                ClientServerHandler.getServerEndPoint().sendMessage(SocketEndPoint.PLAY_GAME_CLIENTS);
+            else { // Local game or online gamer on serverside
 
                 // Definitions
-                Intent playGame;
                 int actualGameId;
 
                 // Set name of the last player
-                Objects.requireNonNull(listOfPlayers.get(actualPlayersIndex)).setName(playerName.getText().toString().trim());
-                Log.e("ListOfPlayers2", listOfPlayers.toString());
+                Objects.requireNonNull(mapOfPlayers.get(actualPlayersIndex)).setName(playerName.getText().toString().trim());
+                Log.e("ListOfPlayers2", mapOfPlayers.toString());
 
-                Toast.makeText(CreatePlayers.this, "Spieler "
-                                + Objects.requireNonNull(listOfPlayers.get(actualPlayersIndex)).getNumber()
-                                + " erfolgreich gespeichert", Toast.LENGTH_LONG).show();
+                runOnUiThread(() -> Toast.makeText(CreatePlayers.this, "Spieler "
+                        + Objects.requireNonNull(mapOfPlayers.get(actualPlayersIndex)).getNumber()
+                        + " erfolgreich gespeichert", Toast.LENGTH_LONG).show());
 
                 // Create database connection:
                 db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
@@ -336,13 +365,13 @@ public class CreatePlayers extends AppCompatActivity {
                 actualGameId = db.gameDao().getAll().get(db.gameDao().getAll().size() - 1).gameId;
 
                 // Insert all players and their stories
-                for (int i = 0; i < listOfPlayers.size(); i++) {
+                for (int i = 0; i < mapOfPlayers.size(); i++) {
 
                     // Create a player
                     Player newPlayer = new Player();
                     //listOfNewPlayers[i].playerId = listOfNewPlayers[i].playerId;      // Player id is set with autoincrement
-                    newPlayer.name = Objects.requireNonNull(listOfPlayers.get(i)).getName();
-                    newPlayer.playerNumber = Objects.requireNonNull(listOfPlayers.get(i)).getNumber();
+                    newPlayer.name = Objects.requireNonNull(mapOfPlayers.get(i)).getName();
+                    newPlayer.playerNumber = Objects.requireNonNull(mapOfPlayers.get(i)).getNumber();
                     newPlayer.gameId = actualGameId;
 
                     // Insert the player
@@ -353,20 +382,19 @@ public class CreatePlayers extends AppCompatActivity {
                     if (i == 0)
                         idOfFirstPlayer = db.playerDao().getAll().get(db.playerDao().getAll().size() - 1).playerId;
 
-                    for (int j = 0; j < Objects.requireNonNull(listOfPlayers.get(i)).getCountOfStories(); j++) {
+                    for (int j = 0; j < Objects.requireNonNull(mapOfPlayers.get(i)).getCountOfStories(); j++) {
 
                         // Create a player's story
                         Story newStory = new Story();
                         //listOfStories[i].storyId = listOfStories[i].storyId;        // Story id is set with autoincrement
                         try {
-                            newStory.content = Objects.requireNonNull(listOfPlayers.get(i)).getStory(j);
+                            newStory.content = Objects.requireNonNull(mapOfPlayers.get(i)).getStory(j);
                         } catch (GamerException ex) {
                             ex.printStackTrace();
                             Log.e("SaveInDatabaseFailed", Arrays.toString(ex.getStackTrace()) + ", Message: " + ex.getMessage());
                             newStory.content = ex.toString();
                         }
-                        newStory.status = false;
-                        newStory.guessedStatus = false;         // Set a "default value"
+
                         newStory.playerId = db.playerDao().getAll().get(db.playerDao().getAll().size() - 1).playerId;
                         newStory.guessingPerson = "";           // Set a "default value"
 
@@ -392,21 +420,16 @@ public class CreatePlayers extends AppCompatActivity {
                 // Close database connection
                 db.close();
 
-                // Start next activity
-                playGame = new Intent(CreatePlayers.this, PlayGame.class);
-                playGame.putExtra("OnlineGame", true);
+                // Start activity in an offline game
+                Intent playGame = new Intent(CreatePlayers.this, PlayGame.class);
+
+                // Pass to next intent
+                playGame.putExtra("OnlineGame", onlineGame);
                 playGame.putExtra("ServerSide", serverSide);
                 playGame.putExtra("GameId", actualGameId);
                 playGame.putExtra("GameIsLoaded", false);
 
-                if (onlineGame) {
-                    // Inform all clients to start game
-                    ClientServerHandler.getServerEndPoint().sendMessage(SocketEndPoint.PLAY_GAME);
-
-                    // Stop receiving messages from all clients
-                    new Thread(() -> ClientServerHandler.getServerEndPoint().stopReceivingMessages()).start();
-                }
-
+                // Start next activity
                 startActivity(playGame);
                 finish();
             }
@@ -424,6 +447,30 @@ public class CreatePlayers extends AppCompatActivity {
             nextPerson.setBackgroundColor(getResources().getColor(R.color.orange_one));
             nextPerson.setText(btnContinue.getText());
             nextPerson.setOnClickListener(view -> btnContinue.callOnClick());
+        }
+    }
+
+    private int getRespondingClients() {
+        int tmp = 0;
+
+        try {
+            semRespondingClient.acquire();
+            tmp = respondingClients;
+            semRespondingClient.release();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        return tmp;
+    }
+
+    private void incrementRespondingClients() {
+        try {
+            semRespondingClient.acquire();
+            respondingClients++;
+            semRespondingClient.release();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 
@@ -486,7 +533,7 @@ public class CreatePlayers extends AppCompatActivity {
         View row;
 
         // Initializations
-        newListOfStories = Objects.requireNonNull(listOfPlayers.get(actualPlayersIndex)).getAllStories();
+        newListOfStories = Objects.requireNonNull(mapOfPlayers.get(actualPlayersIndex)).getAllStories();
         builder = new AlertDialog.Builder(this);
         row = getLayoutInflater().inflate(R.layout.view_your_stories, null);
         listView = row.findViewById(R.id.myStories);
@@ -513,10 +560,10 @@ public class CreatePlayers extends AppCompatActivity {
             }
 
             // Replace all stories
-            Objects.requireNonNull(listOfPlayers.get(actualPlayersIndex)).replaceAllStories(newListOfStories);
+            Objects.requireNonNull(mapOfPlayers.get(actualPlayersIndex)).replaceAllStories(newListOfStories);
 
             // Actualize layout
-            storyNumber.setText("Story " + (Objects.requireNonNull(listOfPlayers.get(actualPlayersIndex)).getCountOfStories() + 1) + ":");
+            storyNumber.setText("Story " + (Objects.requireNonNull(mapOfPlayers.get(actualPlayersIndex)).getCountOfStories() + 1) + ":");
             //listView.invalidateViews();
 
             Toast.makeText(CreatePlayers.this, "Stories wurden erfolgreich \u00fcberarbeitet", Toast.LENGTH_SHORT).show();
