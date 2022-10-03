@@ -8,7 +8,6 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
-
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -17,7 +16,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.room.Room;
@@ -28,8 +26,13 @@ import com.example.ichhabschonmal.database.Player;
 import com.example.ichhabschonmal.database.Story;
 import com.example.ichhabschonmal.exceptions.FalseValuesException;
 import com.example.ichhabschonmal.exceptions.GamerException;
+import com.example.ichhabschonmal.server_client_communication.ClientServerHandler;
+import com.example.ichhabschonmal.server_client_communication.SocketCommunicator;
+import com.example.ichhabschonmal.server_client_communication.SocketEndPoint;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 public class PlayGame extends AppCompatActivity {
@@ -199,7 +202,7 @@ public class PlayGame extends AppCompatActivity {
                                 actualGame.idOfFirstStory = idOfFirstStory;
                             }
 
-                            Game game = db.gameDao().loadAllByGameIds(new int[] {gameId}).get(0);////////////////////////
+                            Game game = db.gameDao().loadAllByGameIds(new int[]{gameId}).get(0);////////////////////////
 
                             // Update actual game in database
                             db.gameDao().updateGame(actualGame);
@@ -965,7 +968,8 @@ public class PlayGame extends AppCompatActivity {
             });
 
             back.setOnClickListener(v -> {
-                dialog.dismiss();;
+                dialog.dismiss();
+                ;
             });
         });
 
