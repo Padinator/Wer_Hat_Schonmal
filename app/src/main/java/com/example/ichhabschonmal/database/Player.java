@@ -34,4 +34,10 @@ public class Player {
 
     @ColumnInfo(name = "countOfTequila")
     public int countOfTequila = 0;
+
+    @ColumnInfo(name = "countOfGin")
+    public int countOfGin = 0;
+
+    @ColumnInfo(name = "countOfLiqueur")
+    public int countOfLiqueur = 0;
 }

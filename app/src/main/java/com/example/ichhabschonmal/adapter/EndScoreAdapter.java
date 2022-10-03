@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
@@ -55,12 +56,14 @@ public class EndScoreAdapter extends RecyclerView.Adapter<EndScoreAdapter.ViewHo
         holder.points.setText(mPlayers.get(pos).score + "");
 
         // Save a player scores
-        int[] playerScores = new int[3]; // Change manually
+        int[] playerScores = new int[5]; // Change manually
         playerScores[0] = mPlayers.get(pos).countOfBeers;
         playerScores[1] = mPlayers.get(pos).countOfVodka;
         playerScores[2] = mPlayers.get(pos).countOfTequila;
+        playerScores[3] = mPlayers.get(pos).countOfGin;
+        playerScores[4] = mPlayers.get(pos).countOfLiqueur;
 
-        if (playerScores[0] + playerScores[1] + playerScores[2] == 0) {
+        if (playerScores[0] + playerScores[1] + playerScores[2] + playerScores[3] + playerScores[4] == 0) {
             setDrink(holder, 0, lastDrinkNumber, 0);
             for (int counterPos=1; counterPos<playerScores.length; counterPos++) {
                 allRelativeLayouts[counterPos].setVisibility(View.INVISIBLE);
@@ -97,8 +100,13 @@ public class EndScoreAdapter extends RecyclerView.Adapter<EndScoreAdapter.ViewHo
             case "Tequila":
                 drinkNumber = 2;
                 break;
+            case "Gin Shot":
+                drinkNumber = 3;
+                break;
+            case "Jaegermeister":
+                drinkNumber = 4;
+                break;
         }
-
         return drinkNumber;
     }
 
@@ -114,6 +122,12 @@ public class EndScoreAdapter extends RecyclerView.Adapter<EndScoreAdapter.ViewHo
             case 2:
                 holder.images[counterPos].setImageResource(R.drawable.tequila);
                 break;
+            case 3:
+                holder.images[counterPos].setImageResource(R.drawable.gin_tonic_gin);
+                break;
+            case 4:
+                holder.images[counterPos].setImageResource(R.drawable.jaegermeister);
+                break;
         }
     }
 
@@ -125,10 +139,10 @@ public class EndScoreAdapter extends RecyclerView.Adapter<EndScoreAdapter.ViewHo
     // Stores and recycles views as they are scrolled off screen
     public class ViewHolder extends RecyclerView.ViewHolder {
         TextView player, points;
-        ImageView[] images = new ImageView[3]; // Change manually
-        ImageView[] multiplicators = new ImageView[3]; // Change manually
-        TextView[] countOfDrinks = new TextView[3]; // Change manually
-        RelativeLayout[] relativeLayouts = new RelativeLayout[3]; // Change manually
+        ImageView[] images = new ImageView[5]; // Change manually
+        ImageView[] multiplicators = new ImageView[5]; // Change manually
+        TextView[] countOfDrinks = new TextView[5]; // Change manually
+        RelativeLayout[] relativeLayouts = new RelativeLayout[5]; // Change manually
 
 
         ViewHolder(View itemView) {
@@ -139,18 +153,26 @@ public class EndScoreAdapter extends RecyclerView.Adapter<EndScoreAdapter.ViewHo
             images[0] = itemView.findViewById(R.id.drinkIconOne);
             images[1] = itemView.findViewById(R.id.drinkIconTwo);
             images[2] = itemView.findViewById(R.id.drinkIconThree);
+            images[3] = itemView.findViewById(R.id.drinkIconFour);
+            images[4] = itemView.findViewById(R.id.drinkIconFive);
 
             multiplicators[0] = itemView.findViewById(R.id.xOne);
             multiplicators[1] = itemView.findViewById(R.id.xTwo);
             multiplicators[2] = itemView.findViewById(R.id.xThree);
+            multiplicators[3] = itemView.findViewById(R.id.xFour);
+            multiplicators[4] = itemView.findViewById(R.id.xFive);
 
             countOfDrinks[0] = itemView.findViewById(R.id.countOfDrinksOne);
             countOfDrinks[1] = itemView.findViewById(R.id.countOfDrinksTwo);
             countOfDrinks[2] = itemView.findViewById(R.id.countOfDrinksThree);
+            countOfDrinks[3] = itemView.findViewById(R.id.countOfDrinksFour);
+            countOfDrinks[4] = itemView.findViewById(R.id.countOfDrinksFive);
 
             relativeLayouts[0] = itemView.findViewById(R.id.drinkOne);
             relativeLayouts[1] = itemView.findViewById(R.id.drinkTwo);
             relativeLayouts[2] = itemView.findViewById(R.id.drinkThree);
+            relativeLayouts[3] = itemView.findViewById(R.id.drinkFour);
+            relativeLayouts[4] = itemView.findViewById(R.id.drinkFive);
 
             allRelativeLayouts = relativeLayouts;
         }

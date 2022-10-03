@@ -1,23 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
+
     <ImageView
         android:id="@+id/main_activity_background"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="fitXY"
-
         android:src="@drawable/main_activity_background" />
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_margin="9dp">
-
 
         <Button
             android:id="@+id/newGame"
@@ -30,8 +29,7 @@
             android:textColor="@color/white"
             android:textSize="20dp"
             app:backgroundTint="@color/orange_one"
-            app:cornerRadius="16dp"
-            />
+            app:cornerRadius="16dp" />
 
         <Button
             android:id="@+id/joinGame"
@@ -46,7 +44,7 @@
             android:textAlignment="textStart"
             android:textColor="@color/white"
             android:textSize="20dp"
-            app:cornerRadius="16dp"/>
+            app:cornerRadius="16dp" />
 
         <Button
             android:id="@+id/loadGame"
@@ -62,8 +60,8 @@
             android:textAlignment="textStart"
             android:textColor="@color/white"
             android:textSize="20dp"
-            app:cornerRadius="16dp"/>
+            app:cornerRadius="16dp" />
 
     </RelativeLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</RelativeLayout>

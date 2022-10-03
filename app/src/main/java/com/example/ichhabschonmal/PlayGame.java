@@ -3,12 +3,16 @@ package com.example.ichhabschonmal;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,13 +28,8 @@ import com.example.ichhabschonmal.database.Player;
 import com.example.ichhabschonmal.database.Story;
 import com.example.ichhabschonmal.exceptions.FalseValuesException;
 import com.example.ichhabschonmal.exceptions.GamerException;
-import com.example.ichhabschonmal.server_client_communication.ClientServerHandler;
-import com.example.ichhabschonmal.server_client_communication.SocketCommunicator;
-import com.example.ichhabschonmal.server_client_communication.SocketEndPoint;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 
 public class PlayGame extends AppCompatActivity {
@@ -45,7 +44,7 @@ public class PlayGame extends AppCompatActivity {
     private Button solution;
     private Spinner chooseAPlayer, drinkVariantsTwo;        // spin is used to select a player
     private AppDatabase db;
-    private String actualDrinkOfTheGame;
+    private String actualDrinkOfTheGame, newDrinkOfTheGame;
     private int[] playerIds, storyIds;
     private boolean onlineGame = false, serverSide = false, solutionPressed = false,
             allPlayersGuessed = false, preconditionsSet = false, anotherRound = false;
@@ -53,6 +52,11 @@ public class PlayGame extends AppCompatActivity {
     // allPlayersGuessed: true means that all players guessed one time
     private int idOfFirstPlayer, countOfPlayers, idOfFirstStory, countOfStories, gameId, roundNumber;
     private int actualStoryNumberInList, actualStoryNumber;     // actualStoryNumber is a counter to set stories to used
+    private AlertDialog dialog;
+    private Button save, back;
+    private ListView listDrink;
+    private AlertDialog.Builder dialogBuilder;
+    private ArrayAdapter adapter;
 
     private SocketCommunicator.Receiver receiverAction;
 
@@ -68,7 +72,6 @@ public class PlayGame extends AppCompatActivity {
         // Preconditions before playing, until method "playGame()" is called
         // Definitions
         ArrayAdapter<String> adapter;
-        ArrayList<String> drinks = new ArrayList<>();
         boolean gameIsLoaded;
 
         // Buttons
@@ -341,6 +344,7 @@ public class PlayGame extends AppCompatActivity {
 
                 // Set used variable
                 setDrinkOfTheGame(actualGame.actualDrinkOfTheGame);
+                newDrinkOfTheGame = actualGame.actualDrinkOfTheGame;
 
                 listOfStories = db.storyDao().loadAllByStoryIds(storyIds);
                 countOfStories = storyIds.length;
@@ -361,14 +365,6 @@ public class PlayGame extends AppCompatActivity {
                 // Save players in a new data structure
                 players = saveInNewDataStructure(listOfPlayers, listOfStories);
                 editedPlayers = saveInNewDataStructure(listOfPlayers, listOfStories);
-
-                // Create drop down menu for choosing a drink
-                drinkVariantsTwo = findViewById(R.id.drinkVariantsTwo);
-                drinks.add("Bier");
-                drinks.add("Vodka Shots");
-                drinks.add("Tequila");
-                adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, drinks);
-                drinkVariantsTwo.setAdapter(adapter);
 
                 if (checkRound()) { // Play a game
                     playGame();
@@ -528,10 +524,9 @@ public class PlayGame extends AppCompatActivity {
         });
 
         // calling the action bar
-        ActionBar actionBar = getSupportActionBar();
-
-        // showing the back button in action bar
-        // actionBar.setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.arrow_back);
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
     }
 
@@ -588,7 +583,7 @@ public class PlayGame extends AppCompatActivity {
         return newStoryIds;
     }
 
-    // Save players of listOfPlayers in the an array of players
+    // Save players of listOfPlayers in an array of players
     private Gamer[] saveInNewDataStructure(List<Player> listOfPlayers, List<Story> listOfStories) {
         Gamer[] players = new Gamer[countOfPlayers];
         int oldPlayerId = idOfFirstPlayer;
@@ -846,13 +841,19 @@ public class PlayGame extends AppCompatActivity {
         // Set new values
         switch (actualGame.actualDrinkOfTheGame) {
             case "Bier":
-                updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers + 1, listOfPlayers.get(i).countOfVodka, listOfPlayers.get(i).countOfTequila);
+                updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers + 1, listOfPlayers.get(i).countOfVodka, listOfPlayers.get(i).countOfTequila, listOfPlayers.get(i).countOfGin, listOfPlayers.get(i).countOfLiqueur);
                 break;
             case "Vodka Shots":
-                updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers, listOfPlayers.get(i).countOfVodka + 1, listOfPlayers.get(i).countOfTequila);
+                updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers, listOfPlayers.get(i).countOfVodka + 1, listOfPlayers.get(i).countOfTequila, listOfPlayers.get(i).countOfGin, listOfPlayers.get(i).countOfLiqueur);
                 break;
             case "Tequila":
-                updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers, listOfPlayers.get(i).countOfVodka, listOfPlayers.get(i).countOfTequila + 1);
+                updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers, listOfPlayers.get(i).countOfVodka, listOfPlayers.get(i).countOfTequila + 1, listOfPlayers.get(i).countOfGin, listOfPlayers.get(i).countOfLiqueur);
+                break;
+            case "Gin Shot":
+                updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers, listOfPlayers.get(i).countOfVodka, listOfPlayers.get(i).countOfTequila, listOfPlayers.get(i).countOfGin + 1, listOfPlayers.get(i).countOfLiqueur);
+                break;
+            case "Jaegermeister":
+                updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers, listOfPlayers.get(i).countOfVodka, listOfPlayers.get(i).countOfTequila, listOfPlayers.get(i).countOfGin, listOfPlayers.get(i).countOfLiqueur + 1);
                 break;
         }
 
@@ -861,7 +862,7 @@ public class PlayGame extends AppCompatActivity {
     }
 
     // Adjust later
-    private void updateAPlayer(int playerNumber, int score, int countOfBeers, int countOfVodka, int countOfTequila) { // Add later: "int typeOfDrink
+    private void updateAPlayer(int playerNumber, int score, int countOfBeers, int countOfVodka, int countOfTequila, int countOfGin, int countOfLiqueur) {     // Add later: "int typeOfDrink
 
         // Create database connection
         db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
@@ -871,6 +872,8 @@ public class PlayGame extends AppCompatActivity {
         listOfPlayers.get(playerNumber).countOfBeers = countOfBeers; // Adjust later
         listOfPlayers.get(playerNumber).countOfVodka = countOfVodka;
         listOfPlayers.get(playerNumber).countOfTequila = countOfTequila;
+        listOfPlayers.get(playerNumber).countOfGin = countOfGin;
+        listOfPlayers.get(playerNumber).countOfLiqueur = countOfLiqueur;
         db.playerDao().updatePlayer(listOfPlayers.get(playerNumber));
 
         // Close database connection
@@ -903,7 +906,10 @@ public class PlayGame extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Getr\u00e4nk wechseln")
                 .setMessage("Soll der Drink des Spiels gewechselt werden?\nBei Aufl\u00f6sung der n\u00e4chsten Story wird der Drink gewechselt.")
-                .setPositiveButton("Ja", (dialog, which) -> drinkVariantsTwo.setVisibility(View.VISIBLE))
+                .setPositiveButton("Ja", (dialog, which) -> {
+                    // drinkVariantsTwo.setVisibility(View.VISIBLE);
+                    showDrinkSelection(NewGame.drinks);
+                })
                 .setNegativeButton("Nein", (dialogInterface, i) -> {
 
                 });
@@ -912,7 +918,6 @@ public class PlayGame extends AppCompatActivity {
 
     private void changeDrink(String drink) {
         updateAGame(actualGame.roundNumber, drink);
-        drinkVariantsTwo.setVisibility(View.INVISIBLE);
     }
 
     private void setDrinkOfTheGame(String drink) {
@@ -926,6 +931,12 @@ public class PlayGame extends AppCompatActivity {
             case "Tequila":
                 actualDrinkOfTheGame = "einen Tequila";
                 break;
+            case "Gin Shot":
+                actualDrinkOfTheGame = "einen Gin Shot";
+                break;
+            case "Jaegermeister":
+                actualDrinkOfTheGame = "einen Jaegermeister Shot";
+                break;
             default:
                 actualDrinkOfTheGame = "Error: Index zu hoch, dieser Drink ist nicht vorhanden!";
                 break;
@@ -933,6 +944,34 @@ public class PlayGame extends AppCompatActivity {
 
         drink = "Das Getränk des Spiels ist: " + drink;
         drinkOfTheGameTextView.setText(drink);
+    }
+
+    public void showDrinkSelection(ArrayList<String> drinks) {
+        dialogBuilder = new AlertDialog.Builder(this);
+        final View popUpView = getLayoutInflater().inflate(R.layout.popup, null);
+        listDrink = (ListView) popUpView.findViewById(R.id.listDrink);
+        save = (Button) popUpView.findViewById(R.id.save);
+        back = (Button) popUpView.findViewById(R.id.back);
+
+        // set list
+        adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, drinks);
+        listDrink.setAdapter(adapter);
+
+        listDrink.setOnItemClickListener((adapterView, view, i, l) -> {
+
+            save.setOnClickListener(v -> {
+                newDrinkOfTheGame = drinks.get(i);
+                dialog.dismiss();
+            });
+
+            back.setOnClickListener(v -> {
+                dialog.dismiss();;
+            });
+        });
+
+        dialogBuilder.setView(popUpView);
+        dialog = dialogBuilder.create();
+        dialog.show();
     }
 
     @SuppressLint("LongLogTag")

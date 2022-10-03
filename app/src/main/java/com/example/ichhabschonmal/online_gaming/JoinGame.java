@@ -2,8 +2,11 @@ package com.example.ichhabschonmal.online_gaming;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -37,6 +40,7 @@ public class JoinGame extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.join_game);
+
         etIP = findViewById(R.id.etIP);
         connectionStatusInfo = findViewById(R.id.connectionStatusInfo);
         btnConnect = findViewById(R.id.btnConnect);
@@ -79,8 +83,7 @@ public class JoinGame extends AppCompatActivity {
                         createPlayers.putExtra("PlayerNumber", 1);     // Pass number of players
                         createPlayers.putExtra("GameName", lines[3]);     // Pass the name of the game
                         createPlayers.putExtra("DrinkOfTheGame", lines[4]);
-                        //createPlayers.putExtra("PlayersIndex", Integer.parseInt(lines[5]));   // Pass the player's number
-                        ClientServerHandler.getClientEndPoint().getClient().setPlayerNumber(Integer.parseInt(lines[5]) + 1);
+                        createPlayers.putExtra("PlayersIndex", Integer.parseInt(lines[5]));   // Pass the player's number
 
                         startActivity(createPlayers);
                         finish();
@@ -120,6 +123,20 @@ public class JoinGame extends AppCompatActivity {
                 e.printStackTrace();
             }
         });
+        // calling the action bar
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.arrow_back);
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     public void onBackPressed() {       // Catch back button
