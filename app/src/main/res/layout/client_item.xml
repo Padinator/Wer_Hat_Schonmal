@@ -37,8 +37,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="0.01"
-            android:background="@color/normalBlue"
-            android:src="@drawable/multipilcator"
+            android:background="@drawable/button_border"
+            android:src="@drawable/delete_icon_small"
             android:layout_gravity="center" />
 
 

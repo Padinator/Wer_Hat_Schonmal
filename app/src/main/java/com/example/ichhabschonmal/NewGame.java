@@ -159,6 +159,7 @@ public class NewGame extends AppCompatActivity {
         });
         // calling the action bar
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.arrow_back);
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
@@ -197,6 +198,11 @@ public class NewGame extends AppCompatActivity {
                 dialog.dismiss();
                 ;
             });
+        });
+
+        back.setOnClickListener(v -> {
+            dialog.dismiss();
+            ;
         });
 
         dialogBuilder.setView(popUpView);

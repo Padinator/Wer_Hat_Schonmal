@@ -9,7 +9,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Spinner;
@@ -45,9 +47,8 @@ public class PlayGame extends AppCompatActivity {
     private List<Story> listOfStories;              // Contains lal stories of the actual game, listOfStories has access to the database
     private TextView player, story, round, drinkOfTheGameTextView;
     private Button solution;
-    private Spinner chooseAPlayer, drinkVariantsTwo;        // spin is used to select a player
     private AppDatabase db;
-    private String actualDrinkOfTheGame, newDrinkOfTheGame;
+    private String actualDrinkOfTheGame, newDrinkOfTheGame, selectedPlayer;
     private int[] playerIds, storyIds;
     private boolean onlineGame = false, serverSide = false, solutionPressed = false,
             allPlayersGuessed = false, preconditionsSet = false, anotherRound = false;
@@ -60,6 +61,7 @@ public class PlayGame extends AppCompatActivity {
     private ListView listDrink;
     private AlertDialog.Builder dialogBuilder;
     private ArrayAdapter adapter;
+    private AutoCompleteTextView autoCompleteText;
 
     private SocketCommunicator.Receiver receiverAction;
 
@@ -369,6 +371,18 @@ public class PlayGame extends AppCompatActivity {
                 players = saveInNewDataStructure(listOfPlayers, listOfStories);
                 editedPlayers = saveInNewDataStructure(listOfPlayers, listOfStories);
 
+                // New drop down menu for selecting a player
+                autoCompleteText = findViewById(R.id.auto_complete);
+                ArrayAdapter adapterItems = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, listOfPlayersForSpinner);
+                autoCompleteText.setAdapter(adapterItems);
+
+                autoCompleteText.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                        selectedPlayer = adapterView.getItemAtPosition(i).toString();
+                    }
+                });
+
                 if (checkRound()) { // Play a game
                     playGame();
                 } else { // The game is already over
@@ -405,10 +419,10 @@ public class PlayGame extends AppCompatActivity {
                         allPlayersGuessed = false;
                     }
 
-                    if (chooseAPlayer.getSelectedItem().toString().equals(correctInput)) { // guessing player has guessed correctly
-                        /*
-                        for (; i < listOfPlayers.size(); i++) {
-                            if (listOfPlayers.get(i).playerNumber == guessedPlayer.getNumber()) {
+                if (selectedPlayer.equals(correctInput)) {       // chosenPlayer has guessed correctly
+                    /*
+                    for (; i < listOfPlayers.size(); i++) {
+                        if (listOfPlayers.get(i).playerNumber == otherPlayer.getNumber()) {
 
                                 // Update a player in the database
                                 updateAPlayer(i);
@@ -528,6 +542,7 @@ public class PlayGame extends AppCompatActivity {
 
         // calling the action bar
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.arrow_back);
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
@@ -651,6 +666,7 @@ public class PlayGame extends AppCompatActivity {
 
         for (Player player : listOfPlayers)
             Log.e("All players", player.name + ", " + player.playerNumber);
+
 
         // Save players' numbers and names for Spinner spin, only one time
         if (!preconditionsSet) {

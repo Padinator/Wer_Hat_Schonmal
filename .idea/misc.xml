@@ -3,8 +3,13 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/AndroidProjects/Ich_hab_schon_mal/app/src/main/res/drawable-v24/delete_icon_small.xml" value="0.331" />
+        <entry key="..\:/AndroidProjects/Ich_hab_schon_mal/app/src/main/res/drawable/button_border.xml" value="0.234" />
+        <entry key="..\:/AndroidProjects/Ich_hab_schon_mal/app/src/main/res/drawable/delete_icon.xml" value="0.246" />
+        <entry key="..\:/AndroidProjects/Ich_hab_schon_mal/app/src/main/res/drawable/multipilcator.xml" value="0.1415" />
         <entry key="..\:/AndroidProjects/Ich_hab_schon_mal/app/src/main/res/drawable/vodkashot.xml" value="0.1625" />
         <entry key="..\:/AndroidProjects/Ich_hab_schon_mal/app/src/main/res/layout/activity_main.xml" value="0.36666666666666664" />
+        <entry key="..\:/AndroidProjects/Ich_hab_schon_mal/app/src/main/res/layout/client_item.xml" value="0.32916666666666666" />
         <entry key="..\:/AndroidProjects/Ich_hab_schon_mal/app/src/main/res/layout/create_players.xml" value="0.33" />
         <entry key="..\:/AndroidProjects/Ich_hab_schon_mal/app/src/main/res/layout/end_score.xml" value="0.36666666666666664" />
         <entry key="..\:/AndroidProjects/Ich_hab_schon_mal/app/src/main/res/layout/end_score_item.xml" value="0.36666666666666664" />
@@ -17,6 +22,7 @@
         <entry key="..\:/AndroidProjects/Ich_hab_schon_mal/app/src/main/res/layout/score_item.xml" value="0.11302083333333333" />
         <entry key="..\:/AndroidProjects/Ich_hab_schon_mal/app/src/main/res/layout/view_all_stories.xml" value="0.36666666666666664" />
         <entry key="..\:/AndroidProjects/Ich_hab_schon_mal/app/src/main/res/layout/view_all_stories_item.xml" value="0.36666666666666664" />
+        <entry key="..\:/AndroidProjects/Ich_hab_schon_mal/app/src/main/res/layout/view_your_stories_list_item.xml" value="0.33" />
         <entry key="..\:/Users/Nutzer/AndroidStudioProjects/Ichhabschonmal/app/src/main/res/drawable/textview_border.xml" value="0.19583333333333333" />
         <entry key="..\:/Users/Nutzer/AndroidStudioProjects/Ichhabschonmal/app/src/main/res/drawable/textview_border_explanation.xml" value="0.19583333333333333" />
         <entry key="..\:/Users/Nutzer/AndroidStudioProjects/Ichhabschonmal/app/src/main/res/drawable/textview_story_border.xml" value="0.19583333333333333" />

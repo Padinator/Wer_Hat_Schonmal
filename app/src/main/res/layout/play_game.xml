@@ -9,7 +9,8 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:theme="@style/Theme.MaterialComponents.DayNight.DarkActionBar">
 
             <TextView
                 android:id="@+id/round"
@@ -18,40 +19,40 @@
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp"
-                android:text="Runde Nr.0"
                 android:textColor="#8ab6de"
-                android:textSize="20dp" />
+                android:textSize="20dp"
+                android:text="Runde Nr.0"/>
 
             <TextView
                 android:id="@+id/player"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/round"
                 android:layout_marginLeft="20dp"
                 android:layout_marginTop="10dp"
-                android:text="Gib das Gerät Spieler 0, Dein Name"
-                android:textSize="23dp"
-                android:textStyle="bold" />
+                android:layout_below="@+id/round"
+                android:textStyle="bold"
+                android:text="Gib das Gerät Spieler 1, Dein Name"
+                android:textSize="23dp"/>
 
             <TextView
                 android:id="@+id/drinkOfTheGame"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/player"
-                android:layout_marginLeft="20dp"
                 android:layout_marginTop="5dp"
+                android:layout_marginLeft="20dp"
                 android:text="Das Getränk des Spiels ist: Bier"
-                android:textSize="20dp" />
+                android:textSize="20dp"/>
 
             <TextView
                 android:id="@+id/whoHasText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text="Wer hat schon mal...?"
                 android:layout_below="@+id/drinkOfTheGame"
                 android:layout_marginLeft="20dp"
                 android:layout_marginTop="40dp"
-                android:text="Wer hat schon mal...?"
-                android:textSize="27dp" />
+                android:textSize="27dp"/>
 
             <TextView
                 android:id="@+id/story"
@@ -67,23 +68,33 @@
                               Hier sollte eine Story drin stehen.
                               Hier sollte eine Story drin stehen.
                               Hier sollte eine Story drin stehen."
-                android:textSize="23dp" />
+                android:textSize="23dp"/>
+                android:spinnerMode="dropdown" />
+                -->
 
-            <Spinner
-                android:id="@+id/chooseAPlayer"
-                android:layout_width="260dp"
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/menu"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_margin="10dp"
                 android:layout_below="@id/story"
-                android:layout_centerHorizontal="true"
-                android:background="@android:drawable/btn_dropdown"
-                android:spinnerMode="dropdown"
-                android:visibility="invisible" />
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
+                <AutoCompleteTextView
+                    android:id="@+id/auto_complete"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:focusable="false"
+                    android:focusableInTouchMode="false"
+                    android:inputType="none|textNoSuggestions"
+                    android:cursorVisible="false"
+                    android:hint="Select Player"/>
+            </com.google.android.material.textfield.TextInputLayout>
 
             <Button
                 android:id="@+id/solution"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/story"
+                android:layout_below="@+id/menu"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="80dp"
                 android:layout_marginBottom="15dp"

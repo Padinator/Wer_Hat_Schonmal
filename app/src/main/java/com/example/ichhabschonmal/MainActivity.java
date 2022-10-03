@@ -1,8 +1,6 @@
 package com.example.ichhabschonmal;
 
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.widget.Button;
 
@@ -51,9 +49,6 @@ public class MainActivity extends AppCompatActivity {
         /*ActionBar actionBar = getSupportActionBar();
         assert actionBar != null;
         actionBar.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));*/
-
-
-        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.LTGRAY));
 
 
     }
