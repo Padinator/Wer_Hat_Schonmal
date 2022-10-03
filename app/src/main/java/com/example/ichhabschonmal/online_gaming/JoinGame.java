@@ -83,7 +83,7 @@ public class JoinGame extends AppCompatActivity {
                         createPlayers.putExtra("PlayerNumber", 1);     // Pass number of players
                         createPlayers.putExtra("GameName", lines[3]);     // Pass the name of the game
                         createPlayers.putExtra("DrinkOfTheGame", lines[4]);
-                        createPlayers.putExtra("PlayersIndex", Integer.parseInt(lines[5]));   // Pass the player's number
+                        ClientServerHandler.getClientEndPoint().getClient().setPlayerNumber(Integer.parseInt(lines[5]) + 1);
 
                         startActivity(createPlayers);
                         finish();

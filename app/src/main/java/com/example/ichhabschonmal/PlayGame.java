@@ -9,12 +9,10 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -88,11 +86,12 @@ public class PlayGame extends AppCompatActivity {
         story = findViewById(R.id.story);
         round = findViewById(R.id.round);
 
-        // Spinner
-        chooseAPlayer = findViewById(R.id.chooseAPlayer);
+        // New drop down menu for selecting a player
+        autoCompleteText = findViewById(R.id.auto_complete);
+
 
         if (!onlineGame) { // Set solution-possibility to visible
-            chooseAPlayer.setVisibility(View.VISIBLE);
+            autoCompleteText.setVisibility(View.VISIBLE);
             solution.setVisibility(View.VISIBLE);
         }
 
@@ -204,8 +203,6 @@ public class PlayGame extends AppCompatActivity {
                                 actualGame.idOfFirstStory = idOfFirstStory;
                             }
 
-                            Game game = db.gameDao().loadAllByGameIds(new int[]{gameId}).get(0);////////////////////////
-
                             // Update actual game in database
                             db.gameDao().updateGame(actualGame);
 
@@ -226,7 +223,7 @@ public class PlayGame extends AppCompatActivity {
 
                             // Set solution-possibility to invisible
                             runOnUiThread(() -> {
-                                chooseAPlayer.setVisibility(View.INVISIBLE);
+                                autoCompleteText.setVisibility(View.INVISIBLE);
                                 solution.setVisibility(View.INVISIBLE);
                             });
 
@@ -236,12 +233,15 @@ public class PlayGame extends AppCompatActivity {
                             List<String> actualListOfPlayersForSpinner = new ArrayList<>(listOfPlayersForSpinner);
 
                             runOnUiThread(() -> { // Set UI
-                                // Set adapter of spinner
+                                // Set adapter of drop down menu
                                 actualListOfPlayersForSpinner.remove(guessingPlayer.getNumber() - 1);
-                                runOnUiThread(() -> chooseAPlayer.setAdapter(new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, actualListOfPlayersForSpinner)));
+                                runOnUiThread(() -> {
+                                    autoCompleteText.setAdapter(new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, actualListOfPlayersForSpinner));
+                                    autoCompleteText.setOnItemClickListener((adapterView, view, i, l) -> selectedPlayer = adapterView.getItemAtPosition(i).toString());
+                                });
 
                                 // Set solution possibility to visible
-                                chooseAPlayer.setVisibility(View.VISIBLE);
+                                autoCompleteText.setVisibility(View.VISIBLE);
                                 solution.setVisibility(View.VISIBLE);
                             });
 
@@ -311,7 +311,7 @@ public class PlayGame extends AppCompatActivity {
                     + SocketEndPoint.SEPARATOR + (ClientServerHandler.getClientEndPoint().getClient().getPlayerNumber() - 2));
         } else { // Equal to 'if (!onlineGame || serverSide)' -> local-/online-serverside-game
             if (!onlineGame) {
-                chooseAPlayer.setVisibility(View.VISIBLE);
+                autoCompleteText.setVisibility(View.VISIBLE);
                 solution.setVisibility(View.VISIBLE);
             }
 
@@ -344,6 +344,8 @@ public class PlayGame extends AppCompatActivity {
             storyIds = findUnusedStories();
 
             if (storyIds.length > 0) {      // Continue/start playing game
+                ArrayAdapter<String> adapterItems;
+
                 if (gameIsLoaded)       // If game is loaded, aks to change drinks
                     requestToChangeDrink();
 
@@ -355,33 +357,14 @@ public class PlayGame extends AppCompatActivity {
                 countOfStories = storyIds.length;
                 idOfFirstStory = storyIds[0];
 
-                /*
-                // Save players' numbers and names for Spinner spin
-                listOfPlayersForSpinner = new ArrayList<>();
-
-                for (int i = 0; i < listOfPlayers.size(); i++)
-                    listOfPlayersForSpinner.add("Spieler " + listOfPlayers.get(i).playerNumber + ", " + listOfPlayers.get(i).name);
-
-                // Create drop down menu for choosing a player
-                adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, listOfPlayersForSpinner);
-                chooseAPlayer.setAdapter(adapter);
-                */
-
                 // Save players in a new data structure
                 players = saveInNewDataStructure(listOfPlayers, listOfStories);
                 editedPlayers = saveInNewDataStructure(listOfPlayers, listOfStories);
 
                 // New drop down menu for selecting a player
-                autoCompleteText = findViewById(R.id.auto_complete);
-                ArrayAdapter adapterItems = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, listOfPlayersForSpinner);
+                adapterItems = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, listOfPlayersForSpinner);
                 autoCompleteText.setAdapter(adapterItems);
-
-                autoCompleteText.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                        selectedPlayer = adapterView.getItemAtPosition(i).toString();
-                    }
-                });
+                autoCompleteText.setOnItemClickListener((adapterView, view, i, l) -> selectedPlayer = adapterView.getItemAtPosition(i).toString());
 
                 if (checkRound()) { // Play a game
                     playGame();
@@ -404,7 +387,7 @@ public class PlayGame extends AppCompatActivity {
             // The host (or in local game the one player/device) presses the solution-Button
             if (!solutionPressed) { // solution-Button may not been pressed
                 if (onlineGame && !serverSide) { // A client pressed solution-Button
-                    String guessedPlayerNumber = SocketEndPoint.PLAYER_CHOSEN + SocketEndPoint.SEPARATOR + chooseAPlayer.getSelectedItemPosition();
+                    String guessedPlayerNumber = SocketEndPoint.PLAYER_CHOSEN + SocketEndPoint.SEPARATOR + autoCompleteText.getListSelection();/////////////
                     Log.e("Client sends guessedPlayerNumber", guessedPlayerNumber);
                     ClientServerHandler.getClientEndPoint().sendMessage(guessedPlayerNumber);
                 } else { // Host (or player/device in a local game) pressed solution-Button
@@ -413,25 +396,13 @@ public class PlayGame extends AppCompatActivity {
                     int i = 0;
 
                     if (allPlayersGuessed) { // Change actual drink of the game, if all players guessed one time
-                        changeDrink(drinkVariantsTwo.getSelectedItem().toString());
-                        setDrinkOfTheGame(drinkVariantsTwo.getSelectedItem().toString());
+                        changeDrink(newDrinkOfTheGame);
+                        setDrinkOfTheGame(newDrinkOfTheGame);
                         Log.e("actualDrinkOfTheGame", actualGame.actualDrinkOfTheGame + ", " + actualDrinkOfTheGame);
                         allPlayersGuessed = false;
                     }
 
-                if (selectedPlayer.equals(correctInput)) {       // chosenPlayer has guessed correctly
-                    /*
-                    for (; i < listOfPlayers.size(); i++) {
-                        if (listOfPlayers.get(i).playerNumber == otherPlayer.getNumber()) {
-
-                                // Update a player in the database
-                                updateAPlayer(i);
-
-                                // Update a story in the database
-                                updateAStory(actualStoryNumberInList, true, true, guessingPlayer.getName());
-                            }
-                        }
-                        */
+                    if (selectedPlayer.equals(correctInput)) {       // Guessing player has guessed correctly
 
                         // Update a player in the database
                         updateAPlayer(guessedPlayer.getNumber() - 1);
@@ -441,18 +412,6 @@ public class PlayGame extends AppCompatActivity {
 
                         loser = "Spieler " + guessedPlayer.getNumber() + ", " + guessedPlayer.getName() + " muss " + actualDrinkOfTheGame + " trinken!";
                     } else {        // chosenPlayer has not guessed correctly
-                        /*
-                        for (; i < listOfPlayers.size(); i++) {
-                            if (listOfPlayers.get(i).playerNumber == guessingPlayer.getNumber()) {
-
-                                // Update a player in the database
-                                updateAPlayer(i);
-
-                                // Update a story in the database
-                                updateAStory(actualStoryNumberInList, true, false, guessingPlayer.getName());
-                            }
-                        }
-                        */
 
                         // Update a player in the database
                         updateAPlayer(guessingPlayer.getNumber() - 1);
@@ -480,10 +439,10 @@ public class PlayGame extends AppCompatActivity {
 
                     // Inform all clients about result
                     if (serverSide) {
-                        String chosenPlayersNumber = chooseAPlayer.getSelectedItem().toString();
+                        String chosenPlayersNumber; // = chooseAPlayer.getSelectedItem().toString();
                         String[] result; // Contains split String: "Spieler <number>, <name>"
 
-                        chosenPlayersNumber = chosenPlayersNumber.replaceFirst("Spieler ", "");
+                        chosenPlayersNumber = selectedPlayer.replaceFirst("Spieler ", "");
                         result = chosenPlayersNumber.split(",");
                         ClientServerHandler.getServerEndPoint().sendMessage(SocketEndPoint.RESULT_OF_GUESSING
                                 + SocketEndPoint.SEPARATOR + loser + SocketEndPoint.SEPARATOR
@@ -534,7 +493,7 @@ public class PlayGame extends AppCompatActivity {
 
                 // "Deactivate" temporary solution-possibility for all players
                 if (onlineGame) {
-                    chooseAPlayer.setVisibility(View.INVISIBLE);
+                    autoCompleteText.setVisibility(View.INVISIBLE);
                     solution.setVisibility(View.INVISIBLE);
                 }
             }
@@ -688,7 +647,8 @@ public class PlayGame extends AppCompatActivity {
         actualListOfPlayersForSpinner = new ArrayList<>(listOfPlayersForSpinner); // Reset list of players for spinner for actual round
         actualListOfPlayersForSpinner.remove(guessingPlayer.getNumber() - 1); // Remove guessing player
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, actualListOfPlayersForSpinner);
-        chooseAPlayer.setAdapter(adapter);
+        autoCompleteText.setAdapter(adapter);
+        autoCompleteText.setOnItemClickListener((adapterView, view, i, l) -> selectedPlayer = adapterView.getItemAtPosition(i).toString());
 
         // chosenPlayer may guess again, when all players have guessed
         editedPlayers[guessingPlayer.getNumber() - 1] = null;
@@ -709,13 +669,13 @@ public class PlayGame extends AppCompatActivity {
             if (guessingPlayer.getNumber() == 1) { // Host may guess
 
                 // Set solution-possibility to visible
-                chooseAPlayer.setVisibility(View.VISIBLE);
+                autoCompleteText.setVisibility(View.VISIBLE);
                 solution.setVisibility(View.VISIBLE);
             } else { // Another player may guess
                 final int guessingPlayersNumber = guessingPlayer.getNumber();
 
                 // Set solution-possibility of host to invisible
-                chooseAPlayer.setVisibility(View.INVISIBLE);
+                autoCompleteText.setVisibility(View.INVISIBLE);
                 solution.setVisibility(View.INVISIBLE);
 
                 // Inform guessing player to guess
@@ -733,7 +693,9 @@ public class PlayGame extends AppCompatActivity {
 
                                 if (receivedMessage.equals(SocketEndPoint.PLAYER_CHOSEN)) {
                                     runOnUiThread(() -> {
-                                        chooseAPlayer.setSelection(Integer.parseInt(lines[1]));
+                                        //chooseAPlayer.setSelection(Integer.parseInt(lines[1]));/////////////////
+                                        //autoCompleteText.setText(autoCompleteText.getAdapter().getItem(Integer.parseInt(lines[1])).toString(), false);
+                                        autoCompleteText.setListSelection(Integer.parseInt(lines[1]));
                                         solution.callOnClick();
                                         solution.setVisibility(View.VISIBLE);
                                     });
