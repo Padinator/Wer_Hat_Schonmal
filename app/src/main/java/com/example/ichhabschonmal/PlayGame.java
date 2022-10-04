@@ -29,6 +29,7 @@ import com.example.ichhabschonmal.exceptions.GamerException;
 import com.example.ichhabschonmal.server_client_communication.ClientServerHandler;
 import com.example.ichhabschonmal.server_client_communication.SocketCommunicator;
 import com.example.ichhabschonmal.server_client_communication.SocketEndPoint;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,24 +45,27 @@ public class PlayGame extends AppCompatActivity {
     private final List<String> listOfPlayersForSpinner = new ArrayList<>();
     private List<Story> listOfStories;              // Contains lal stories of the actual game, listOfStories has access to the database
     private TextView player, story, round, drinkOfTheGameTextView;
-    private Button solution;
+    private Button solution, save, back;
     private AppDatabase db;
-    private String actualDrinkOfTheGame, newDrinkOfTheGame, selectedPlayer;
+    private String actualDrinkOfTheGame, newDrinkOfTheGame;
     private int[] playerIds, storyIds;
     private boolean onlineGame = false, serverSide = false, solutionPressed = false,
-            allPlayersGuessed = false, preconditionsSet = false, anotherRound = false;
+            allPlayersGuessed = false, preconditionsSet = false, anotherRound = false,
+            selectedPlayerSelected = false;
     // solutionPressed: before next round begins, Button solution may not been pressed
     // allPlayersGuessed: true means that all players guessed one time
     private int idOfFirstPlayer, countOfPlayers, idOfFirstStory, countOfStories, gameId, roundNumber;
     private int actualStoryNumberInList, actualStoryNumber;     // actualStoryNumber is a counter to set stories to used
-    private AlertDialog dialog;
-    private Button save, back;
-    private ListView listDrink;
-    private AlertDialog.Builder dialogBuilder;
-    private ArrayAdapter adapter;
-    private AutoCompleteTextView autoCompleteText;
 
-    private SocketCommunicator.Receiver receiverAction;
+    private AlertDialog dialog;
+    private AlertDialog.Builder dialogBuilder;
+    private ListView listDrink;
+
+    private TextInputLayout dropDownMenu;
+    private AutoCompleteTextView autoCompleteText;
+    private ArrayAdapter<String> adapter;
+    private String selectedPlayer;
+    private int selectedPlayerPosition;
 
     @SuppressLint({"SetTextI18n", "LongLogTag"})
     @Override
@@ -74,7 +78,7 @@ public class PlayGame extends AppCompatActivity {
 
         // Preconditions before playing, until method "playGame()" is called
         // Definitions
-        ArrayAdapter<String> adapter;
+        SocketCommunicator.Receiver receiverAction;
         boolean gameIsLoaded;
 
         // Buttons
@@ -87,11 +91,11 @@ public class PlayGame extends AppCompatActivity {
         round = findViewById(R.id.round);
 
         // New drop down menu for selecting a player
+        dropDownMenu = findViewById(R.id.menu);
         autoCompleteText = findViewById(R.id.auto_complete);
 
-
         if (!onlineGame) { // Set solution-possibility to visible
-            autoCompleteText.setVisibility(View.VISIBLE);
+            dropDownMenu.setVisibility(View.VISIBLE);
             solution.setVisibility(View.VISIBLE);
         }
 
@@ -194,12 +198,13 @@ public class PlayGame extends AppCompatActivity {
 
                             // Insert next story in database
                             db.storyDao().insert(nextStory);
+                            nextStory = db.storyDao().getAll().get(db.storyDao().getAll().size() - 1);
                             actualGame.countOfStories++;
 
                             // Set idOfFirstStory
                             if (idOfFirstStory == -1) {
                                 listOfStories = new LinkedList<>();
-                                idOfFirstStory = db.storyDao().getAll().get(db.storyDao().getAll().size() - 1).storyId;
+                                idOfFirstStory = nextStory.storyId;
                                 actualGame.idOfFirstStory = idOfFirstStory;
                             }
 
@@ -223,7 +228,7 @@ public class PlayGame extends AppCompatActivity {
 
                             // Set solution-possibility to invisible
                             runOnUiThread(() -> {
-                                autoCompleteText.setVisibility(View.INVISIBLE);
+                                dropDownMenu.setVisibility(View.INVISIBLE);
                                 solution.setVisibility(View.INVISIBLE);
                             });
 
@@ -231,17 +236,25 @@ public class PlayGame extends AppCompatActivity {
                         }
                         case (SocketEndPoint.YOUR_TURN): { // Receive that you are the guessing player
                             List<String> actualListOfPlayersForSpinner = new ArrayList<>(listOfPlayersForSpinner);
+                            ArrayAdapter<String> adapter;
+
+                            // Set adapter for a client
+                            actualListOfPlayersForSpinner.remove(guessingPlayer.getNumber() - 1);
+                            adapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, actualListOfPlayersForSpinner);
+                            Log.e("actualListOfPlayersForSpinner", actualListOfPlayersForSpinner.toString());
 
                             runOnUiThread(() -> { // Set UI
                                 // Set adapter of drop down menu
-                                actualListOfPlayersForSpinner.remove(guessingPlayer.getNumber() - 1);
-                                runOnUiThread(() -> {
-                                    autoCompleteText.setAdapter(new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, actualListOfPlayersForSpinner));
-                                    autoCompleteText.setOnItemClickListener((adapterView, view, i, l) -> selectedPlayer = adapterView.getItemAtPosition(i).toString());
+                                autoCompleteText.setAdapter(adapter);
+                                autoCompleteText.setOnItemClickListener((adapterView, view, i, l) -> {
+                                    selectedPlayer = adapterView.getItemAtPosition(i).toString();
+                                    selectedPlayerPosition = i;
+                                    selectedPlayerSelected = true;
                                 });
+                                autoCompleteText.setVisibility(View.VISIBLE);
 
                                 // Set solution possibility to visible
-                                autoCompleteText.setVisibility(View.VISIBLE);
+                                dropDownMenu.setVisibility(View.VISIBLE);
                                 solution.setVisibility(View.VISIBLE);
                             });
 
@@ -256,29 +269,27 @@ public class PlayGame extends AppCompatActivity {
 
                                         });
                                 builder.create().show();
-
-                                // Set solution-Button
-                                if (anotherRound) // Another round is left
-                                    solution.setText("Weiter");
-                                else // No round is left
-                                    solution.setText("Spielende");
-
-                                solution.setVisibility(View.VISIBLE);
                             });
 
                             Log.e("Received lines[2]", lines[2]);
+                            Log.e("Results", guessedPlayer.getName() + ", " + guessedPlayer.getNumber());
+                            Log.e("Updatedd story", listOfStories.get(listOfStories.size() - 1).content);
+                            Log.e("Updatedd story", listOfStories.get(listOfStories.size() - 1).guessedStatus + "");
 
                             for (Player player : listOfPlayers)
                                 Log.e("All players", player.name + ", " + player.playerNumber);
 
                             // Actualize database
                             if (Integer.parseInt(lines[2]) == guessedPlayer.getNumber()) { // It was guessed correctly
+                                Log.e("Results", "1");
+
                                 // Actualize guessedPlayer
                                 updateAPlayer(guessedPlayer.getNumber() - 1);
 
                                 // Actualize nextStory
                                 updateAStory(listOfStories.size() - 1, true, true, "");
                             } else { // It was guessed not correctly
+                                Log.e("Results", "2");
 
                                 // Actualize guessedPlayer
                                 updateAPlayer(guessingPlayer.getNumber() - 1);
@@ -290,6 +301,18 @@ public class PlayGame extends AppCompatActivity {
                             // Set used variables
                             anotherRound = Boolean.parseBoolean(lines[3]);
                             solutionPressed = true;
+                            selectedPlayerSelected = true;
+
+                            runOnUiThread(() -> {
+
+                                // Set solution-Button
+                                if (anotherRound) // Another round is left
+                                    solution.setText("Weiter");
+                                else // No round is left
+                                    solution.setText("Spielende");
+
+                                solution.setVisibility(View.VISIBLE);
+                            });
 
                             break;
                         }
@@ -311,7 +334,7 @@ public class PlayGame extends AppCompatActivity {
                     + SocketEndPoint.SEPARATOR + (ClientServerHandler.getClientEndPoint().getClient().getPlayerNumber() - 2));
         } else { // Equal to 'if (!onlineGame || serverSide)' -> local-/online-serverside-game
             if (!onlineGame) {
-                autoCompleteText.setVisibility(View.VISIBLE);
+                dropDownMenu.setVisibility(View.VISIBLE);
                 solution.setVisibility(View.VISIBLE);
             }
 
@@ -364,7 +387,10 @@ public class PlayGame extends AppCompatActivity {
                 // New drop down menu for selecting a player
                 adapterItems = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, listOfPlayersForSpinner);
                 autoCompleteText.setAdapter(adapterItems);
-                autoCompleteText.setOnItemClickListener((adapterView, view, i, l) -> selectedPlayer = adapterView.getItemAtPosition(i).toString());
+                autoCompleteText.setOnItemClickListener((adapterView, view, i, l) -> {
+                    selectedPlayer = adapterView.getItemAtPosition(i).toString();
+                    selectedPlayerPosition = i;
+                });
 
                 if (checkRound()) { // Play a game
                     playGame();
@@ -385,9 +411,12 @@ public class PlayGame extends AppCompatActivity {
         solution.setOnClickListener(view -> {
 
             // The host (or in local game the one player/device) presses the solution-Button
-            if (!solutionPressed) { // solution-Button may not been pressed
+            if (!selectedPlayerSelected)
+                Toast.makeText(PlayGame.this, "W\u00e4hle zuerst einen Spieler aus!", Toast.LENGTH_SHORT).show();
+            else if (!solutionPressed) { // solution-Button may not been pressed
                 if (onlineGame && !serverSide) { // A client pressed solution-Button
-                    String guessedPlayerNumber = SocketEndPoint.PLAYER_CHOSEN + SocketEndPoint.SEPARATOR + autoCompleteText.getListSelection();/////////////
+                    //String guessedPlayerNumber = SocketEndPoint.PLAYER_CHOSEN + SocketEndPoint.SEPARATOR + autoCompleteText.getListSelection();/////////////
+                    String guessedPlayerNumber = SocketEndPoint.PLAYER_CHOSEN + SocketEndPoint.SEPARATOR + selectedPlayer;
                     Log.e("Client sends guessedPlayerNumber", guessedPlayerNumber);
                     ClientServerHandler.getClientEndPoint().sendMessage(guessedPlayerNumber);
                 } else { // Host (or player/device in a local game) pressed solution-Button
@@ -447,7 +476,7 @@ public class PlayGame extends AppCompatActivity {
                         ClientServerHandler.getServerEndPoint().sendMessage(SocketEndPoint.RESULT_OF_GUESSING
                                 + SocketEndPoint.SEPARATOR + loser + SocketEndPoint.SEPARATOR
                                 + result[0] + SocketEndPoint.SEPARATOR // Send looser
-                                + checkRound());
+                                + anotherRound);
                     }
 
                     // Show result
@@ -477,7 +506,10 @@ public class PlayGame extends AppCompatActivity {
                     next.putExtra("GameId", gameId);
                     startActivity(next);
 
-                    if (!onlineGame || serverSide)
+                    // Set used variables
+                    selectedPlayerSelected = false;
+
+                    if (!onlineGame || serverSide) // Start next round
                         playRound();
                 } else { // New intent with end score, game is over
                     end.putExtra("GameId", gameId);
@@ -493,7 +525,7 @@ public class PlayGame extends AppCompatActivity {
 
                 // "Deactivate" temporary solution-possibility for all players
                 if (onlineGame) {
-                    autoCompleteText.setVisibility(View.INVISIBLE);
+                    dropDownMenu.setVisibility(View.INVISIBLE);
                     solution.setVisibility(View.INVISIBLE);
                 }
             }
@@ -648,7 +680,11 @@ public class PlayGame extends AppCompatActivity {
         actualListOfPlayersForSpinner.remove(guessingPlayer.getNumber() - 1); // Remove guessing player
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, actualListOfPlayersForSpinner);
         autoCompleteText.setAdapter(adapter);
-        autoCompleteText.setOnItemClickListener((adapterView, view, i, l) -> selectedPlayer = adapterView.getItemAtPosition(i).toString());
+        autoCompleteText.setOnItemClickListener((adapterView, view, i, l) -> {
+            selectedPlayer = adapterView.getItemAtPosition(i).toString();
+            selectedPlayerPosition = i;
+            selectedPlayerSelected = true;
+        });
 
         // chosenPlayer may guess again, when all players have guessed
         editedPlayers[guessingPlayer.getNumber() - 1] = null;
@@ -667,15 +703,16 @@ public class PlayGame extends AppCompatActivity {
 
             // Set solution-possibility
             if (guessingPlayer.getNumber() == 1) { // Host may guess
-
+                Log.e("guessingPlayer ist", guessingPlayer.getNumber() + ", ist 1");
                 // Set solution-possibility to visible
-                autoCompleteText.setVisibility(View.VISIBLE);
+                dropDownMenu.setVisibility(View.VISIBLE);
                 solution.setVisibility(View.VISIBLE);
             } else { // Another player may guess
                 final int guessingPlayersNumber = guessingPlayer.getNumber();
+                Log.e("guessingPlayer ist", guessingPlayer.getNumber() + "");
 
                 // Set solution-possibility of host to invisible
-                autoCompleteText.setVisibility(View.INVISIBLE);
+                dropDownMenu.setVisibility(View.INVISIBLE);
                 solution.setVisibility(View.INVISIBLE);
 
                 // Inform guessing player to guess
@@ -695,7 +732,9 @@ public class PlayGame extends AppCompatActivity {
                                     runOnUiThread(() -> {
                                         //chooseAPlayer.setSelection(Integer.parseInt(lines[1]));/////////////////
                                         //autoCompleteText.setText(autoCompleteText.getAdapter().getItem(Integer.parseInt(lines[1])).toString(), false);
-                                        autoCompleteText.setListSelection(Integer.parseInt(lines[1]));
+                                        //autoCompleteText.setListSelection(Integer.parseInt(lines[1]));
+                                        selectedPlayer = lines[1];
+                                        selectedPlayerSelected = true;
                                         solution.callOnClick();
                                         solution.setVisibility(View.VISIBLE);
                                     });
@@ -887,12 +926,8 @@ public class PlayGame extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Getr\u00e4nk wechseln")
                 .setMessage("Soll der Drink des Spiels gewechselt werden?\nBei Aufl\u00f6sung der n\u00e4chsten Story wird der Drink gewechselt.")
-                .setPositiveButton("Ja", (dialog, which) -> {
-                    // drinkVariantsTwo.setVisibility(View.VISIBLE);
-                    showDrinkSelection(NewGame.drinks);
-                })
+                .setPositiveButton("Ja", (dialog, which) -> showDrinkSelection(Gamer.drinks))
                 .setNegativeButton("Nein", (dialogInterface, i) -> {
-
                 });
         builder.create().show();
     }
@@ -927,7 +962,7 @@ public class PlayGame extends AppCompatActivity {
         drinkOfTheGameTextView.setText(drink);
     }
 
-    public void showDrinkSelection(ArrayList<String> drinks) {
+    public void showDrinkSelection(List<String> drinks) {
         dialogBuilder = new AlertDialog.Builder(this);
         final View popUpView = getLayoutInflater().inflate(R.layout.popup, null);
         listDrink = (ListView) popUpView.findViewById(R.id.listDrink);
@@ -935,7 +970,7 @@ public class PlayGame extends AppCompatActivity {
         back = (Button) popUpView.findViewById(R.id.back);
 
         // set list
-        adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, drinks);
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, drinks);
         listDrink.setAdapter(adapter);
 
         listDrink.setOnItemClickListener((adapterView, view, i, l) -> {
@@ -945,10 +980,7 @@ public class PlayGame extends AppCompatActivity {
                 dialog.dismiss();
             });
 
-            back.setOnClickListener(v -> {
-                dialog.dismiss();
-                ;
-            });
+            back.setOnClickListener(v -> dialog.dismiss());
         });
 
         dialogBuilder.setView(popUpView);

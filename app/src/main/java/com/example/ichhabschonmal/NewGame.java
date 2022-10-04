@@ -1,5 +1,6 @@
 package com.example.ichhabschonmal;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Color;
@@ -23,20 +24,16 @@ import com.example.ichhabschonmal.database.AppDatabase;
 import com.example.ichhabschonmal.database.Game;
 import com.example.ichhabschonmal.online_gaming.HostOnlineGame;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class NewGame extends AppCompatActivity {
 
-    // meine ergaenzung
     private AlertDialog dialog;
     private Button save, back;
     private ListView listDrink;
     private AlertDialog.Builder dialogBuilder;
-    private ArrayAdapter adapter;
+    private ArrayAdapter<String> adapter;
     private TextView currentDrink;
-
-    public static ArrayList<String> drinks = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,7 +46,7 @@ public class NewGame extends AppCompatActivity {
         // Definitions
         EditText gameName, playerCount, storyMinCount, storyMaxCount;
         Button nextMenu, chooseDrink;
-        Switch playMode;
+        @SuppressLint("UseSwitchCompatOrMaterialCode") Switch playMode;
         AppDatabase db;
         List<Game> listOfGames;
 
@@ -67,11 +64,6 @@ public class NewGame extends AppCompatActivity {
         currentDrink = findViewById(R.id.currentDrink);
 
         // Create drop down menu for choosing a drink
-        drinks.add("Bier");
-        drinks.add("Vodka Shots");
-        drinks.add("Tequila");
-        drinks.add("Gin Shot");
-        drinks.add("Jaegermeister");
 
         // Switches
         playMode = findViewById(R.id.playMode);
@@ -83,10 +75,8 @@ public class NewGame extends AppCompatActivity {
         // Close database connection
         db.close();
 
-        // Pop up window
-        chooseDrink.setOnClickListener(e -> {
-            showDrinkSelection(drinks);
-        });
+        // Pop up window for drink selection
+        chooseDrink.setOnClickListener(e -> showDrinkSelection(Gamer.drinks));
 
         nextMenu.setOnClickListener(view -> {
             String fileName, playerNumber, storyMinNumber, storyMaxNumber, drinkOfTheGame;
@@ -167,16 +157,15 @@ public class NewGame extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                onBackPressed();
-                return true;
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
     // PopUp Window for selection a drink
-    public void showDrinkSelection(ArrayList<String> drinks) {
+    public void showDrinkSelection(List<String> drinks) {
         dialogBuilder = new AlertDialog.Builder(this);
         final View popUpView = getLayoutInflater().inflate(R.layout.popup, null);
         listDrink = (ListView) popUpView.findViewById(R.id.listDrink);
@@ -184,7 +173,7 @@ public class NewGame extends AppCompatActivity {
         back = (Button) popUpView.findViewById(R.id.back);
 
         // set list
-        adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, drinks);
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, drinks);
         listDrink.setAdapter(adapter);
 
         listDrink.setOnItemClickListener((adapterView, view, i, l) -> {
@@ -194,16 +183,9 @@ public class NewGame extends AppCompatActivity {
                 dialog.dismiss();
             });
 
-            back.setOnClickListener(v -> {
-                dialog.dismiss();
-                ;
-            });
         });
 
-        back.setOnClickListener(v -> {
-            dialog.dismiss();
-            ;
-        });
+        back.setOnClickListener(v -> dialog.dismiss());
 
         dialogBuilder.setView(popUpView);
         dialog = dialogBuilder.create();

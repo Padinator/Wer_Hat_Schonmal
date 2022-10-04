@@ -78,6 +78,7 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
                 android:layout_below="@id/story"
+                android:visibility="invisible"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
                 <AutoCompleteTextView
                     android:id="@+id/auto_complete"

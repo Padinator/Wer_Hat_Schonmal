@@ -1,5 +1,6 @@
 package com.example.ichhabschonmal.adapter;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -14,7 +15,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.ichhabschonmal.LoadGame;
 import com.example.ichhabschonmal.R;
 import com.example.ichhabschonmal.Rules;
 import com.example.ichhabschonmal.database.AppDatabase;
@@ -25,12 +25,12 @@ public class LoadGameAdapter extends RecyclerView.Adapter<LoadGameAdapter.ViewHo
     private final LayoutInflater mInflater;
     private final AppDatabase mDatabase;
     private final Context mContext;
-    private final int countOfGames;
+    private int countOfGames;
 
 
     public LoadGameAdapter(Context context, AppDatabase database) {
         mInflater = LayoutInflater.from(context);
-        mDatabase = database;
+        mDatabase = database; // Database is never closed in LoadGameAdapter
         mContext = context;
         countOfGames = mDatabase.gameDao().getAll().size() - 1;
     }
@@ -59,6 +59,7 @@ public class LoadGameAdapter extends RecyclerView.Adapter<LoadGameAdapter.ViewHo
         ImageButton delete;
         TextView name;
 
+        @SuppressLint("NotifyDataSetChanged")
         ViewHolder(View itemView) {
             super(itemView);
             name = itemView.findViewById(R.id.name);
@@ -77,9 +78,6 @@ public class LoadGameAdapter extends RecyclerView.Adapter<LoadGameAdapter.ViewHo
                             rules.putExtra("GameId", game.gameId);
                             rules.putExtra("GameIsLoaded", true);
 
-                            // Close database connection
-                            mDatabase.close();
-
                             // Start PlayGame activity
                             mContext.startActivity(rules);
                             ((Activity) mContext).finish();
@@ -93,27 +91,23 @@ public class LoadGameAdapter extends RecyclerView.Adapter<LoadGameAdapter.ViewHo
             });
 
             delete.setOnClickListener(view -> {
-                Game game = mDatabase.gameDao().getAll().get(getAbsoluteAdapterPosition());
+                Game game = mDatabase.gameDao().getAll().get(countOfGames - getAbsoluteAdapterPosition());
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
                 builder.setTitle("Spiel l\u00f6schen")
                         .setMessage("Soll das Spiel " + game.gameName + " gel\u00f6scht werden?")
                         .setPositiveButton("L\u00f6schen", (dialog, which) -> {
-                            Intent intent = new Intent(view.getContext().getApplicationContext(), LoadGame.class);
 
                             // Delete a game
                             mDatabase.gameDao().delete(game);
 
-                            // Close database connection
-                            mDatabase.close();
+                            // Set used variables
+                            countOfGames--;
 
-                            // Start this activity and stop it to refresh content
-                            mContext.startActivity(intent);
-                            ((Activity) mContext).finish();
+                            // Notify adapter
+                            notifyDataSetChanged();
                         })
-                        .setNegativeButton("Abbrechen", (dialogInterface, i) -> {
-
-                        });
+                        .setNegativeButton("Abbrechen", (dialogInterface, i) -> {});
                 builder.create().show();
             });
         }

@@ -6,9 +6,16 @@ import com.example.ichhabschonmal.exceptions.GamerException;
 import com.example.ichhabschonmal.server_client_communication.SocketEndPoint;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Gamer { // Data entity is already named Player
+
+    // Constants
+    public static final List<String> drinks = Arrays.asList("Bier", "Vodka Shots", "Tequila", "Gin Shot", "Jaegermeister");
+        // Change after drinks in database were changed
+
+    // Variables
     private List<String> listOfStories = new ArrayList<>(); // Stories are saved temporary in listOfStories
     private final int number;
     private String name = "";
@@ -75,7 +82,7 @@ public class Gamer { // Data entity is already named Player
             }
         }
 
-        return  check;
+        return check;
     }
 
     public static Gamer[] copyPlayers(Gamer[] listOfPlayers) {
