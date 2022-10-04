@@ -27,6 +27,7 @@ import com.example.ichhabschonmal.database.Player;
 import com.example.ichhabschonmal.database.Story;
 import com.example.ichhabschonmal.exceptions.FalseValuesException;
 import com.example.ichhabschonmal.exceptions.GamerException;
+import com.example.ichhabschonmal.server_client_communication.Client;
 import com.example.ichhabschonmal.server_client_communication.ClientServerHandler;
 import com.example.ichhabschonmal.server_client_communication.SocketCommunicator;
 import com.example.ichhabschonmal.server_client_communication.SocketEndPoint;
@@ -98,6 +99,8 @@ public class PlayGame extends AppCompatActivity {
         if (!onlineGame) { // Set solution-possibility to visible
             dropDownMenu.setVisibility(View.VISIBLE);
             solution.setVisibility(View.VISIBLE);
+            getSupportActionBar().setTitle((Html.fromHtml("<font color=\"#000000\">" + "Ich Hab Schonmal" + "</font>")));
+
         }
 
         // Get from last intent
@@ -118,6 +121,7 @@ public class PlayGame extends AppCompatActivity {
 
                     switch (clientsMessage) {
                         case (SocketEndPoint.SET_PRE_CONDITIONS_OF_PLAYING_GAME): { // Set spinner (after game has started)
+                            Client client = ClientServerHandler.getClientEndPoint().getClient();
 
                             // Create database
                             db = Room.databaseBuilder(PlayGame.this, AppDatabase.class, "database").allowMainThreadQueries().build();
@@ -171,6 +175,9 @@ public class PlayGame extends AppCompatActivity {
 
                             // Set used variable
                             idOfFirstStory = -1;
+
+                            // Set clients name as Actionbar title
+                            getSupportActionBar().setTitle((Html.fromHtml("<font color=\"#000000\">" + "Du bist " + client.getPlayerNumber() + "., " + client.getDeviceName() + "</font>")));
 
                             break;
                         }
@@ -364,6 +371,9 @@ public class PlayGame extends AppCompatActivity {
             // Close database connection
             db.close();
 
+            if (serverSide)
+                getSupportActionBar().setTitle((Html.fromHtml("<font color=\"#000000\">" + "Du bist 1., " + listOfPlayers.get(0).name + "</font>")));
+
             // Case if a game is loaded, only use unused stories
             storyIds = findUnusedStories();
 
@@ -536,9 +546,6 @@ public class PlayGame extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.arrow_back);
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.WHITE));
-        getSupportActionBar().setTitle((Html.fromHtml("<font color=\"#FF4444\">" + chosenPlayer.getNumber() + ": " + chosenPlayer.getName() + "</font>")));
-
-
     }
 
     @Override

@@ -25,6 +25,7 @@ import com.example.ichhabschonmal.server_client_communication.SocketCommunicator
 import com.example.ichhabschonmal.server_client_communication.SocketEndPoint;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 @SuppressLint("SetTextI18n")
 public class JoinGame extends AppCompatActivity {
