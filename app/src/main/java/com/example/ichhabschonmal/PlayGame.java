@@ -28,6 +28,7 @@ import com.example.ichhabschonmal.database.Player;
 import com.example.ichhabschonmal.database.Story;
 import com.example.ichhabschonmal.exceptions.FalseValuesException;
 import com.example.ichhabschonmal.exceptions.GamerException;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,6 +55,7 @@ public class PlayGame extends AppCompatActivity {
     private AlertDialog.Builder dialogBuilder;
     private ArrayAdapter adapter;
     private AutoCompleteTextView autoCompleteText;
+    private TextInputLayout menu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -160,126 +162,130 @@ public class PlayGame extends AppCompatActivity {
         }
 
         solution.setOnClickListener(view -> {
-            if (!solutionPressed) {     // Solution may not been pressed
-                String correctInput = "Spieler " + otherPlayer.getNumber() + ", " + otherPlayer.getName();
-                String /*winner = "",*/ loser = "";
-                int i = 0;
+            if (selectedPlayer != null ) {  // Check if player have been selected
+                if (!solutionPressed) {     // Solution may not been pressed
+                    String correctInput = "Spieler " + otherPlayer.getNumber() + ", " + otherPlayer.getName();
+                    String /*winner = "",*/ loser = "";
+                    int i = 0;
 
-                if (allPlayersGuessed) {            // Change actual drink of the game, if all players guessed one time
-                    changeDrink(newDrinkOfTheGame);
-                    setDrinkOfTheGame(newDrinkOfTheGame);
-                    Log.e("actualDrinkOfTheGame", actualGame.actualDrinkOfTheGame + ", " + actualDrinkOfTheGame);
-                    allPlayersGuessed = false;
-                }
-
-                if (selectedPlayer.equals(correctInput)) {       // chosenPlayer has guessed correctly
-                    for (; i < listOfPlayers.size(); i++) {
-                        if (listOfPlayers.get(i).playerNumber == otherPlayer.getNumber()) {
-
-                            // Update a player in the database
-                            switch (actualGame.actualDrinkOfTheGame) {
-                                case "Bier":
-                                    updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers + 1, listOfPlayers.get(i).countOfVodka, listOfPlayers.get(i).countOfTequila, listOfPlayers.get(i).countOfGin, listOfPlayers.get(i).countOfLiqueur);
-                                    break;
-                                case "Vodka Shots":
-                                    updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers, listOfPlayers.get(i).countOfVodka + 1, listOfPlayers.get(i).countOfTequila, listOfPlayers.get(i).countOfGin, listOfPlayers.get(i).countOfLiqueur);
-                                    break;
-                                case "Tequila":
-                                    updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers, listOfPlayers.get(i).countOfVodka, listOfPlayers.get(i).countOfTequila + 1, listOfPlayers.get(i).countOfGin, listOfPlayers.get(i).countOfLiqueur);
-                                    break;
-                                case "Gin Shot":
-                                    updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers, listOfPlayers.get(i).countOfVodka, listOfPlayers.get(i).countOfTequila, listOfPlayers.get(i).countOfGin + 1, listOfPlayers.get(i).countOfLiqueur);
-                                    break;
-                                case "Jaegermeister":
-                                    updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers, listOfPlayers.get(i).countOfVodka, listOfPlayers.get(i).countOfTequila, listOfPlayers.get(i).countOfGin, listOfPlayers.get(i).countOfLiqueur + 1);
-                                    break;
-                            }
-
-                            // Update a story in the database
-                            updateAStory(actualStoryNumberInList, true, true, chosenPlayer.getName());
-                        }
+                    if (allPlayersGuessed) {            // Change actual drink of the game, if all players guessed one time
+                        changeDrink(newDrinkOfTheGame);
+                        setDrinkOfTheGame(newDrinkOfTheGame);
+                        Log.e("actualDrinkOfTheGame", actualGame.actualDrinkOfTheGame + ", " + actualDrinkOfTheGame);
+                        allPlayersGuessed = false;
                     }
 
-                    //winner = "Spieler " + chosenPlayer.getNumber() + ", " + chosenPlayer.getName() + " hat diese Runde gewonnen";
-                    loser = "Spieler " + otherPlayer.getNumber() + ", " + otherPlayer.getName() + " muss " + actualDrinkOfTheGame + " trinken!";
-                } else {        // chosenPlayer has not guessed correctly
-                    for (; i < listOfPlayers.size(); i++) {
-                        if (listOfPlayers.get(i).playerNumber == chosenPlayer.getNumber()) {
+                    if (selectedPlayer.equals(correctInput)) {       // chosenPlayer has guessed correctly
+                        for (; i < listOfPlayers.size(); i++) {
+                            if (listOfPlayers.get(i).playerNumber == otherPlayer.getNumber()) {
 
-                            // Update a player in the database
-                            switch (actualGame.actualDrinkOfTheGame) {
-                                case "Bier":
-                                    updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers + 1, listOfPlayers.get(i).countOfVodka, listOfPlayers.get(i).countOfTequila, listOfPlayers.get(i).countOfGin, listOfPlayers.get(i).countOfLiqueur);
-                                    break;
-                                case "Vodka Shots":
-                                    updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers, listOfPlayers.get(i).countOfVodka + 1, listOfPlayers.get(i).countOfTequila, listOfPlayers.get(i).countOfGin, listOfPlayers.get(i).countOfLiqueur);
-                                    break;
-                                case "Tequila":
-                                    updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers, listOfPlayers.get(i).countOfVodka, listOfPlayers.get(i).countOfTequila + 1, listOfPlayers.get(i).countOfGin, listOfPlayers.get(i).countOfLiqueur);
-                                    break;
-                                case "Gin Shot":
-                                    updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers, listOfPlayers.get(i).countOfVodka, listOfPlayers.get(i).countOfTequila, listOfPlayers.get(i).countOfGin + 1, listOfPlayers.get(i).countOfLiqueur);
-                                    break;
-                                case "Jaegermeister":
-                                    updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers, listOfPlayers.get(i).countOfVodka, listOfPlayers.get(i).countOfTequila, listOfPlayers.get(i).countOfGin, listOfPlayers.get(i).countOfLiqueur + 1);
-                                    break;
+                                // Update a player in the database
+                                switch (actualGame.actualDrinkOfTheGame) {
+                                    case "Bier":
+                                        updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers + 1, listOfPlayers.get(i).countOfVodka, listOfPlayers.get(i).countOfTequila, listOfPlayers.get(i).countOfGin, listOfPlayers.get(i).countOfLiqueur);
+                                        break;
+                                    case "Vodka Shots":
+                                        updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers, listOfPlayers.get(i).countOfVodka + 1, listOfPlayers.get(i).countOfTequila, listOfPlayers.get(i).countOfGin, listOfPlayers.get(i).countOfLiqueur);
+                                        break;
+                                    case "Tequila":
+                                        updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers, listOfPlayers.get(i).countOfVodka, listOfPlayers.get(i).countOfTequila + 1, listOfPlayers.get(i).countOfGin, listOfPlayers.get(i).countOfLiqueur);
+                                        break;
+                                    case "Gin Shot":
+                                        updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers, listOfPlayers.get(i).countOfVodka, listOfPlayers.get(i).countOfTequila, listOfPlayers.get(i).countOfGin + 1, listOfPlayers.get(i).countOfLiqueur);
+                                        break;
+                                    case "Jaegermeister":
+                                        updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers, listOfPlayers.get(i).countOfVodka, listOfPlayers.get(i).countOfTequila, listOfPlayers.get(i).countOfGin, listOfPlayers.get(i).countOfLiqueur + 1);
+                                        break;
+                                }
+
+                                // Update a story in the database
+                                updateAStory(actualStoryNumberInList, true, true, chosenPlayer.getName());
                             }
-
-                            // Update a story in the database
-                            updateAStory(actualStoryNumberInList, true, false, chosenPlayer.getName());
                         }
+
+                        //winner = "Spieler " + chosenPlayer.getNumber() + ", " + chosenPlayer.getName() + " hat diese Runde gewonnen";
+                        loser = "Spieler " + otherPlayer.getNumber() + ", " + otherPlayer.getName() + " muss " + actualDrinkOfTheGame + " trinken!";
+                    } else {        // chosenPlayer has not guessed correctly
+                        for (; i < listOfPlayers.size(); i++) {
+                            if (listOfPlayers.get(i).playerNumber == chosenPlayer.getNumber()) {
+
+                                // Update a player in the database
+                                switch (actualGame.actualDrinkOfTheGame) {
+                                    case "Bier":
+                                        updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers + 1, listOfPlayers.get(i).countOfVodka, listOfPlayers.get(i).countOfTequila, listOfPlayers.get(i).countOfGin, listOfPlayers.get(i).countOfLiqueur);
+                                        break;
+                                    case "Vodka Shots":
+                                        updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers, listOfPlayers.get(i).countOfVodka + 1, listOfPlayers.get(i).countOfTequila, listOfPlayers.get(i).countOfGin, listOfPlayers.get(i).countOfLiqueur);
+                                        break;
+                                    case "Tequila":
+                                        updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers, listOfPlayers.get(i).countOfVodka, listOfPlayers.get(i).countOfTequila + 1, listOfPlayers.get(i).countOfGin, listOfPlayers.get(i).countOfLiqueur);
+                                        break;
+                                    case "Gin Shot":
+                                        updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers, listOfPlayers.get(i).countOfVodka, listOfPlayers.get(i).countOfTequila, listOfPlayers.get(i).countOfGin + 1, listOfPlayers.get(i).countOfLiqueur);
+                                        break;
+                                    case "Jaegermeister":
+                                        updateAPlayer(i, listOfPlayers.get(i).score + 1, listOfPlayers.get(i).countOfBeers, listOfPlayers.get(i).countOfVodka, listOfPlayers.get(i).countOfTequila, listOfPlayers.get(i).countOfGin, listOfPlayers.get(i).countOfLiqueur + 1);
+                                        break;
+                                }
+
+                                // Update a story in the database
+                                updateAStory(actualStoryNumberInList, true, false, chosenPlayer.getName());
+                            }
+                        }
+
+                        //winner = "Spieler " + otherPlayer.getNumber() + ", " + otherPlayer.getName() + " hat diese Runde gewonnen";
+                        loser = "Spieler " + chosenPlayer.getNumber() + ", " + chosenPlayer.getName() + " muss " + actualDrinkOfTheGame + " trinken!";
                     }
 
-                    //winner = "Spieler " + otherPlayer.getNumber() + ", " + otherPlayer.getName() + " hat diese Runde gewonnen";
-                    loser = "Spieler " + chosenPlayer.getNumber() + ", " + chosenPlayer.getName() + " muss " + actualDrinkOfTheGame + " trinken!";
+                    // Update a game
+                    updateAGame(++roundNumber, actualGame.actualDrinkOfTheGame);
+
+                    // Delete story in the List "players"
+                    try {
+                        players[otherPlayer.getNumber() - 1].deleteStory(actualStoryNumber - 1);
+                    } catch (GamerException ex) {
+                        ex.printStackTrace();
+                        Log.e("DeleteStoryFailed", ex.getStackTrace() + ", Message: " + ex.getMessage());
+                        // There is no story to delete
+                    }
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+                    builder.setTitle("ERGEBNIS")
+                            .setMessage(loser)
+                            .setPositiveButton("OK", (dialog, which) -> {
+
+                            });
+                    builder.create().show();
+
+                    // Set used variable
+                    solutionPressed = true;
+
+                    if (!checkRound())      // Set text of button nextRound, if there is no round left
+                        solution.setText("Spielende");
+                } else {
+                    //Toast.makeText(PlayGame.this, "Starte zuerst die n\u00e4chste Runde!", Toast.LENGTH_SHORT).show();
+                    Intent next = new Intent(PlayGame.this, Score.class);
+                    Intent end = new Intent(PlayGame.this, EndScore.class);
+
+                    if (checkRound()) {         // Show score and then play next round
+
+                        // Start Score-intent
+                        next.putExtra("GameId", gameId);
+                        startActivity(next);
+                        playRound();
+                    } else {        // New intent with end score
+
+                        // Start EndScore-intent
+                        end.putExtra("GameId", gameId);
+                        startActivity(end);
+                        finish();       // Game is over
+                    }
+
+                    // Change value of solutionPressed
+                    solutionPressed = false;
                 }
-
-                // Update a game
-                updateAGame(++roundNumber, actualGame.actualDrinkOfTheGame);
-
-                // Delete story in the List "players"
-                try {
-                    players[otherPlayer.getNumber() - 1].deleteStory(actualStoryNumber - 1);
-                } catch (GamerException ex) {
-                    ex.printStackTrace();
-                    Log.e("DeleteStoryFailed", ex.getStackTrace() + ", Message: " + ex.getMessage());
-                    // There is no story to delete
-                }
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
-                builder.setTitle("ERGEBNIS")
-                        .setMessage(loser)
-                        .setPositiveButton("OK", (dialog, which) -> {
-
-                        });
-                builder.create().show();
-
-                // Set used variable
-                solutionPressed = true;
-
-                if (!checkRound())      // Set text of button nextRound, if there is no round left
-                    solution.setText("Spielende");
             } else {
-                //Toast.makeText(PlayGame.this, "Starte zuerst die n\u00e4chste Runde!", Toast.LENGTH_SHORT).show();
-                Intent next = new Intent(PlayGame.this, Score.class);
-                Intent end = new Intent(PlayGame.this, EndScore.class);
-
-                if (checkRound()) {         // Show score and then play next round
-
-                    // Start Score-intent
-                    next.putExtra("GameId", gameId);
-                    startActivity(next);
-                    playRound();
-                } else {        // New intent with end score
-
-                    // Start EndScore-intent
-                    end.putExtra("GameId", gameId);
-                    startActivity(end);
-                    finish();       // Game is over
-                }
-
-                // Change value of solutionPressed
-                solutionPressed = false;
+                Toast.makeText(PlayGame.this, "Bitte zuerst einen Spieler auswahelen!", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -638,6 +644,9 @@ public class PlayGame extends AppCompatActivity {
         adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, drinks);
         listDrink.setAdapter(adapter);
 
+        // back button is invisible
+        back.setVisibility(View.GONE);
+
         listDrink.setOnItemClickListener((adapterView, view, i, l) -> {
 
             save.setOnClickListener(v -> {
@@ -645,9 +654,6 @@ public class PlayGame extends AppCompatActivity {
                 dialog.dismiss();
             });
 
-            back.setOnClickListener(v -> {
-                dialog.dismiss();;
-            });
         });
 
         dialogBuilder.setView(popUpView);

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -37,6 +38,7 @@ public class NewGame extends AppCompatActivity {
     private TextView currentDrink;
 
     public static ArrayList<String> drinks = new ArrayList<>();
+    public static int lastSelectedDrink;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -191,6 +193,11 @@ public class NewGame extends AppCompatActivity {
 
             save.setOnClickListener(v -> {
                 currentDrink.setText(drinks.get(i));
+
+                // last selected drink
+                lastSelectedDrink = i;
+                Log.e("Last Selected Drink:" , String.valueOf(lastSelectedDrink));
+
                 dialog.dismiss();
             });
 
