@@ -1,10 +1,12 @@
 package com.example.ichhabschonmal;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
@@ -16,7 +18,9 @@ import com.example.ichhabschonmal.adapter.LoadGameAdapter;
 import com.example.ichhabschonmal.database.AppDatabase;
 
 public class LoadGame extends AppCompatActivity {
+    TextView noStoriesSaved;
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,6 +53,11 @@ public class LoadGame extends AppCompatActivity {
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.arrow_back);
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        noStoriesSaved = findViewById(R.id.noStoriesSaved);
+        noStoriesSaved.setText("Anzahl der gespeicherten Stories: " + loadGameAdapter.getItemCount());
+
+
     }
 
     @Override
