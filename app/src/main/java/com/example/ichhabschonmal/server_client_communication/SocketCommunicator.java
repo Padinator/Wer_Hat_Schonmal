@@ -17,7 +17,7 @@ public class SocketCommunicator {
     private final Activity activity;
     private final Context context;
 
-    private final Socket endPoint;
+    private /* final */ Socket endPoint;
     private final BufferedReader input;
     private final PrintWriter output;
 
@@ -69,17 +69,11 @@ public class SocketCommunicator {
         return tmp;
     }
 
-    public boolean isClosed() {
-        return endPoint.isClosed();
-    }
-
-    public void close() throws IOException {
-        if (!isClosed())
-            endPoint.close();
-    }
-
     public boolean isConnected() {
-        return endPoint.isConnected();
+        if (endPoint != null)
+            return endPoint.isConnected();
+
+        return false;
     }
 
     /*
@@ -96,7 +90,7 @@ public class SocketCommunicator {
                 Log.e("Test1", "Test1");
                 receiverThread = new Thread(this.receiverAction);
                 receiverThread.start();
-            }
+            } // else: last still running receiver-Thread receives with new receiverAction
         } catch (NullPointerException e) {
             throw new NullPointerException("\"During receiveMessages(...)\": No Receiver-Action defined: null");
         }
@@ -183,8 +177,10 @@ public class SocketCommunicator {
         receiverAction.setDoneReading(true);
 
         // Close Socket for communication
-        if (!isClosed())
-            close(); // "input" and "output" will be closed automatically too
+        if (!endPoint.isClosed()) {
+            endPoint.close(); // "input" and "output" will be closed automatically too
+            endPoint = null; // Disconnect does not really work
+        }
     }
 
     public abstract class Receiver implements Runnable {
@@ -246,7 +242,12 @@ public class SocketCommunicator {
             return input.readLine();
         }
 
-        public abstract void action(); // Define actions of this Thread
+        /*
+         *
+         * Define actions for receiving messages.
+         *
+         */
+        public abstract void action();
 
         @Override
         public void run() {
@@ -276,7 +277,7 @@ public class SocketCommunicator {
                             }
                         }
                     }
-                    Log.e("Receiving stopped", "stopped or failed reading");
+                    Log.e("Receiving stopped", "stopped reading");
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

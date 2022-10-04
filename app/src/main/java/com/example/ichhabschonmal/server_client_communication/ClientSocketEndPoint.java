@@ -166,7 +166,6 @@ public class ClientSocketEndPoint extends SocketEndPoint {
                 Log.e("Client sees Server", "Server-IP: " + serverIP + ", Server-Port: " + SERVER_PORT + "");
 
                 clientEndPoint = new Socket(serverIP, SERVER_PORT);
-                //clientEndPoint = new Socket("192.168.1.38", 8080);
                 input = new BufferedReader(new InputStreamReader(clientEndPoint.getInputStream()));
                 output = new PrintWriter(clientEndPoint.getOutputStream());
                 client = new Client(activity, context, clientEndPoint, input, output, getNameOfDevice(), getLocalIpAddress());

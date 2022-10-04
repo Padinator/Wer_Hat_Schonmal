@@ -11,21 +11,21 @@ import androidx.room.PrimaryKey;
         onDelete = ForeignKey.CASCADE)
 })
 public class Story {
-    @PrimaryKey(autoGenerate = true)            // Autoincrement is on
+    @PrimaryKey(autoGenerate = true) // Autoincrement is on
     public int storyId;
 
     @ColumnInfo(name = "content")
     public String content;
 
     @ColumnInfo(name = "status")
-    public boolean status;                      // false: unused; true: used
+    public boolean status = false; // false: unused; true: used
 
     @ColumnInfo(name = "guessedStatus")
-    public boolean guessedStatus;               // false: guessed wrong; true: guessed correctly
+    public boolean guessedStatus = false; // false: guessed wrong; true: guessed correctly
 
     @ColumnInfo(name = "playerId")
-    public int playerId;                        // PlayerId of player, who owns the story
+    public int playerId; // PlayerId of player, who owns the story
 
     @ColumnInfo(name = "guessingPerson")
-    public String guessingPerson;               // Player number and name of a player, who guessed this story
+    public String guessingPerson; // Player number and name of a player, who guessed this story
 }

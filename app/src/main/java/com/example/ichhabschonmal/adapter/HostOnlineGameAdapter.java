@@ -2,7 +2,6 @@ package com.example.ichhabschonmal.adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +17,6 @@ import com.example.ichhabschonmal.server_client_communication.SocketCommunicator
 import com.example.ichhabschonmal.server_client_communication.SocketEndPoint;
 
 import java.io.IOException;
-import java.util.concurrent.Semaphore;
 
 public class HostOnlineGameAdapter extends RecyclerView.Adapter<HostOnlineGameAdapter.ViewHolder> {
 

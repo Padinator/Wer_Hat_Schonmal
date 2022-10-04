@@ -69,24 +69,16 @@
                               Hier sollte eine Story drin stehen.
                               Hier sollte eine Story drin stehen."
                 android:textSize="23dp"/>
-
-            <!--
-            <Spinner
-                android:id="@+id/chooseAPlayer"
-                android:layout_width="260dp"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/story"
-                android:layout_centerHorizontal="true"
-                android:background="@android:drawable/btn_dropdown"
                 android:spinnerMode="dropdown" />
                 -->
-            
+
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/menu"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
                 android:layout_below="@id/story"
+                android:visibility="invisible"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
                 <AutoCompleteTextView
                     android:id="@+id/auto_complete"
@@ -107,30 +99,8 @@
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="80dp"
                 android:layout_marginBottom="15dp"
-                android:text="Weiter" />
-
-            <!--
-            <Button
-                android:id="@+id/nextRound"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/solution"
-                android:layout_centerHorizontal="true"
-                android:text="Nächste Runde"
-                android:layout_marginBottom="30dp"/>
-            -->
-
-            <Spinner
-                android:id="@+id/drinkVariantsTwo"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/solution"
-                android:layout_centerHorizontal="true"
-                android:layout_marginBottom="15dp"
-                android:background="@android:drawable/btn_dropdown"
-                android:spinnerMode="dropdown"
+                android:text="Auflösen"
                 android:visibility="invisible" />
-
 
         </RelativeLayout>
 
