@@ -3,6 +3,7 @@ package com.example.ichhabschonmal;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.text.Html;
 import android.view.MenuItem;
 import android.widget.Button;
 
@@ -70,9 +71,10 @@ public class Score extends AppCompatActivity {
 
         // calling the action bar
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.arrow_back);
-        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+        getSupportActionBar().setTitle((Html.fromHtml("<font color=\"#000000\">" + "Punktestand" + "</font>")));
+
 
     }
 

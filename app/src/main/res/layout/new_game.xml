@@ -10,9 +10,13 @@
         android:id="@+id/gameName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
         android:background="@drawable/textview_story_border"
         android:hint="Spielname"
+        android:text="qwe"
         android:padding="8dp" />
 
 
@@ -21,10 +25,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/gameName"
-        android:layout_margin="8dp"
-        android:layout_marginBottom="15dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
         android:background="@drawable/textview_story_border"
         android:hint="Spieleranzahl"
+        android:text="3"
         android:inputType="numberDecimal"
         android:padding="8dp" />
 
@@ -46,9 +53,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/playMode"
-        android:layout_margin="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
         android:background="@drawable/textview_story_border"
         android:hint="Minimale Story-Zahl"
+        android:text="1"
         android:inputType="numberDecimal"
         android:padding="8dp" />
 
@@ -58,9 +69,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/storyMinCount"
-        android:layout_margin="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
         android:background="@drawable/textview_story_border"
         android:hint="Maximale Story-Zahl"
+        android:text="2"
         android:inputType="numberDecimal"
         android:padding="8dp" />
 

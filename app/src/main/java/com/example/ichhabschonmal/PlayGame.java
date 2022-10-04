@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.text.Html;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -14,7 +15,6 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -86,7 +86,7 @@ public class PlayGame extends AppCompatActivity {
 
         // Create database connection
         db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
-        actualGame = db.gameDao().loadAllByGameIds(new int[] {gameId}).get(0);////////////////////////
+        actualGame = db.gameDao().loadAllByGameIds(new int[]{gameId}).get(0);////////////////////////
 
         // Set used variables
         idOfFirstPlayer = actualGame.idOfFirstPlayer;
@@ -309,9 +309,10 @@ public class PlayGame extends AppCompatActivity {
         });*/
         // calling the action bar
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.arrow_back);
-        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+        getSupportActionBar().setTitle((Html.fromHtml("<font color=\"#FF4444\">" + chosenPlayer.getNumber() + ": " + chosenPlayer.getName() + "</font>")));
+
 
     }
 
@@ -346,7 +347,7 @@ public class PlayGame extends AppCompatActivity {
         } catch (FalseValuesException ex) {
             ex.printStackTrace();
             Log.e("FindSomethingOfActualGame", ex.getStackTrace() + ", Message: " + ex.getMessage());
-            return new int[] {1, 2, 3, 4, 5};
+            return new int[]{1, 2, 3, 4, 5};
         }
     }
 
@@ -375,7 +376,7 @@ public class PlayGame extends AppCompatActivity {
         int oldPlayerId = idOfFirstPlayer;
         int storyCounter = 0;
 
-        Log.e("saveInNewDataStructure",  "CountOfPlayers: " + countOfPlayers + ", IdOfFirstPlayer: " + idOfFirstPlayer);
+        Log.e("saveInNewDataStructure", "CountOfPlayers: " + countOfPlayers + ", IdOfFirstPlayer: " + idOfFirstPlayer);
         for (int i = 0; i < countOfPlayers; i++) {
 
             if (storyCounter < listOfStories.size())
@@ -386,7 +387,7 @@ public class PlayGame extends AppCompatActivity {
 
             // Insert stories of a player
             for (; storyCounter < countOfStories
-                    && oldPlayerId == listOfStories.get(storyCounter).playerId ; storyCounter++) {
+                    && oldPlayerId == listOfStories.get(storyCounter).playerId; storyCounter++) {
                 players[i].addStory(listOfStories.get(storyCounter).content);
                 Log.e("saveInNewDataStructure", "StoryCounter: " + storyCounter + ", PlayerId: " + listOfStories.get(storyCounter).playerId + ", OldPlayerId: " + oldPlayerId + ", StoryId: " + listOfStories.get(storyCounter).storyId);
             }
@@ -451,7 +452,7 @@ public class PlayGame extends AppCompatActivity {
         do {
             playerNumber = (int) (Math.random() * factor);
             Log.e("endlosschleife", "Endlosschleife1");
-        } while (playerNumber <= 0 || playerNumber > editedPlayers.length|| editedPlayers[playerNumber - 1] == null);       // If a player is null, he has already guessed
+        } while (playerNumber <= 0 || playerNumber > editedPlayers.length || editedPlayers[playerNumber - 1] == null);       // If a player is null, he has already guessed
 
         return editedPlayers[playerNumber - 1];
     }
@@ -646,7 +647,8 @@ public class PlayGame extends AppCompatActivity {
             });
 
             back.setOnClickListener(v -> {
-                dialog.dismiss();;
+                dialog.dismiss();
+                ;
             });
         });
 
@@ -663,12 +665,12 @@ public class PlayGame extends AppCompatActivity {
         int storyPlayers = 0;      // storyPlayer = count of players with at least one story
         Gamer checkPlayer = null;
 
-        for (Gamer gamer: editedPlayers) {
+        for (Gamer gamer : editedPlayers) {
             if (gamer != null)
                 Log.e("checkRound: check editedPlayers", gamer.getName());
         }
 
-        for (Gamer gamer: players) {      // Check ALL players
+        for (Gamer gamer : players) {      // Check ALL players
             if (gamer.getCountOfStories() != 0) {
                 nextRound = true;
                 storyPlayers++;
@@ -689,7 +691,7 @@ public class PlayGame extends AppCompatActivity {
 
             Log.e("checkRound", "EditedPlayers: " + editedPlayers.length);
 
-            for (Gamer editedPlayer: editedPlayers) {
+            for (Gamer editedPlayer : editedPlayers) {
                 if (editedPlayer != null)
                     checkEmptyArray = false;
             }
@@ -715,7 +717,7 @@ public class PlayGame extends AppCompatActivity {
             if (proofCheckPlayer/* && i != editedPlayers.length*/) {        // case: editedPlayers[i].getNumber() == checkPlayer.getNumber()
                 editedPlayers = Gamer.copyPlayers(players);
                 editedPlayers[i] = null;        // The player with the last story/stories can not guess
-                Log.e("checkRound", "Spieler: " + (i+1) );
+                Log.e("checkRound", "Spieler: " + (i + 1));
             }
         }
 
@@ -749,7 +751,7 @@ public class PlayGame extends AppCompatActivity {
                     ", GameId: " + listOfPlayers.get(i).gameId);
         }
 
-        for (int i = 0; i <listOfStories.size(); i++) {
+        for (int i = 0; i < listOfStories.size(); i++) {
             Log.e("checkAllStories", "PlayerId der Story: " + listOfStories.get(i).playerId + ", StoryId: " +
                     listOfStories.get(i).storyId + ", Content: " + listOfStories.get(i).content +
                     ", Story benutzt?: " + listOfStories.get(i).status + ", Rater: " +
@@ -759,7 +761,7 @@ public class PlayGame extends AppCompatActivity {
     }
 
     private void checkPlayers(Gamer[] players) {
-        for (Gamer gamer :players) {
+        for (Gamer gamer : players) {
             Log.e("checkPlayers", "Spieler" + gamer.getNumber() + ", " + gamer.getName() + ", " + gamer.getCountOfStories());
         }
     }

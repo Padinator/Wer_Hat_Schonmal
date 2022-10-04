@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.text.Html;
 import android.view.MenuItem;
 import android.widget.TextView;
 
@@ -50,10 +51,9 @@ public class LoadGame extends AppCompatActivity {
 
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.arrow_back);
-        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+        getSupportActionBar().setTitle((Html.fromHtml("<font color=\"#000000\">" + "Spiel laden" + "</font>")));
         noStoriesSaved = findViewById(R.id.noStoriesSaved);
         noStoriesSaved.setText("Anzahl der gespeicherten Stories: " + loadGameAdapter.getItemCount());
 
