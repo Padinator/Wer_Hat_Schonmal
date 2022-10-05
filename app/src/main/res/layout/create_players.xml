@@ -85,7 +85,8 @@
                 android:background="@drawable/textview_story_border"
                 android:hint="Ich hab schon mal..."
                 android:maxLength="250"
-                android:padding="6dp" />
+                android:padding="6dp"
+                android:text="popopopopopopopopopopopopopopopopopopopopopopoppopopopopopopopopopopopopo"/>
 
             <RelativeLayout
                 android:id="@+id/buttons"

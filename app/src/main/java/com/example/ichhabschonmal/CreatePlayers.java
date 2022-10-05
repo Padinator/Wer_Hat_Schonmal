@@ -178,7 +178,7 @@ public class CreatePlayers extends AppCompatActivity {
                         if (receivedMessage.equals(SocketEndPoint.PLAY_GAME_CLIENTS)) {
                             Intent playGame = new Intent(CreatePlayers.this, PlayGame.class);
                             new Thread(() -> ClientServerHandler.getClientEndPoint().stopReceivingMessages()).start();
-
+                            Log.e("181", "ist in Zeile 181");
                             // Pass to next intent
                             playGame.putExtra("OnlineGame", true);
                             playGame.putExtra("ServerSide", serverSide);
@@ -429,6 +429,8 @@ public class CreatePlayers extends AppCompatActivity {
                 playGame.putExtra("ServerSide", serverSide);
                 playGame.putExtra("GameId", actualGameId);
                 playGame.putExtra("GameIsLoaded", false);
+
+                Log.e("Hier kommt er rein", "Bin drin");
 
                 // Start next activity
                 startActivity(playGame);
