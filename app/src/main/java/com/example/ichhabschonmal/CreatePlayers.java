@@ -51,6 +51,7 @@ public class CreatePlayers extends AppCompatActivity {
 
     private final TreeMap<Integer, Gamer> mapOfGamers = new TreeMap<>(); // <Index in list, Player>
     private List<String> newListOfStories = new ArrayList<>();          // Is used for deleting/replacing stories in viewYourStories
+    private Semaphore semMapOfGamers = new Semaphore(1); // Semaphore for mapOfGamers
 
     private int minStoryNumber, maxStoryNumber, maxPlayerNumber;
     private int actualPlayersIndex = 0, idOfFirstPlayer = -1, countOfPlayers = 0, idOfFirstStory = -1, countOfStories = 0;
@@ -142,8 +143,14 @@ public class CreatePlayers extends AppCompatActivity {
                                     receivedPlayer.addStory(lines[i]);
 
                                 // Last player in list is the host
-                                mapOfGamers.put(receivedPlayer.getNumber() - 1, receivedPlayer);
-                                Log.e("ListOfPlayers1", mapOfGamers.toString());
+                                try {
+                                    semMapOfGamers.acquire();
+                                    mapOfGamers.put(receivedPlayer.getNumber() - 1, receivedPlayer);
+                                    Log.e("ListOfPlayers1", mapOfGamers.toString());
+                                    semMapOfGamers.release();
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
 
                                 break;
                             }
@@ -356,6 +363,7 @@ public class CreatePlayers extends AppCompatActivity {
                 // newGame.gameId = newGame.gameId;         // Game id are set with autoincrement
                 newGame.gameName = getIntent().getStringExtra("GameName");
                 newGame.onlineGame = onlineGame;
+                newGame.serverSide = serverSide;
                 newGame.roundNumber = 1;
                 newGame.actualDrinkOfTheGame = getIntent().getStringExtra("DrinkOfTheGame");
                 db.gameDao().insert(newGame);

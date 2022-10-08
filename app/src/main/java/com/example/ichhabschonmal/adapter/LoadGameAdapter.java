@@ -15,6 +15,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.ichhabschonmal.EndScore;
 import com.example.ichhabschonmal.R;
 import com.example.ichhabschonmal.Rules;
 import com.example.ichhabschonmal.database.AppDatabase;
@@ -55,7 +56,7 @@ public class LoadGameAdapter extends RecyclerView.Adapter<LoadGameAdapter.ViewHo
 
     // stores and recycles views as they are scrolled off screen
     public class ViewHolder extends RecyclerView.ViewHolder {
-        Button load;
+        Button load, viewGame;
         ImageButton delete;
         TextView name;
 
@@ -64,34 +65,43 @@ public class LoadGameAdapter extends RecyclerView.Adapter<LoadGameAdapter.ViewHo
             super(itemView);
             name = itemView.findViewById(R.id.name);
             load = itemView.findViewById(R.id.load);
+            viewGame = itemView.findViewById(R.id.view_game);
             delete = itemView.findViewById(R.id.delete);
 
             load.setOnClickListener(view -> {
                 Game game = mDatabase.gameDao().getAll().get(countOfGames - getAbsoluteAdapterPosition());
+                // "getAbsoluteAdapterPosition()" works only here
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
-                builder.setTitle("Spiel laden")
-                        .setMessage("Soll das Spiel " + game.gameName + " geladen werden?")
-                        .setPositiveButton("Laden", (dialog, which) -> {
-                            Intent rules = new Intent(view.getContext().getApplicationContext(), Rules.class);
+                if (game.onlineGame && !game.serverSide) { // Edit view for online gaming showing (clientside)
+                    load.setText("Ansehen");
+                    viewGame.setVisibility(View.INVISIBLE);
+                }
 
-                            rules.putExtra("GameId", game.gameId);
-                            rules.putExtra("GameIsLoaded", true);
+                if (game.onlineGame && !game.serverSide) // Online game, clientside
+                    viewGame.callOnClick();
+                else { // Offline game or online game (serverside)
+                    AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+                    builder.setTitle("Spiel laden")
+                            .setMessage("Soll das Spiel " + game.gameName + " geladen werden?")
+                            .setPositiveButton("Laden", (dialog, which) -> {
+                                Intent rules = new Intent(view.getContext().getApplicationContext(), Rules.class);
 
-                            // Start PlayGame activity
-                            mContext.startActivity(rules);
-                            ((Activity) mContext).finish();
-                        })
-                        .setNegativeButton("Abbrechen", (dialogInterface, i) -> {
+                                rules.putExtra("GameId", game.gameId);
+                                rules.putExtra("GameIsLoaded", true);
 
-                        });
-                builder.create().show();
-
-
+                                // Start PlayGame activity
+                                mContext.startActivity(rules);
+                                ((Activity) mContext).finish();
+                            })
+                            .setNegativeButton("Abbrechen", (dialogInterface, i) -> {
+                            });
+                    builder.create().show();
+                }
             });
 
             delete.setOnClickListener(view -> {
                 Game game = mDatabase.gameDao().getAll().get(countOfGames - getAbsoluteAdapterPosition());
+                // "getAbsoluteAdapterPosition()" works only here
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
                 builder.setTitle("Spiel l\u00f6schen")
@@ -106,6 +116,26 @@ public class LoadGameAdapter extends RecyclerView.Adapter<LoadGameAdapter.ViewHo
 
                             // Notify adapter
                             notifyDataSetChanged();
+                        })
+                        .setNegativeButton("Abbrechen", (dialogInterface, i) -> {});
+                builder.create().show();
+            });
+
+            viewGame.setOnClickListener(view -> {
+                Game game = mDatabase.gameDao().getAll().get(countOfGames - getAbsoluteAdapterPosition());
+                // "getAbsoluteAdapterPosition()" works only here
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+                builder.setTitle("Spiel laden")
+                        .setMessage("Soll das Spiel " + game.gameName + " angesehen werden?")
+                        .setPositiveButton("Ansehen", (dialog, which) -> {
+                            Intent rules = new Intent(view.getContext().getApplicationContext(), EndScore.class);
+
+                            rules.putExtra("GameId", game.gameId);
+
+                            // Start PlayGame activity
+                            mContext.startActivity(rules);
+                            ((Activity) mContext).finish();
                         })
                         .setNegativeButton("Abbrechen", (dialogInterface, i) -> {});
                 builder.create().show();

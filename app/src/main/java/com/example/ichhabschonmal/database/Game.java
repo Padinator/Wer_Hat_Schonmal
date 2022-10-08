@@ -2,7 +2,6 @@ package com.example.ichhabschonmal.database;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
-import androidx.room.ForeignKey;
 import androidx.room.PrimaryKey;
 
 @Entity
@@ -15,6 +14,9 @@ public class Game {
 
     @ColumnInfo(name = "onlineGame")
     public boolean onlineGame;
+
+    @ColumnInfo(name = "serverSide")
+    public boolean serverSide;
 
     @ColumnInfo(name = "idOfFirstPlayer")
     public int idOfFirstPlayer;

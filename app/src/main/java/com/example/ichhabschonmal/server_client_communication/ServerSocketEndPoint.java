@@ -24,7 +24,7 @@ public class ServerSocketEndPoint extends SocketEndPoint implements Serializable
     private int countOfRequestedClients = 0;
     private final Semaphore semCountOfRequestedClients = new Semaphore(1);
 
-    /*
+    /**
      *
      * Creates an end point for a Server-Socket
      *
@@ -41,7 +41,7 @@ public class ServerSocketEndPoint extends SocketEndPoint implements Serializable
         serverSocket.setReuseAddress(true);
     }
 
-    /*
+    /**
      *
      * Return a list of all clients' messages.
      *
@@ -88,7 +88,7 @@ public class ServerSocketEndPoint extends SocketEndPoint implements Serializable
         return clients.size();
     }
 
-    /*
+    /**
      *
      * Creates connection between host and clients.
      *
@@ -97,7 +97,7 @@ public class ServerSocketEndPoint extends SocketEndPoint implements Serializable
         createConnection(countOfClients, null);
     }
 
-    /*
+    /**
      *
      * Creates connection between host and clients and starts receiving messages.
      *
@@ -123,7 +123,7 @@ public class ServerSocketEndPoint extends SocketEndPoint implements Serializable
         }
     }
 
-    /*
+    /**
      *
      * Start Receiving messages from one client.
      *
@@ -142,7 +142,7 @@ public class ServerSocketEndPoint extends SocketEndPoint implements Serializable
         }
     }
 
-    /*
+    /**
      *
      * Start Receiving messages from all clients.
      *
@@ -158,7 +158,7 @@ public class ServerSocketEndPoint extends SocketEndPoint implements Serializable
         }
     }
 
-    /*
+    /**
      *
      * Stops receiving messages from one client.
      *
@@ -178,7 +178,7 @@ public class ServerSocketEndPoint extends SocketEndPoint implements Serializable
         */
     }
 
-    /*
+    /**
      *
      * Stops receiving messages from all clients.
      *
@@ -196,7 +196,7 @@ public class ServerSocketEndPoint extends SocketEndPoint implements Serializable
         */
     }
 
-    /*
+    /**
      *
      * Continue receiving messages from one client.
      *
@@ -209,7 +209,7 @@ public class ServerSocketEndPoint extends SocketEndPoint implements Serializable
             clients.get(index).continueReceivingMessages();
     }
 
-    /*
+    /**
      *
      * Continue receiving messages from all clients.
      *
@@ -227,7 +227,7 @@ public class ServerSocketEndPoint extends SocketEndPoint implements Serializable
         return clients.get(index).sendMessage(message);
     }
 
-    /*
+    /**
      *
      * Send messages to all clients. Return indices of clients for failed sending.
      *
@@ -242,7 +242,7 @@ public class ServerSocketEndPoint extends SocketEndPoint implements Serializable
         return responses; // Works not on every device!!!
     }
 
-    /*
+    /**
      *
      * Disconnect the connection from server to client, serverside disconnection.
      *
@@ -258,7 +258,7 @@ public class ServerSocketEndPoint extends SocketEndPoint implements Serializable
         clients.remove(index);
     }
 
-    /*
+    /**
      *
      * Disconnect all connections from server to clients, serverside disconnection.
      *

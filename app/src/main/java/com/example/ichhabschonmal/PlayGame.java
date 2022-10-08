@@ -35,8 +35,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.Semaphore;
 
 public class PlayGame extends AppCompatActivity {
+
+    // Game settings and status
     private Gamer[] players, editedPlayers;         // players contains all players of the actual game
     // editedPlayers contains all players, who have not guessed yet
     private Gamer guessingPlayer, guessedPlayer;        // Define the two playing players here, to proof in button solution, who is which one
@@ -46,6 +49,9 @@ public class PlayGame extends AppCompatActivity {
     private List<Story> listOfStories;              // Contains lal stories of the actual game, listOfStories has access to the database
     private TextView player, story, round, drinkOfTheGameTextView;
     private Button solution, save, back;
+    private static Semaphore semPlayGame;
+
+    // Variables for database and client-server-communication
     private AppDatabase db;
     private String actualDrinkOfTheGame, newDrinkOfTheGame;
     private int[] playerIds, storyIds;
@@ -57,10 +63,12 @@ public class PlayGame extends AppCompatActivity {
     private int idOfFirstPlayer, countOfPlayers, idOfFirstStory, countOfStories, gameId, roundNumber;
     private int actualStoryNumberInList, actualStoryNumber;     // actualStoryNumber is a counter to set stories to used
 
+    // Extra Views (alert dialog)
     private AlertDialog dialog;
     private AlertDialog.Builder dialogBuilder;
     private ListView listDrink;
 
+    // TextInputLayout for choosing a player
     private TextInputLayout dropDownMenu;
     private AutoCompleteTextView autoCompleteText;
     private ArrayAdapter<String> adapter;
@@ -127,6 +135,7 @@ public class PlayGame extends AppCompatActivity {
                             // Save actual game in game
                             actualGame = new Game();
                             actualGame.onlineGame = true;
+                            actualGame.serverSide = false;
                             actualGame.countOfPlayers = listOfPlayersForSpinner.size();
                             // game.gameId = game.gameId; // Set with auto increment
                             actualGame.gameName = lines[1];
@@ -333,11 +342,6 @@ public class PlayGame extends AppCompatActivity {
             ClientServerHandler.getClientEndPoint().sendMessage(SocketEndPoint.PLAY_GAME_HOST
                     + SocketEndPoint.SEPARATOR + (ClientServerHandler.getClientEndPoint().getClient().getPlayerNumber() - 2));
         } else { // Equal to 'if (!onlineGame || serverSide)' -> local-/online-serverside-game
-            if (!onlineGame) {
-                dropDownMenu.setVisibility(View.VISIBLE);
-                solution.setVisibility(View.VISIBLE);
-            }
-
             // Get from last intent
             gameId = getIntent().getExtras().getInt("GameId");
 
@@ -362,6 +366,14 @@ public class PlayGame extends AppCompatActivity {
 
             // Close database connection
             db.close();
+
+            // Set used variables and views
+            if (!onlineGame) { // Local game
+                dropDownMenu.setVisibility(View.VISIBLE);
+                solution.setVisibility(View.VISIBLE);
+                semPlayGame = new Semaphore(0);
+            } else // Online game
+                semPlayGame = new Semaphore(countOfPlayers - 2);
 
             // Case if a game is loaded, only use unused stories
             storyIds = findUnusedStories();
@@ -506,27 +518,43 @@ public class PlayGame extends AppCompatActivity {
                     next.putExtra("GameId", gameId);
                     startActivity(next);
 
-                    // Set used variables
-                    selectedPlayerSelected = false;
+                    new Thread(() -> {
+                        if (!onlineGame || serverSide) { // Start next round
 
-                    if (!onlineGame || serverSide) // Start next round
-                        playRound();
+                            // Wait for closing next intent
+                            try {
+                                if (!onlineGame) // Local game
+                                    waitForSth(1);
+                                else // Online game, serverside
+                                    waitForSth(countOfPlayers);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+
+                            // Play another round
+                            playRound();
+                        }
+
+                        // Set used variable
+                        solutionPressed = false;
+                        selectedPlayerSelected = false;
+
+                        runOnUiThread(() -> {
+                            if (!onlineGame) // Set TextView
+                                solution.setText("Aufl\u00f6sen");
+                            else { // "Deactivate" temporary solution-possibility for all players
+                                dropDownMenu.setVisibility(View.INVISIBLE);
+                                solution.setVisibility(View.INVISIBLE);
+                            }
+                        });
+                    }).start();
+
                 } else { // New intent with end score, game is over
-                    end.putExtra("GameId", gameId);
-                    startActivity(end);
-                    finish();
-                }
-
-                // Set used variable
-                solutionPressed = false;
-
-                // Set TextView
-                solution.setText("Aufl\u00f6sen");
-
-                // "Deactivate" temporary solution-possibility for all players
-                if (onlineGame) {
-                    dropDownMenu.setVisibility(View.INVISIBLE);
-                    solution.setVisibility(View.INVISIBLE);
+                    runOnUiThread(() -> { // Run last Intent on UI-Thread
+                        end.putExtra("GameId", gameId);
+                        startActivity(end);
+                        finish();
+                    });
                 }
             }
         });
@@ -628,125 +656,141 @@ public class PlayGame extends AppCompatActivity {
 
     @SuppressLint("SetTextI18n")
     private void playRound() {
-        ArrayAdapter<String> adapter;
-        List<String> actualListOfPlayersForSpinner;
-        StringBuilder messagePrecondition = new StringBuilder(SocketEndPoint.SET_PRE_CONDITIONS_OF_PLAYING_GAME
-                + SocketEndPoint.SEPARATOR + actualGame.gameName);
-        String messageForAllClients = SocketEndPoint.GAME_STATUS_CHANGED + SocketEndPoint.SEPARATOR;
+        runOnUiThread(() -> { //  Main-Thread = UI-Thread
+            ArrayAdapter<String> adapter;
+            List<String> actualListOfPlayersForSpinner;
+            StringBuilder messagePrecondition = new StringBuilder(SocketEndPoint.SET_PRE_CONDITIONS_OF_PLAYING_GAME
+                    + SocketEndPoint.SEPARATOR + actualGame.gameName);
+            String messageForAllClients = SocketEndPoint.GAME_STATUS_CHANGED + SocketEndPoint.SEPARATOR;
 
-        if (allPlayersGuessed || Gamer.isEmpty(editedPlayers)) { // Enter, if each player has guessed one time
-            editedPlayers = Gamer.copyPlayers(players);
-            requestToChangeDrink(); // Request to change drink
-        }
-
-        guessingPlayer = chooseRandomPlayerWhoGuesses(); // Choose randomly a player to guess someone's story
-        guessedPlayer = chooseRandomPlayerToBeGuessed(); // Choose another player to be guessed
-        String chosenStory = chooseRandomStory(); // Then choose randomly story of this player
-
-        // Set TextViews
-        round.setText("Runde Nr." + roundNumber);
-        story.setText(chosenStory);
-
-        if (onlineGame)
-            player.setText("Spieler " + guessingPlayer.getNumber() + ": " + guessingPlayer.getName() + " ist an der Reihe");
-        else
-            player.setText("Gib das Gerät Spieler " + guessingPlayer.getNumber() + ", " + guessingPlayer.getName());
-
-        //Log.e("bbb", "Raten:" + chosenPlayer.getName() + ", " + chosenPlayer.getNumber() + ", " + chosenPlayer.getCountOfStories());        // Count of stories has not been adjusted in editedPlayers
-        //Log.e("bbb", "Erraten werden: " + otherPlayer.getName() + ", " + otherPlayer.getNumber() + ", " + otherPlayer.getCountOfStories());
-
-        for (Player player : listOfPlayers)
-            Log.e("All players", player.name + ", " + player.playerNumber);
-
-
-        // Save players' numbers and names for Spinner spin, only one time
-        if (!preconditionsSet) {
-            for (int i = 0; i < listOfPlayers.size(); i++) {
-                String element = "Spieler " + listOfPlayers.get(i).playerNumber + ", " + listOfPlayers.get(i).name;
-                listOfPlayersForSpinner.add(element);
-                messagePrecondition.append(SocketEndPoint.SEPARATOR).append(element);
+            if (allPlayersGuessed || Gamer.isEmpty(editedPlayers)) { // Enter, if each player has guessed one time
+                editedPlayers = Gamer.copyPlayers(players);
+                requestToChangeDrink(); // Request to change drink
             }
 
-            // Set used variable
-            preconditionsSet = true;
+            guessingPlayer = chooseRandomPlayerWhoGuesses(); // Choose randomly a player to guess someone's story
+            guessedPlayer = chooseRandomPlayerToBeGuessed(); // Choose another player to be guessed
+            String chosenStory = chooseRandomStory(); // Then choose randomly story of this player
 
-            // Inform clients
-            if (serverSide)
-                ClientServerHandler.getServerEndPoint().sendMessage(String.valueOf(messagePrecondition));
-        }
+            // Set TextViews
+            round.setText("Runde Nr." + roundNumber);
+            story.setText(chosenStory);
 
-        // Set adapter of spinner
-        actualListOfPlayersForSpinner = new ArrayList<>(listOfPlayersForSpinner); // Reset list of players for spinner for actual round
-        actualListOfPlayersForSpinner.remove(guessingPlayer.getNumber() - 1); // Remove guessing player
-        adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, actualListOfPlayersForSpinner);
-        autoCompleteText.setAdapter(adapter);
-        autoCompleteText.setOnItemClickListener((adapterView, view, i, l) -> {
-            selectedPlayer = adapterView.getItemAtPosition(i).toString();
-            selectedPlayerPosition = i;
-            selectedPlayerSelected = true;
-        });
+            if (onlineGame)
+                player.setText("Spieler " + guessingPlayer.getNumber() + ": " + guessingPlayer.getName() + " ist an der Reihe");
+            else
+                player.setText("Gib das Gerät Spieler " + guessingPlayer.getNumber() + ", " + guessingPlayer.getName());
 
-        // chosenPlayer may guess again, when all players have guessed
-        editedPlayers[guessingPlayer.getNumber() - 1] = null;
+            //Log.e("bbb", "Raten:" + chosenPlayer.getName() + ", " + chosenPlayer.getNumber() + ", " + chosenPlayer.getCountOfStories());        // Count of stories has not been adjusted in editedPlayers
+            //Log.e("bbb", "Erraten werden: " + otherPlayer.getName() + ", " + otherPlayer.getNumber() + ", " + otherPlayer.getCountOfStories());
 
-        // Set adapter
-        if (onlineGame && serverSide) { // Online game: inform all clients about new situation
-            messageForAllClients += roundNumber + SocketEndPoint.SEPARATOR;
-            messageForAllClients += round.getText() + SocketEndPoint.SEPARATOR;
-            messageForAllClients += actualGame.actualDrinkOfTheGame + SocketEndPoint.SEPARATOR;
-            messageForAllClients += drinkOfTheGameTextView.getText() + SocketEndPoint.SEPARATOR;
-            messageForAllClients += chosenStory + SocketEndPoint.SEPARATOR;
-            messageForAllClients += guessingPlayer.getNumber() - 1 + SocketEndPoint.SEPARATOR;
-            messageForAllClients += player.getText() + SocketEndPoint.SEPARATOR;
-            messageForAllClients += guessedPlayer.getNumber() - 1;
-            ClientServerHandler.getServerEndPoint().sendMessage(messageForAllClients);
+            for (Player player : listOfPlayers)
+                Log.e("All players", player.name + ", " + player.playerNumber);
 
-            // Set solution-possibility
-            if (guessingPlayer.getNumber() == 1) { // Host may guess
-                Log.e("guessingPlayer ist", guessingPlayer.getNumber() + ", ist 1");
-                // Set solution-possibility to visible
-                dropDownMenu.setVisibility(View.VISIBLE);
-                solution.setVisibility(View.VISIBLE);
-            } else { // Another player may guess
-                final int guessingPlayersNumber = guessingPlayer.getNumber();
-                Log.e("guessingPlayer ist", guessingPlayer.getNumber() + "");
 
-                // Set solution-possibility of host to invisible
-                dropDownMenu.setVisibility(View.INVISIBLE);
-                solution.setVisibility(View.INVISIBLE);
+            // Save players' numbers and names for Spinner spin, only one time
+            if (!preconditionsSet) {
+                for (int i = 0; i < listOfPlayers.size(); i++) {
+                    String element = "Spieler " + listOfPlayers.get(i).playerNumber + ", " + listOfPlayers.get(i).name;
+                    listOfPlayersForSpinner.add(element);
+                    messagePrecondition.append(SocketEndPoint.SEPARATOR).append(element);
+                }
 
-                // Inform guessing player to guess
-                ClientServerHandler.getServerEndPoint().sendMessageToClient(guessingPlayersNumber - 2, SocketEndPoint.YOUR_TURN);
+                // Set used variable
+                preconditionsSet = true;
 
-                // Receive results from guessing player
-                ClientServerHandler.getServerEndPoint().receiveMessages(guessingPlayersNumber - 2,
-                        new SocketCommunicator(null, null, null, null, null).new Receiver() {
+                // Inform clients
+                if (serverSide)
+                    ClientServerHandler.getServerEndPoint().sendMessage(String.valueOf(messagePrecondition));
+            }
 
-                            @Override
-                            public void action() {
-                                String receivedMessage = getMessage();
-                                String[] lines = receivedMessage.split(SocketEndPoint.SEPARATOR);
-                                receivedMessage = lines[0];
+            // Set adapter of spinner
+            actualListOfPlayersForSpinner = new ArrayList<>(listOfPlayersForSpinner); // Reset list of players for spinner for actual round
+            actualListOfPlayersForSpinner.remove(guessingPlayer.getNumber() - 1); // Remove guessing player
+            adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, actualListOfPlayersForSpinner);
+            autoCompleteText.setAdapter(adapter);
+            autoCompleteText.setOnItemClickListener((adapterView, view, i, l) -> {
+                selectedPlayer = adapterView.getItemAtPosition(i).toString();
+                selectedPlayerPosition = i;
+                selectedPlayerSelected = true;
+            });
 
-                                if (receivedMessage.equals(SocketEndPoint.PLAYER_CHOSEN)) {
-                                    runOnUiThread(() -> {
-                                        //chooseAPlayer.setSelection(Integer.parseInt(lines[1]));/////////////////
-                                        //autoCompleteText.setText(autoCompleteText.getAdapter().getItem(Integer.parseInt(lines[1])).toString(), false);
-                                        //autoCompleteText.setListSelection(Integer.parseInt(lines[1]));
-                                        selectedPlayer = lines[1];
-                                        selectedPlayerSelected = true;
-                                        solution.callOnClick();
-                                        solution.setVisibility(View.VISIBLE);
-                                    });
+            // chosenPlayer may guess again, when all players have guessed
+            editedPlayers[guessingPlayer.getNumber() - 1] = null;
 
-                                    // Stop receiving from this client
-                                    new Thread(() -> ClientServerHandler.getServerEndPoint().stopReceivingMessages(guessingPlayersNumber - 2)).start();
+            // Set adapter
+            if (onlineGame && serverSide) { // Online game: inform all clients about new situation
+                messageForAllClients += roundNumber + SocketEndPoint.SEPARATOR;
+                messageForAllClients += round.getText() + SocketEndPoint.SEPARATOR;
+                messageForAllClients += actualGame.actualDrinkOfTheGame + SocketEndPoint.SEPARATOR;
+                messageForAllClients += drinkOfTheGameTextView.getText() + SocketEndPoint.SEPARATOR;
+                messageForAllClients += chosenStory + SocketEndPoint.SEPARATOR;
+                messageForAllClients += guessingPlayer.getNumber() - 1 + SocketEndPoint.SEPARATOR;
+                messageForAllClients += player.getText() + SocketEndPoint.SEPARATOR;
+                messageForAllClients += guessedPlayer.getNumber() - 1;
+                ClientServerHandler.getServerEndPoint().sendMessage(messageForAllClients);
+
+                // Set solution-possibility
+                if (guessingPlayer.getNumber() == 1) { // Host may guess
+                    Log.e("guessingPlayer ist", guessingPlayer.getNumber() + ", ist 1");
+                    // Set solution-possibility to visible
+                    dropDownMenu.setVisibility(View.VISIBLE);
+                    solution.setVisibility(View.VISIBLE);
+                } else { // Another player may guess
+                    final int guessingPlayersNumber = guessingPlayer.getNumber();
+                    Log.e("guessingPlayer ist", guessingPlayer.getNumber() + "");
+
+                    // Set solution-possibility of host to invisible
+                    dropDownMenu.setVisibility(View.INVISIBLE);
+                    solution.setVisibility(View.INVISIBLE);
+
+                    // Inform guessing player to guess
+                    ClientServerHandler.getServerEndPoint().sendMessageToClient(guessingPlayersNumber - 2, SocketEndPoint.YOUR_TURN);
+
+                    // Receive results from guessing player
+                    ClientServerHandler.getServerEndPoint().receiveMessages(guessingPlayersNumber - 2,
+                            new SocketCommunicator(null, null, null, null, null).new Receiver() {
+
+                                @SuppressLint("LongLogTag")
+                                @Override
+                                public void action() {
+                                    String receivedMessage = getMessage();
+                                    String[] lines = receivedMessage.split(SocketEndPoint.SEPARATOR);
+                                    receivedMessage = lines[0];
+
+                                    switch (receivedMessage) {
+                                        case (SocketEndPoint.PLAYER_CHOSEN): {
+                                            runOnUiThread(() -> {
+                                                //chooseAPlayer.setSelection(Integer.parseInt(lines[1]));/////////////////
+                                                //autoCompleteText.setText(autoCompleteText.getAdapter().getItem(Integer.parseInt(lines[1])).toString(), false);
+                                                //autoCompleteText.setListSelection(Integer.parseInt(lines[1]));
+                                                selectedPlayer = lines[1];
+                                                selectedPlayerSelected = true;
+                                                solution.callOnClick();
+                                                solution.setVisibility(View.VISIBLE);
+                                            });
+
+                                            break;
+                                        }
+                                        case (SocketEndPoint.VIEWED_ACTUAL_SCORE): { // Terminate waiting status "peu a peu"
+                                            releasePlayGame();
+
+                                            // Stop receiving from this client
+                                            new Thread(() -> ClientServerHandler.getServerEndPoint().stopReceivingMessages(guessingPlayersNumber - 2)).start();
+
+                                            break;
+                                        }
+                                        default: {
+                                            Log.e("Server receives outside, PlayGame", Arrays.toString(lines));
+                                            break;
+                                        }
+                                    }
                                 }
                             }
-                        }
-                );
+                    );
+                }
             }
-        }
+        });
     }
 
     private Gamer chooseRandomPlayerWhoGuesses() {
@@ -1055,6 +1099,24 @@ public class PlayGame extends AppCompatActivity {
         }
 
         return nextRound;
+    }
+
+    /**
+     * Use a semaphore of class PlayGame to wait for sth. Another class can terminate this
+     * waiting-status with using the method "releasePlayGame()" (releasing the semaphore).
+     */
+    private void waitForSth(int i) throws InterruptedException {
+        semPlayGame.acquire(i);
+    }
+
+    /**
+     * Terminates waiting status of class PlayGame (release a semaphore).
+     */
+    public static void releasePlayGame() {
+        if (semPlayGame.availablePermits() >= 0)
+            semPlayGame.release();
+        else
+            throw new UnsupportedOperationException("Cannot perform releasing of semaphore, permits: " + semPlayGame.availablePermits());
     }
 
     @Override
