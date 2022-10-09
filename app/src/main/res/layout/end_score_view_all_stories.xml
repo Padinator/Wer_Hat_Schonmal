@@ -4,35 +4,20 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-        <RelativeLayout
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginBottom="30dp"
+            tools:layout_editor_absoluteX="1dp"
+            tools:layout_editor_absoluteY="1dp" />
 
-            <TextView
-                android:id="@+id/allStories"
-                android:layout_width="match_parent"
-                android:layout_height="30dp"
-                android:layout_alignParentTop="true"
-                android:layout_centerInParent="true"
-                android:layout_marginTop="10dp"
-                android:background="#00000000"
-                android:gravity="center_horizontal"
-                android:text="ALLE STORIES"
-                android:textAlignment="center"
-                android:textColor="#8ab6de"
-                android:textSize="20dp" />
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/allStories"
-                tools:layout_editor_absoluteX="1dp"
-                tools:layout_editor_absoluteY="1dp"
-                android:layout_marginBottom="30dp"
-                android:layout_marginRight="20dp"
-                android:layout_marginLeft="20dp" />
-
-        </RelativeLayout>
+    </RelativeLayout>
 
 </LinearLayout>

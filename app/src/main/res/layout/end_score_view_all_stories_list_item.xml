@@ -1,54 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TableRow>
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginEnd="20dp"
-            android:layout_weight="0.9"
-            android:layout_marginBottom="10dp"
-            android:layout_marginTop="10dp">
-
-            <TextView
-                android:id="@+id/storyNumber"
-                android:layout_width="wrap_content"
+            <RelativeLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="10dp"
-                android:text="Story 1:"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/storyContent"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Ich hab schon mal ..."
-                android:layout_below="@id/storyNumber"
-                android:layout_marginTop="10dp"/>
-
-            <TextView
-                android:id="@+id/guessedStory"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/storyContent"
+                android:layout_margin="3dp"
                 android:layout_marginTop="10dp"
-                android:text="Wurde geraten von:"/>
+                android:layout_marginBottom="10dp">
 
-            <TextView
-                android:id="@+id/guessingPerson"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/storyContent"
-                android:layout_toRightOf="@id/guessedStory"
-                android:layout_marginLeft="10dp"
-                android:layout_marginTop="10dp"
-                android:text="Dein Name"/>
+                <TextView
+                    android:id="@+id/storyNumber"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="9dp"
+                    android:text="Story 1:"
+                    android:textSize="18dp"
+                    android:textStyle="bold" />
 
-        </RelativeLayout>
+                <TextView
+                    android:id="@+id/storyContent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/storyNumber"
+                    android:layout_marginTop="9dp"
+                    android:text="Ich hab schon mal ..."
+                    android:textSize="16dp" />
 
-    </TableRow>
+                <TextView
+                    android:id="@+id/guessedStory"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/storyContent"
+                    android:layout_marginTop="9dp"
+                    android:text="Wurde geraten von:"
+                    android:textSize="16dp" />
 
-</TableLayout>
+                <TextView
+                    android:id="@+id/guessingPerson"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/storyContent"
+                    android:layout_marginLeft="9dp"
+                    android:layout_marginTop="9dp"
+                    android:layout_toRightOf="@id/guessedStory"
+                    android:text="Dein Name"
+                    android:textSize="18dp" />
+
+            </RelativeLayout>
+
+</LinearLayout>
