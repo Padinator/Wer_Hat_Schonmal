@@ -15,6 +15,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.werhatschonmal.EndScore;
 import com.example.werhatschonmal.R;
 import com.example.werhatschonmal.Rules;
 import com.example.werhatschonmal.database.AppDatabase;

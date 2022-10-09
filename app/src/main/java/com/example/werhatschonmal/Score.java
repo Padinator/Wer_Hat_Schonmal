@@ -16,6 +16,8 @@ import com.example.werhatschonmal.adapter.ScoreAdapter;
 import com.example.werhatschonmal.database.AppDatabase;
 import com.example.werhatschonmal.database.Game;
 import com.example.werhatschonmal.database.Player;
+import com.example.werhatschonmal.server_client_communication.ClientServerHandler;
+import com.example.werhatschonmal.server_client_communication.SocketEndPoint;
 
 import java.util.List;
 
@@ -25,7 +27,7 @@ public class Score extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-       super.onCreate(savedInstanceState);
+        super.onCreate(savedInstanceState);
         setContentView(R.layout.score);
 
         // Set dark mode to none
@@ -49,7 +51,7 @@ public class Score extends AppCompatActivity {
 
         // Create database connection
         db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
-        game = db.gameDao().loadAllByGameIds(new int[] {gameId}).get(0);////////////////////////
+        game = db.gameDao().loadAllByGameIds(new int[]{gameId}).get(0);////////////////////////
 
         // Set used variables
         onlineGame = game.onlineGame;
