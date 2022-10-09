@@ -13,7 +13,8 @@ public class ClientServerHandler {
 
     /**
      *
-     * Data field for the end point (serverside). Default value: null
+     * <strong>Data field for the end point (serverside).</strong><br>
+     * Default value: null
      */
     @SuppressLint("StaticFieldLeak")
     private static ServerSocketEndPoint serverEndPoint;

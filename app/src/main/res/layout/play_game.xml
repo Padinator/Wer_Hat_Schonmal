@@ -68,7 +68,7 @@
                               Hier sollte eine Story drin stehen.
                               Hier sollte eine Story drin stehen.
                               Hier sollte eine Story drin stehen."
-                android:textSize="23dp"/>
+                android:textSize="23dp" />
                 android:spinnerMode="dropdown" />
                 -->
 
