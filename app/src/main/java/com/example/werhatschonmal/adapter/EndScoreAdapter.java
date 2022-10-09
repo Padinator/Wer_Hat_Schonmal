@@ -11,7 +11,7 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
 
-import com.example.werhatschonmal.R;
+import com.example.ichhabschonmal.R;
 import com.example.werhatschonmal.database.AppDatabase;
 import com.example.werhatschonmal.database.Game;
 import com.example.werhatschonmal.database.Player;

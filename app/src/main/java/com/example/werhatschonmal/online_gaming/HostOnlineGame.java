@@ -16,9 +16,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.ichhabschonmal.R;
 import com.example.werhatschonmal.CreatePlayers;
 import com.example.werhatschonmal.MainActivity;
-import com.example.werhatschonmal.R;
 import com.example.werhatschonmal.adapter.HostOnlineGameAdapter;
 import com.example.werhatschonmal.server_client_communication.ClientServerHandler;
 import com.example.werhatschonmal.server_client_communication.ServerSocketEndPoint;

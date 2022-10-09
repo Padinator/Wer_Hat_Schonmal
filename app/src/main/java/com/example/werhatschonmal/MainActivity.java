@@ -4,9 +4,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 
-import com.example.werhatschonmal.online_gaming.JoinGame;
-
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.ichhabschonmal.R;
+import com.example.werhatschonmal.online_gaming.JoinGame;
 
 public class MainActivity extends AppCompatActivity {
 

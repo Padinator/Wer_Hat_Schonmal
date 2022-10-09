@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
 
+import com.example.ichhabschonmal.R;
 import com.example.werhatschonmal.adapter.LoadGameAdapter;
 import com.example.werhatschonmal.database.AppDatabase;
 
