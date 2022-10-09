@@ -5,11 +5,13 @@
     android:layout_height="wrap_content"
     android:layout_margin="16dp">
 
-
     <TextView
         android:id="@+id/name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+
+        android:layout_marginLeft="3dp"
+
         android:text="Spiel1"
         android:textSize="20dp" />
 
@@ -27,6 +29,16 @@
         android:background="@drawable/button_border"
         android:text="Laden" />
 
+    <Button
+        android:id="@+id/view_game"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/name"
+        android:layout_toRightOf="@+id/load"
+        android:layout_margin="3dp"
+        android:background="@drawable/button_border"
+        android:text="Ansehen" />
+
     <ImageButton
         android:id="@+id/delete"
         android:layout_width="wrap_content"
@@ -34,10 +46,8 @@
         android:layout_below="@+id/name"
         android:layout_marginTop="3dp"
         android:layout_marginLeft="72dp"
-        android:layout_toEndOf="@+id/load"
-        android:layout_toRightOf="@+id/load"
+        android:layout_toEndOf="@+id/view_game"
         android:background="@drawable/button_border"
-
         android:src="@drawable/delete_icon" />
 
 
