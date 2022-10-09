@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".PlayGame"
+    tools:showIn="@layout/play_game">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -70,7 +73,6 @@
                               Hier sollte eine Story drin stehen."
                 android:textSize="23dp"/>
                 android:spinnerMode="dropdown" />
-                -->
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/menu"
@@ -78,7 +80,6 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
                 android:layout_below="@id/story"
-                android:visibility="invisible"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
                 <AutoCompleteTextView
                     android:id="@+id/auto_complete"
@@ -88,6 +89,7 @@
                     android:focusableInTouchMode="false"
                     android:inputType="none|textNoSuggestions"
                     android:cursorVisible="false"
+                    android:visibility="invisible"
                     android:hint="Select Player"/>
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -106,4 +108,4 @@
 
     </ScrollView>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</RelativeLayout>

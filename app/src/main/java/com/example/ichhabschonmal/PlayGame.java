@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Html;
 import android.util.Log;
 import android.view.MenuItem;
@@ -37,6 +38,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 public class PlayGame extends AppCompatActivity {
     private Gamer[] players, editedPlayers;         // players contains all players of the actual game
@@ -177,7 +179,9 @@ public class PlayGame extends AppCompatActivity {
                             idOfFirstStory = -1;
 
                             // Set clients name as Actionbar title
-                            getSupportActionBar().setTitle((Html.fromHtml("<font color=\"#000000\">" + "Du bist " + client.getPlayerNumber() + "., " + client.getDeviceName() + "</font>")));
+                            runOnUiThread(() -> Objects.requireNonNull(getSupportActionBar()).setTitle((Html
+                                    .fromHtml("<font color=\"#000000\">" + "Du bist "
+                                            + client.getPlayerNumber() + "., " + client.getDeviceName() + "</font>"))));
 
                             break;
                         }
@@ -236,8 +240,14 @@ public class PlayGame extends AppCompatActivity {
 
                             // Set solution-possibility to invisible
                             runOnUiThread(() -> {
-                                dropDownMenu.setVisibility(View.INVISIBLE);
-                                solution.setVisibility(View.INVISIBLE);
+                                Handler han = new Handler();
+                                han.postAtTime(() -> {
+
+                                    // Set solution possibility to visible
+                                    dropDownMenu.setVisibility(View.INVISIBLE);
+                                    solution.setVisibility(View.INVISIBLE);
+
+                                }, 1000);
                             });
 
                             break;
@@ -245,7 +255,6 @@ public class PlayGame extends AppCompatActivity {
                         case (SocketEndPoint.YOUR_TURN): { // Receive that you are the guessing player
                             List<String> actualListOfPlayersForSpinner = new ArrayList<>(listOfPlayersForSpinner);
                             ArrayAdapter<String> adapter;
-
                             // Set adapter for a client
                             actualListOfPlayersForSpinner.remove(guessingPlayer.getNumber() - 1);
                             adapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, actualListOfPlayersForSpinner);
@@ -259,11 +268,15 @@ public class PlayGame extends AppCompatActivity {
                                     selectedPlayerPosition = i;
                                     selectedPlayerSelected = true;
                                 });
-                                autoCompleteText.setVisibility(View.VISIBLE);
+                                Handler han = new Handler();
+                                han.postAtTime(() -> {
+                                    autoCompleteText.setVisibility(View.VISIBLE);
 
-                                // Set solution possibility to visible
-                                dropDownMenu.setVisibility(View.VISIBLE);
-                                solution.setVisibility(View.VISIBLE);
+                                    // Set solution possibility to visible
+                                    dropDownMenu.setVisibility(View.VISIBLE);
+                                    solution.setVisibility(View.VISIBLE);
+                                }, 1000);
+
                             });
 
                             break;
