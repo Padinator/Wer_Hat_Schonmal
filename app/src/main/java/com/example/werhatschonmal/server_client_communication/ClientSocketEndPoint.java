@@ -15,6 +15,14 @@ import java.net.NoRouteToHostException;
 import java.net.Socket;
 import java.util.concurrent.Semaphore;
 
+/**
+ *
+ * @author Patrick
+ *
+ * <string>
+ *     Class connecting, receiving messages and sending messages as client to a serevr.<br>
+ * </string>
+ */
 public class ClientSocketEndPoint extends SocketEndPoint {
     private Client client;
     private final Semaphore semConnection = new Semaphore(0); // Connect client with host
@@ -22,7 +30,12 @@ public class ClientSocketEndPoint extends SocketEndPoint {
     public static final String STATUS_CONNECTED = "Warten auf Host";
     public static final String STATUS_NOT_CONNECTED = "Nicht verbunden";
 
-
+    /**
+     *
+     * @param activity Pass actual activity for running messages on UI-Thread.
+     * @param context Pass actual context for making and showing Toasts.
+     * @param serverIP Pass the IP-address of the server (to connect as client)
+     */
     public ClientSocketEndPoint(Activity activity, Context context, String serverIP) {
         super(activity, context, serverIP);
 
@@ -31,23 +44,25 @@ public class ClientSocketEndPoint extends SocketEndPoint {
         this.serverIP = serverIP;
     }
 
-
+    /**
+     *
+     * @return Return the actual data element client.
+     */
     public Client getClient() {
         return client;
     }
 
+    /**
+     *
+     * @param client Set the actual data element client.
+     */
     public void setClient(Client client) {
         this.client = client;
     }
 
-    public void setServerIP(String serverIP) {
-        this.serverIP = serverIP;
-    }
-
     /**
      *
-     * Returns the client's connection status.
-     *
+     * @return Returns the client's connection status.
      */
     @SuppressLint("LongLogTag")
     public boolean isConnected() { // Undecided about exception handling
@@ -67,8 +82,11 @@ public class ClientSocketEndPoint extends SocketEndPoint {
 
     /**
      *
-     * Creates connection between host and client.
+     * <strong>Creates connection between host and client.</strong><br>
      *
+     * @return Return, if connection was created (no matter, if it was successful).
+     * @throws InterruptedException If semaphore for waiting for creating connection cannot failed
+     *                              during "~Semaphore~.acquire()".
      */
     public boolean createConnection() throws InterruptedException {
         return createConnection(null);
@@ -76,9 +94,15 @@ public class ClientSocketEndPoint extends SocketEndPoint {
 
     /**
      *
-     * Creates connection between host and client and starts receiving messages.
-     * Returns, if connection could be created -> automatically synchronization with return value
+     * <strong>
+     *     Creates connection between host and client and starts receiving messages.<br>
+     * </strong>
      *
+     * @param receiverAction
+     * @return Returns, if connection could be created -> automatically synchronization with return
+     *         value.
+     * @throws InterruptedException If semaphore for waiting for creating connection cannot failed
+     *                              during "~Semaphore~.acquire()".
      */
     public boolean createConnection(SocketCommunicator.Receiver receiverAction) throws InterruptedException {
         boolean isConnected = false;
@@ -99,8 +123,9 @@ public class ClientSocketEndPoint extends SocketEndPoint {
 
     /**
      *
-     * Start Receiving messages from server.
+     * <strong>Start Receiving messages from server.</strong><br>
      *
+     * @param receiverAction Pass receiver action to receive messages from server
      */
     public void receiveMessages(SocketCommunicator.Receiver receiverAction) {
         if (client != null)
@@ -111,8 +136,7 @@ public class ClientSocketEndPoint extends SocketEndPoint {
 
     /**
      *
-     * Stops receiving messages from server.
-     *
+     * <strong>Stops receiving messages from server.</strong><br>
      */
     public void stopReceivingMessages() {
         client.stopReceivingMessages();
@@ -125,8 +149,7 @@ public class ClientSocketEndPoint extends SocketEndPoint {
 
     /**
      *
-     * Continue receiving messages from server.
-     *
+     * <strong>Continue receiving messages from server.</strong><br>
      */
     public void continueReceivingMessages() {
         if (client != null)
@@ -137,8 +160,10 @@ public class ClientSocketEndPoint extends SocketEndPoint {
 
     /**
      *
-     * Send messages to the server.
+     * <strong>Send messages to the server.</strong><br>
      *
+     * @param message Pass a message to send to the server.
+     * @return Return, whether message was send successfully.
      */
     public boolean sendMessage(String message) {
         if (client != null)
@@ -147,15 +172,33 @@ public class ClientSocketEndPoint extends SocketEndPoint {
             throw new NullPointerException("Class ClientSocketEndPoint, during \"sendMessage(...)\": No client defined: null");
     }
 
-    public void disconnectClient() throws IOException {
+    /**
+     *
+     * <strong>Disconnect clients end point from server</strong><br>
+     *
+     * @throws IOException From "~Client~.disconnectClientFromServer()"
+     * @throws NullPointerException If no client is defined to disconnect it (clientside).
+     */
+    public void disconnectClient() throws IOException, NullPointerException {
         if (client != null)
             client.disconnectClientFromServer();
         else
             throw new NullPointerException("Class ClientSocketEndPoint, during \"disconnectClient(...)\": No client defined: null");
     }
 
+    /**
+     *
+     * @author Patrick
+     *
+     * <strong>Class for connectiing to server as a client.</strong>
+     * Class is derived from Runnable, use in "~Thread~.start(~ClientConnector~)".
+     */
     private class ClientConnector implements Runnable {
 
+        /**
+         *
+         * Redefine run method
+         */
         @Override
         public void run() {
             try {

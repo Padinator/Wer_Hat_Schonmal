@@ -14,6 +14,11 @@ import java.nio.ByteOrder;
 /**
  *
  * @author Patrick
+ *
+ * <strong>
+ *     Super class for ServerSocketEndPoint and ClientSocketEndPoint.<br>
+ *     -> Communication between client and server.<br>
+ * </strong>
  */
 public abstract class SocketEndPoint {
     protected Activity activity;
