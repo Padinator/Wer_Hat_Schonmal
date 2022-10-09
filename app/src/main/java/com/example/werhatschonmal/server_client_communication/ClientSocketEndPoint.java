@@ -17,17 +17,35 @@ import java.util.concurrent.Semaphore;
 
 /**
  *
- * @author Patrick
- *
  * <string>
  *     Class connecting, receiving messages and sending messages as client to a serevr.<br>
  * </string>
  */
 public class ClientSocketEndPoint extends SocketEndPoint {
+
+    /**
+     *
+     * Data element "Client client" contains the clients information and SocketCommunicator-skills.
+     */
     private Client client;
+
+    /**
+     *
+     * Semaphore for returning, if connection was created or not (not, if connection is available).
+     */
     private final Semaphore semConnection = new Semaphore(0); // Connect client with host
 
+    // Constants
+    /**
+     *
+     * Constant, if client is connected.
+     */
     public static final String STATUS_CONNECTED = "Warten auf Host";
+
+    /**
+     *
+     * Constant, if client is not connected.
+     */
     public static final String STATUS_NOT_CONNECTED = "Nicht verbunden";
 
     /**
@@ -84,7 +102,8 @@ public class ClientSocketEndPoint extends SocketEndPoint {
      *
      * <strong>Creates connection between host and client.</strong><br>
      *
-     * @return Return, if connection was created (no matter, if it was successful).
+     * @return Returns, if connection could be created (not, if connection is available)<br>
+     *         -> automatically synchronization with return value.
      * @throws InterruptedException If semaphore for waiting for creating connection cannot failed
      *                              during "~Semaphore~.acquire()".
      */
@@ -98,9 +117,9 @@ public class ClientSocketEndPoint extends SocketEndPoint {
      *     Creates connection between host and client and starts receiving messages.<br>
      * </strong>
      *
-     * @param receiverAction
-     * @return Returns, if connection could be created -> automatically synchronization with return
-     *         value.
+     * @param receiverAction Pass a receiverAction for defining an action, when receiving a message.
+     * @return Returns, if connection could be created (not, if connection is available)<br>
+     *         -> automatically synchronization with return value.
      * @throws InterruptedException If semaphore for waiting for creating connection cannot failed
      *                              during "~Semaphore~.acquire()".
      */

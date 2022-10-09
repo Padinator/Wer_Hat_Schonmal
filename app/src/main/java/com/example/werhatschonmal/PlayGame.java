@@ -551,6 +551,13 @@ public class PlayGame extends AppCompatActivity {
 
                 } else { // New intent with end score, game is over
                     runOnUiThread(() -> { // Run last Intent on UI-Thread
+
+                        // Actualize game in database to "game is over"
+                        actualGame.gameIsOver = true;
+                        db = Room.databaseBuilder(PlayGame.this, AppDatabase.class, "database").allowMainThreadQueries().build();
+                        db.gameDao().updateGame(actualGame);
+                        db.close();
+
                         end.putExtra("GameId", gameId);
                         startActivity(end);
                         finish();

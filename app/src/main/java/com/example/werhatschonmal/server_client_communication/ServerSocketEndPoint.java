@@ -19,17 +19,38 @@ import java.util.concurrent.Semaphore;
 
 /**
  *
- * @author Patrick
- *
  * <string>
  *     Class connecting, receiving messages and sending messages client(s) as a serevr.<br>
  * </string>
  */
 public class ServerSocketEndPoint extends SocketEndPoint implements Serializable {
+
+    /**
+     * Data field serverSocket represents the Socket (serverside) as ServerSocket.
+     */
     private final ServerSocket serverSocket;
 
+    /**
+     *
+     * Data field listOfClients contains all clients that the host knows and has
+     * "~ServerSocket~.accept()"-ed.
+     */
     private LinkedList<Client> listOfClients = new LinkedList<>();
+
+    /**
+     *
+     * Data field contains the count of requested clients to connect with host.
+     */
     private int countOfRequestedClients = 0;
+
+    /**
+     *
+     * Semaphore "semCountOfRequestedClients" synchronizes the variable
+     * "countOfRequestedClients".<br>
+     * That is necessary in HostOnlineGame: All clients are/are not connected and some are
+     * removed. <br>
+     * -> Solution: raise synchronized the variable "countOfRequestedClients"<br>
+     */
     private final Semaphore semCountOfRequestedClients = new Semaphore(1);
 
     /**
@@ -136,7 +157,7 @@ public class ServerSocketEndPoint extends SocketEndPoint implements Serializable
      *
      * @param countOfRequestedClients Pass the count of requested clients to accept only a limit
      *                                number of clients.
-     * @param receiverAction Pass a receiverAction for defining an action when receiving a message.
+     * @param receiverAction Pass a receiverAction for defining an action, when receiving a message.
      */
     public void createConnection(int countOfRequestedClients, SocketCommunicator.Receiver receiverAction) {
 

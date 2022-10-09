@@ -13,19 +13,41 @@ import java.nio.ByteOrder;
 
 /**
  *
- * @author Patrick
- *
  * <strong>
  *     Super class for ServerSocketEndPoint and ClientSocketEndPoint.<br>
  *     -> Communication between client and server.<br>
  * </strong>
  */
 public abstract class SocketEndPoint {
+
+    /**
+     *
+     * Data field activity for running messages on UI-Thread.
+     */
     protected Activity activity;
+
+    /**
+     *
+     * Data field context for making and showing Toasts.
+     */
     protected Context context;
 
+    /**
+     *
+     * Data field serverIP contains the servers IP.
+     */
     protected String serverIP;
+
+    /**
+     *
+     * Data field connectionThread creates a connection to server/clients after starting.
+     */
     protected Thread connectionThread;
+
+    /**
+     *
+     * Data field receiverAction for defining an action, when receiving a message.
+     */
     protected SocketCommunicator.Receiver receiverAction;
 
     // Constants (condition: separators are not used by users, who play the game)
