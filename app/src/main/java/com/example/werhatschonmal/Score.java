@@ -21,6 +21,8 @@ import java.util.List;
 
 public class Score extends AppCompatActivity {
 
+    boolean onlineGame = false, serverSide = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
        super.onCreate(savedInstanceState);
@@ -48,6 +50,10 @@ public class Score extends AppCompatActivity {
         // Create database connection
         db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
         game = db.gameDao().loadAllByGameIds(new int[] {gameId}).get(0);////////////////////////
+
+        // Set used variables
+        onlineGame = game.onlineGame;
+        serverSide = game.serverSide;
 
         // Find players
         idOfFirstPlayer = game.idOfFirstPlayer;
@@ -77,7 +83,14 @@ public class Score extends AppCompatActivity {
     }
 
     @Override
-    public void onBackPressed() {       // Catch back button
+    public void onBackPressed() { // Catch back button
+
+        // Terminate waiting status of PlayGame
+        if (!onlineGame || serverSide) // Offline game or online game (serverside)
+            PlayGame.releasePlayGame();
+        else // Online game (clientside)
+            ClientServerHandler.getClientEndPoint().sendMessage(SocketEndPoint.VIEWED_ACTUAL_SCORE);
+
         // Go back to last intent
         finish();
     }
@@ -85,10 +98,9 @@ public class Score extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                onBackPressed();
-                return true;
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }

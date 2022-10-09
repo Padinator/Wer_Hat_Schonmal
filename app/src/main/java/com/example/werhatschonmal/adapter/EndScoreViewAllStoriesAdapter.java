@@ -1,4 +1,4 @@
-package com.example.werhatschonmal.adapter;
+package com.example.ichhabschonmal.adapter;
 
 
 import android.annotation.SuppressLint;
@@ -49,9 +49,6 @@ public class EndScoreViewAllStoriesAdapter extends  RecyclerView.Adapter<EndScor
     public void onBindViewHolder(EndScoreViewAllStoriesAdapter.ViewHolder holder, int pos) {
         holder.playerName.setText("Spieler: " + mPlayers.get(pos).name + "");
         List<Story> actualStories = getActualStories(mPlayers.get(pos).playerId);
-        for (Story story: actualStories) {
-            Log.e("Actual Stories",  pos + ", " +story.storyId + ", " + story.playerId + ", " + story.content + ", " + actualStories.size());
-        }
 
         adapter = new EndScoreViewAllStoriesAdapterListAdapter(mActivity, actualStories);
 
@@ -60,12 +57,16 @@ public class EndScoreViewAllStoriesAdapter extends  RecyclerView.Adapter<EndScor
         holder.endScoreListView.setAdapter(adapter);
     }
 
+    /**
+     *
+     * @param playerId Input player-ID of a player to get his stories.
+     * @return Return all stories of a player.
+     */
     private List<Story> getActualStories(int playerId) {
         List<Story> actualStories = new ArrayList<>();
 
-        for (; storyCounter < mStories.size() && mStories.get(storyCounter).playerId == playerId; storyCounter++) {
+        for (; storyCounter < mStories.size() && mStories.get(storyCounter).playerId == playerId; storyCounter++)
             actualStories.add(mStories.get(storyCounter));
-        }
 
         return actualStories;
     }
@@ -88,7 +89,7 @@ public class EndScoreViewAllStoriesAdapter extends  RecyclerView.Adapter<EndScor
             // Definitions and initializations
             LayoutInflater inflater = activity.getLayoutInflater();
             @SuppressLint({"ViewHolder", "InflateParams"}) View rowView= inflater.inflate(R.layout.end_score_view_all_stories_list_item, null, true);
-            Log.e("ViewAllStories", position + ", " + actualStories.get(position).storyId + ", " + actualStories.get(position).playerId + ", " + actualStories.get(position).content + ", " + actualStories.size());
+            Log.e("ViewAllStories", position + ", " + actualStories.get(position).storyId + ", " + actualStories.get(position).playerId + ", " + actualStories.get(position).content + ", " + actualStories.size() + actualStories.get(position).guessedStatus);
 
             // Definitions
             TextView storyNumber, storyContent, guessedStory, guessingPerson;
@@ -106,7 +107,7 @@ public class EndScoreViewAllStoriesAdapter extends  RecyclerView.Adapter<EndScor
             // guessedStory.setText("Wurde geraten von:"); // already defined in xml, text is always the same
             guessingPerson.setText(actualStories.get(position).guessingPerson);
 
-            if (mStories.get(position).guessedStatus) {
+            if (actualStories.get(position).guessedStatus) {
                 guessingPerson.setTextColor(ContextCompat.getColor(mInflater.getContext(), R.color.lightGreen));
             } else {
                 guessingPerson.setTextColor(ContextCompat.getColor(mInflater.getContext(), android.R.color.holo_red_light));

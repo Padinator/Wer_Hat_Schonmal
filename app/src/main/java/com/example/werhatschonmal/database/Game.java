@@ -15,6 +15,9 @@ public class Game {
     @ColumnInfo(name = "onlineGame")
     public boolean onlineGame;
 
+    @ColumnInfo(name = "serverSide")
+    public boolean serverSide;
+
     @ColumnInfo(name = "idOfFirstPlayer")
     public int idOfFirstPlayer;
 

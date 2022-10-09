@@ -76,7 +76,7 @@ public class SocketCommunicator {
         return false;
     }
 
-    /*
+    /**
      *
      * Receiving messages with new receiver action.
      *
@@ -110,7 +110,7 @@ public class SocketCommunicator {
             Log.e("Thread is already terminated", "During \"stopReceivingMessages(...)\" [for " + this + "]: Cannot stop a terminated Receiver-Thread!");
     }
 
-    /*
+    /**
      *
      * Receiving messages with last receiver action.
      *
@@ -130,7 +130,7 @@ public class SocketCommunicator {
             Log.e("Thread is already running", "During \"continueReceivingMessages(...)\" [for " + this + "]: Cannot start a running Receiver-Thread!");
     }
 
-    /*
+    /**
      *
      * Returns whether the message was sent successfully or not.
      *
@@ -242,7 +242,7 @@ public class SocketCommunicator {
             return input.readLine();
         }
 
-        /*
+        /**
          *
          * Define actions for receiving messages.
          *

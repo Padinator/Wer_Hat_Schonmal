@@ -33,6 +33,7 @@ public abstract class SocketEndPoint {
     public static final String PLAYER_CHOSEN = "PLAYER_CHOSEN";
     public static final String RESULT_OF_GUESSING = "RESULT_OF_GUESSING";
     public static final String VIEW_ACTUAL_SCORE = "VIEW_ACTUAL_SCORE";
+    public static final String VIEWED_ACTUAL_SCORE = "VIEWED_ACTUAL_SCORE";
 
     public SocketEndPoint(Activity activity, Context context, String serverIP) {
         this.activity = activity;
@@ -60,7 +61,7 @@ public abstract class SocketEndPoint {
         this.context = context;
     }
 
-    /*
+    /**
      *
      * Returns the local IP-address of the actual device as a String.
      *
@@ -74,7 +75,7 @@ public abstract class SocketEndPoint {
                 .putInt(ipInt).array()).getHostAddress();
     }
 
-    /*
+    /**
      *
      * Returns the "local" device name of the actual device as a String.
      *
