@@ -6,7 +6,6 @@ import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.ichhabschonmal.R;
 import com.example.werhatschonmal.online_gaming.JoinGame;
 
 public class MainActivity extends AppCompatActivity {

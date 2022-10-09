@@ -9,7 +9,7 @@ import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.ichhabschonmal.R;
+import com.example.werhatschonmal.R;
 import com.example.werhatschonmal.database.Player;
 
 import java.util.List;

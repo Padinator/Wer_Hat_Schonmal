@@ -20,7 +20,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.room.Room;
 
-import com.example.ichhabschonmal.R;
 import com.example.werhatschonmal.database.AppDatabase;
 import com.example.werhatschonmal.database.Game;
 import com.example.werhatschonmal.database.Player;
@@ -737,6 +736,7 @@ public class PlayGame extends AppCompatActivity {
                     // Set solution-possibility to visible
                     dropDownMenu.setVisibility(View.VISIBLE);
                     solution.setVisibility(View.VISIBLE);
+                    dropDownMenu.notifyAll();
                 } else { // Another player may guess
                     final int guessingPlayersNumber = guessingPlayer.getNumber();
                     Log.e("guessingPlayer ist", guessingPlayer.getNumber() + "");
@@ -744,6 +744,7 @@ public class PlayGame extends AppCompatActivity {
                     // Set solution-possibility of host to invisible
                     dropDownMenu.setVisibility(View.INVISIBLE);
                     solution.setVisibility(View.INVISIBLE);
+                    dropDownMenu.notifyAll();
 
                     // Inform guessing player to guess
                     ClientServerHandler.getServerEndPoint().sendMessageToClient(guessingPlayersNumber - 2, SocketEndPoint.YOUR_TURN);
