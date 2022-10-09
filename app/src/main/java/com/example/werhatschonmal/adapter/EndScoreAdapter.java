@@ -1,6 +1,8 @@
 package com.example.werhatschonmal.adapter;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,8 +50,29 @@ public class EndScoreAdapter extends RecyclerView.Adapter<EndScoreAdapter.ViewHo
         Game actualGame = db.gameDao().loadAllByGameIds(new int[] {mGameId}).get(0);
         int lastDrinkNumber = convertDrink(actualGame.actualDrinkOfTheGame);
 
+        Log.e("Rank", pos + 1 + ", ");
+
+        switch (pos + 1) {
+            case 1:
+                holder.rank.setText("1. ");
+                holder.rank.setTextColor(Color.parseColor("#FFD700"));
+                break;
+            case 2:
+                holder.rank.setText("2. ");
+                holder.rank.setTextColor(Color.parseColor("#C0C0C0"));
+                break;
+            case 3:
+                holder.rank.setText("3. ");
+                holder.rank.setTextColor(Color.parseColor("#CD7F32"));
+                break;
+            default:
+                holder.rank.setText(pos + 1 + ". ");
+                holder.rank.setTextColor(Color.BLACK);
+                break;
+        }
+
         holder.player.setText(mPlayers.get(pos).name + "");
-        holder.points.setText(mPlayers.get(pos).score + "");
+        holder.points.setText("Punkte: " + mPlayers.get(pos).score + "");
 
         // Save a player scores
         int[] playerScores = new int[5]; // Change manually
@@ -134,7 +157,7 @@ public class EndScoreAdapter extends RecyclerView.Adapter<EndScoreAdapter.ViewHo
 
     // Stores and recycles views as they are scrolled off screen
     public class ViewHolder extends RecyclerView.ViewHolder {
-        TextView player, points;
+        TextView player, points, rank;
         ImageView[] images = new ImageView[5]; // Change manually
         ImageView[] multiplicators = new ImageView[5]; // Change manually
         TextView[] countOfDrinks = new TextView[5]; // Change manually
@@ -145,6 +168,8 @@ public class EndScoreAdapter extends RecyclerView.Adapter<EndScoreAdapter.ViewHo
             super(itemView);
             player = itemView.findViewById(R.id.playerName);
             points = itemView.findViewById(R.id.totalPoints);
+            rank = itemView.findViewById(R.id.rank);
+
 
             images[0] = itemView.findViewById(R.id.drinkIconOne);
             images[1] = itemView.findViewById(R.id.drinkIconTwo);
