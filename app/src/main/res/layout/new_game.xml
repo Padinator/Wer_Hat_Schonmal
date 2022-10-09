@@ -6,6 +6,7 @@
     android:layout_margin="16dp"
     app:theme="@style/ThemeOverlay.AppCompat.Light">
 
+
     <EditText
         android:id="@+id/gameName"
         android:layout_width="match_parent"
@@ -16,8 +17,9 @@
         android:layout_marginBottom="8dp"
         android:background="@drawable/textview_story_border"
         android:hint="Spielname"
-        android:text="qwe"
-        android:padding="8dp" />
+
+        android:padding="8dp"
+        android:text="qwe" />
 
 
     <EditText
@@ -31,37 +33,25 @@
         android:layout_marginBottom="8dp"
         android:background="@drawable/textview_story_border"
         android:hint="Spieleranzahl"
-        android:text="3"
         android:inputType="numberDecimal"
-        android:padding="8dp" />
-
-    <Switch
-        android:id="@+id/playMode"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/playerCount"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        android:hint="Lokal oder Online"
-        android:padding="8dp" />
+        android:padding="8dp"
+        android:text="3" />
 
 
     <EditText
         android:id="@+id/storyMinCount"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/playMode"
+        android:layout_below="@id/playerCount"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
         android:background="@drawable/textview_story_border"
         android:hint="Minimale Story-Zahl"
-        android:text="1"
         android:inputType="numberDecimal"
-        android:padding="8dp" />
+        android:padding="8dp"
+        android:text="1" />
 
 
     <EditText
@@ -75,39 +65,54 @@
         android:layout_marginBottom="8dp"
         android:background="@drawable/textview_story_border"
         android:hint="Maximale Story-Zahl"
-        android:text="2"
         android:inputType="numberDecimal"
+        android:padding="8dp"
+        android:text="2" />
+
+    <Switch
+        android:id="@+id/playMode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/storyMaxCount"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+
+        android:hint="Lokal oder Online"
         android:padding="8dp" />
+
+    <Button
+        android:id="@+id/anotherDrink"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/playMode"
+        android:layout_centerHorizontal="true"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:padding="8dp"
+        android:text="Drink" />
 
     <TextView
         android:id="@+id/chooseDrink"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/storyMaxCount"
+        android:layout_below="@id/anotherDrink"
         android:layout_marginLeft="10dp"
         android:text="Ausgewählter Drink:"
         android:textSize="20dp" />
+
 
     <TextView
         android:id="@+id/currentDrink"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/storyMaxCount"
+        android:layout_below="@id/anotherDrink"
         android:layout_toRightOf="@id/chooseDrink"
         android:paddingHorizontal="10dp"
         android:textSize="20dp" />
-
-    <Button
-        android:id="@+id/anotherDrink"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/chooseDrink"
-        android:layout_centerHorizontal="true"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="20dp"
-        android:text="Drink" />
 
 
     <Button

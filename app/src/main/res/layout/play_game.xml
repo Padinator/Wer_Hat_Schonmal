@@ -3,7 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".PlayGame"
     tools:showIn="@layout/play_game">
 
     <ScrollView
@@ -89,7 +88,7 @@
                     android:focusableInTouchMode="false"
                     android:inputType="none|textNoSuggestions"
                     android:cursorVisible="false"
-                    android:visibility="invisible"
+                    android:visibility="visible"
                     android:hint="Select Player"/>
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -102,7 +101,7 @@
                 android:layout_marginTop="80dp"
                 android:layout_marginBottom="15dp"
                 android:text="Auflösen"
-                android:visibility="invisible" />
+                android:visibility="visible" />
 
         </RelativeLayout>
 
