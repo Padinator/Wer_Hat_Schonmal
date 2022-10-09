@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.ichhabschonmal">
+    package="com.example.werhatschonmal">
 
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -12,9 +12,9 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/IchHabSchonMal">
+        android:theme="@style/WerHatSchonmal">
         <activity
-            android:name=".MainActivity"
+            android:name="com.example.werhatschonmal.MainActivity"
             android:exported="true"
             android:theme="@style/NoActionBar">
             <intent-filter>
@@ -23,38 +23,38 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".NewGame"
-            android:theme="@style/IchHabSchonMal" />
+            android:name="com.example.werhatschonmal.NewGame"
+            android:theme="@style/WerHatSchonmal" />
         <activity
-            android:name=".CreatePlayers"
-            android:theme="@style/IchHabSchonMal" />
+            android:name="com.example.werhatschonmal.CreatePlayers"
+            android:theme="@style/WerHatSchonmal" />
         <activity
-            android:name=".PlayGame"
-            android:theme="@style/IchHabSchonMal" />
+            android:name="com.example.werhatschonmal.PlayGame"
+            android:theme="@style/WerHatSchonmal" />
         <activity
-            android:name=".LoadGame"
-            android:theme="@style/IchHabSchonMal" />
+            android:name="com.example.werhatschonmal.LoadGame"
+            android:theme="@style/WerHatSchonmal" />
         <activity
-            android:name=".Rules"
-            android:theme="@style/IchHabSchonMal" />
+            android:name="com.example.werhatschonmal.Rules"
+            android:theme="@style/WerHatSchonmal" />
         <activity
-            android:name=".Score"
-            android:theme="@style/IchHabSchonMal" />
+            android:name="com.example.werhatschonmal.Score"
+            android:theme="@style/WerHatSchonmal" />
         <activity
-            android:name=".EndScore"
-            android:theme="@style/IchHabSchonMal" />
+            android:name="com.example.werhatschonmal.EndScore"
+            android:theme="@style/WerHatSchonmal" />
         <activity
-            android:name=".online_gaming.HostOnlineGame"
+            android:name="com.example.werhatschonmal.online_gaming.HostOnlineGame"
             android:label="Server"
-            android:theme="@style/IchHabSchonMal" />
+            android:theme="@style/WerHatSchonmal" />
         <activity
-            android:name=".online_gaming.JoinGame"
+            android:name="com.example.werhatschonmal.online_gaming.JoinGame"
             android:label="Client"
-            android:theme="@style/IchHabSchonMal" />
+            android:theme="@style/WerHatSchonmal" />
         <activity
-            android:name=".EndScoreViewAllStories"
+            android:name="com.example.werhatschonmal.EndScoreViewAllStories"
             android:label="EndScoreViewAllStories"
-            android:theme="@style/IchHabSchonMal" />
+            android:theme="@style/WerHatSchonmal" />
     </application>
 
 </manifest>
