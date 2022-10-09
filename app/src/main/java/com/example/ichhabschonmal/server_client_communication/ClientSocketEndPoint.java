@@ -44,7 +44,7 @@ public class ClientSocketEndPoint extends SocketEndPoint {
         this.serverIP = serverIP;
     }
 
-    /*
+    /**
      *
      * Returns the client's connection status.
      *
@@ -65,7 +65,7 @@ public class ClientSocketEndPoint extends SocketEndPoint {
         return false;
     }
 
-    /*
+    /**
      *
      * Creates connection between host and client.
      *
@@ -74,7 +74,7 @@ public class ClientSocketEndPoint extends SocketEndPoint {
         return createConnection(null);
     }
 
-    /*
+    /**
      *
      * Creates connection between host and client and starts receiving messages.
      * Returns, if connection could be created -> automatically synchronization with return value
@@ -97,7 +97,7 @@ public class ClientSocketEndPoint extends SocketEndPoint {
         return !isConnected;
     }
 
-    /*
+    /**
      *
      * Start Receiving messages from server.
      *
@@ -109,7 +109,7 @@ public class ClientSocketEndPoint extends SocketEndPoint {
             throw new NullPointerException("\"Class ClientSocketEndPoint, during receiveMessages(...)\": No client defined: null");
     }
 
-    /*
+    /**
      *
      * Stops receiving messages from server.
      *
@@ -123,7 +123,7 @@ public class ClientSocketEndPoint extends SocketEndPoint {
             throw new NullPointerException("Class ClientSocketEndPoint, during \"stopReceivingMessages(...)\": No Receiver-Action defined: null");
     }
 
-    /*
+    /**
      *
      * Continue receiving messages from server.
      *
@@ -135,7 +135,7 @@ public class ClientSocketEndPoint extends SocketEndPoint {
             throw new NullPointerException("Class ClientSocketEndPoint, during \"continueReceivingMessages(...)\": No client defined: null");
     }
 
-    /*
+    /**
      *
      * Send messages to the server.
      *
@@ -166,7 +166,6 @@ public class ClientSocketEndPoint extends SocketEndPoint {
                 Log.e("Client sees Server", "Server-IP: " + serverIP + ", Server-Port: " + SERVER_PORT + "");
 
                 clientEndPoint = new Socket(serverIP, SERVER_PORT);
-                //clientEndPoint = new Socket("192.168.1.38", 8080);
                 input = new BufferedReader(new InputStreamReader(clientEndPoint.getInputStream()));
                 output = new PrintWriter(clientEndPoint.getOutputStream());
                 client = new Client(activity, context, clientEndPoint, input, output, getNameOfDevice(), getLocalIpAddress());

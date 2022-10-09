@@ -3,10 +3,7 @@ package com.example.ichhabschonmal.server_client_communication;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
-import android.os.Build;
 import android.util.Log;
-
-import androidx.annotation.RequiresApi;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -27,7 +24,7 @@ public class ServerSocketEndPoint extends SocketEndPoint implements Serializable
     private int countOfRequestedClients = 0;
     private final Semaphore semCountOfRequestedClients = new Semaphore(1);
 
-    /*
+    /**
      *
      * Creates an end point for a Server-Socket
      *
@@ -44,7 +41,7 @@ public class ServerSocketEndPoint extends SocketEndPoint implements Serializable
         serverSocket.setReuseAddress(true);
     }
 
-    /*
+    /**
      *
      * Return a list of all clients' messages.
      *
@@ -91,7 +88,7 @@ public class ServerSocketEndPoint extends SocketEndPoint implements Serializable
         return clients.size();
     }
 
-    /*
+    /**
      *
      * Creates connection between host and clients.
      *
@@ -100,7 +97,7 @@ public class ServerSocketEndPoint extends SocketEndPoint implements Serializable
         createConnection(countOfClients, null);
     }
 
-    /*
+    /**
      *
      * Creates connection between host and clients and starts receiving messages.
      *
@@ -126,7 +123,26 @@ public class ServerSocketEndPoint extends SocketEndPoint implements Serializable
         }
     }
 
-    /*
+    /**
+     *
+     * Start Receiving messages from one client.
+     *
+     */
+    public void receiveMessages(int index, SocketCommunicator.Receiver receiverAction) {
+        try {
+            this.receiverAction = receiverAction;
+
+            if (index < 0 || index >= clients.size())
+                throw new IndexOutOfBoundsException("Class ServerSocketEndPoint, no client to receive from found, invalid index: " + index);
+
+            if (clients.get(index) != null)
+                clients.get(index).receiveMessages(receiverAction);
+        } catch (NullPointerException e) {
+            throw new NullPointerException("Class ServerSocketEndPoint, during \"receiveMessages(...)\": No Receiver-Action defined: " + this.receiverAction);
+        }
+    }
+
+    /**
      *
      * Start Receiving messages from all clients.
      *
@@ -142,7 +158,27 @@ public class ServerSocketEndPoint extends SocketEndPoint implements Serializable
         }
     }
 
-    /*
+    /**
+     *
+     * Stops receiving messages from one client.
+     *
+     */
+    public void stopReceivingMessages(int index) {
+        if (index < 0 || index >= clients.size())
+            throw new IndexOutOfBoundsException("Class ServerSocketEndPoint, no client to receive from found, invalid index: " + index);
+
+        if (clients.get(index) != null)
+            clients.get(index).stopReceivingMessages();
+
+        /*
+        if (receiverAction != null)
+            receiverAction.setDoneReading(true);
+        else
+            throw new NullPointerException("Class ServerSocketEndPoint, during \"stopReceivingMessages(...)\": No Receiver-Action defined: " + null);
+        */
+    }
+
+    /**
      *
      * Stops receiving messages from all clients.
      *
@@ -152,13 +188,28 @@ public class ServerSocketEndPoint extends SocketEndPoint implements Serializable
             if (client != null)
                 client.stopReceivingMessages();
 
+        /*
         if (receiverAction != null)
             receiverAction.setDoneReading(true);
         else
             throw new NullPointerException("Class ServerSocketEndPoint, during \"stopReceivingMessages(...)\": No Receiver-Action defined: " + null);
+        */
     }
 
-    /*
+    /**
+     *
+     * Continue receiving messages from one client.
+     *
+     */
+    public void continueReceivingMessages(int index) {
+        if (index < 0 || index >= clients.size())
+            throw new IndexOutOfBoundsException("Class ServerSocketEndPoint, no client to receive from found, invalid index: " + index);
+
+        if (clients.get(index) != null)
+            clients.get(index).continueReceivingMessages();
+    }
+
+    /**
      *
      * Continue receiving messages from all clients.
      *
@@ -176,7 +227,7 @@ public class ServerSocketEndPoint extends SocketEndPoint implements Serializable
         return clients.get(index).sendMessage(message);
     }
 
-    /*
+    /**
      *
      * Send messages to all clients. Return indices of clients for failed sending.
      *
@@ -191,7 +242,7 @@ public class ServerSocketEndPoint extends SocketEndPoint implements Serializable
         return responses; // Works not on every device!!!
     }
 
-    /*
+    /**
      *
      * Disconnect the connection from server to client, serverside disconnection.
      *
@@ -207,7 +258,7 @@ public class ServerSocketEndPoint extends SocketEndPoint implements Serializable
         clients.remove(index);
     }
 
-    /*
+    /**
      *
      * Disconnect all connections from server to clients, serverside disconnection.
      *
@@ -239,9 +290,13 @@ public class ServerSocketEndPoint extends SocketEndPoint implements Serializable
                     PrintWriter output;
                     Socket serverEndPoint;
 
+                    Log.e("Test-accept", "1");
                     serverEndPoint = serverSocket.accept(); // Searches for clients always
+                    Log.e("Test-accept", "2");
                     input = new BufferedReader(new InputStreamReader(serverEndPoint.getInputStream()));
+                    Log.e("Test-accept", "3");
                     output = new PrintWriter(serverEndPoint.getOutputStream());
+                    Log.e("Test-accept", "4");
                     clients.add(new Client(activity, context, serverEndPoint, input, output));
                     Log.e("ServerConnector", clients.toString());
 

@@ -205,7 +205,7 @@ public class HostOnlineGame extends AppCompatActivity {
             createPlayers.putExtra("PlayerNumber", maxPlayerNumber);     // Pass number of players
             createPlayers.putExtra("GameName", gameName);     // Pass the name of the game
             createPlayers.putExtra("DrinkOfTheGame", drinkOfTheGame);
-            createPlayers.putExtra("PlayersIndex", 0);      // Host is always first player
+            //createPlayers.putExtra("PlayersIndex", 0);      // Host is always first player
 
             startActivity(createPlayers);
             finish();

@@ -79,11 +79,11 @@ public class EndScore extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                onBackPressed();
-                return true;
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
         }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -91,7 +91,7 @@ public class EndScore extends AppCompatActivity {
     public void onBackPressed() {       // Catch back button
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Spiel beenden")
-                .setMessage("Das Spiel wird gel\u00f6scht")
+                .setMessage("Das Spiel wird verlassen")
                 .setPositiveButton("Verlassen", (dialog, which) -> {
                     Intent mainActivity = new Intent(EndScore.this, MainActivity.class);
                     startActivity(mainActivity);
