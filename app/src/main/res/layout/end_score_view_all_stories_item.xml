@@ -7,23 +7,23 @@
         android:id="@+id/endScorePlayerName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="12dp"
         android:layout_centerHorizontal="true"
+        android:layout_marginLeft="12dp"
         android:layout_marginTop="12dp"
         android:layout_marginBottom="5dp"
-        android:textStyle="bold"
+        android:text="Spielername"
         android:textSize="20dp"
-        android:text="Spielername" />
+        android:textStyle="bold" />
 
 
-        <ListView
-            android:id="@+id/endScoreListView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/endScorePlayerName"
-            android:layout_marginLeft="12dp"
-            android:layout_marginBottom="5dp"
-            android:divider="@android:color/transparent" />
+    <ListView
+        android:id="@+id/endScoreListView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/endScorePlayerName"
+        android:layout_margin="9dp"
+
+        android:divider="@android:color/transparent" />
 
     <View
         android:id="@+id/separator"
