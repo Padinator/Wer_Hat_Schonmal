@@ -126,7 +126,9 @@ public class NewGame extends AppCompatActivity {
                 Toast.makeText(NewGame.this, "Maximum-Storyzahl muss gr\u00f6\u00dfer 0 sein!", Toast.LENGTH_LONG).show();
             else if (Integer.parseInt(storyMinNumber) > Integer.parseInt(storyMaxNumber))          // Casts are valid, because of if-cases before
                 Toast.makeText(NewGame.this, "Minimum-Storyzahl muss kleiner oder gleich der Maximum-Storyzahl sein!", Toast.LENGTH_LONG).show();
-            else {
+            else if (drinkOfTheGame.isEmpty()) {
+                Toast.makeText(NewGame.this, "Es muss erst ein Drink ausgew\u00e4hlt werden!", Toast.LENGTH_LONG).show();
+            } else {
                 Intent intent;
 
                 if (!playMode.isChecked())        // One phone for all player, only one counter
