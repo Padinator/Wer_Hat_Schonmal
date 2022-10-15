@@ -33,7 +33,7 @@ public class ScoreAdapter extends RecyclerView.Adapter<ScoreAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(ViewHolder holder, int pos) {
         holder.player.setText(mPlayers.get(pos).name + "");
-        holder.points.setText(mPlayers.get(pos).score + "");
+        holder.points.setText("Punkte: " + mPlayers.get(pos).score + "");
     }
 
     @Override
