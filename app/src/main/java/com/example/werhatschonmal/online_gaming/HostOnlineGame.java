@@ -3,8 +3,11 @@ package com.example.werhatschonmal.online_gaming;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.Html;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -110,6 +113,15 @@ public class HostOnlineGame extends AppCompatActivity {
 
         // Set set OnClickListener for btnContinue
         continues.setOnClickListener(this::onClick);
+
+        //calling the actionbar
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.arrow_back);
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+        getSupportActionBar().setTitle((Html.fromHtml("<font color=\"#000000\">" + "Host" + "</font>")));
+
+
+
     }
 
     private String[] cutClientInfo(String clientInfo) {

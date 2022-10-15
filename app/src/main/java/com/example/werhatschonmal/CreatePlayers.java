@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.Html;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -209,9 +210,10 @@ public class CreatePlayers extends AppCompatActivity {
         maxPlayerNumber = getIntent().getExtras().getInt("PlayerNumber");
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.arrow_back);
-        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+        getSupportActionBar().setTitle((Html.fromHtml("<font color=\"#000000\">" + "Spielererstellung" + "</font>")));
+
 
         viewYourStories.setOnClickListener(this::openDialog);
 
@@ -435,6 +437,8 @@ public class CreatePlayers extends AppCompatActivity {
                 playGame.putExtra("ServerSide", serverSide);
                 playGame.putExtra("GameId", actualGameId);
                 playGame.putExtra("GameIsLoaded", false);
+
+                Log.e("Hier kommt er rein", "Bin drin");
 
                 // Start next activity
                 startActivity(playGame);

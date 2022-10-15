@@ -58,6 +58,7 @@ public class EndScoreViewAllStoriesAdapter extends RecyclerView.Adapter<EndScore
     }
 
     /**
+     *
      * @param playerId Input player-ID of a player to get his stories.
      * @return Return all stories of a player.
      */
@@ -127,12 +128,10 @@ public class EndScoreViewAllStoriesAdapter extends RecyclerView.Adapter<EndScore
         TextView playerName;
         ListView endScoreListView;
 
-
         ViewHolder(View itemView) {
             super(itemView);
             playerName = itemView.findViewById(R.id.endScorePlayerName);
             endScoreListView = itemView.findViewById(R.id.endScoreListView);
         }
-
     }
 }

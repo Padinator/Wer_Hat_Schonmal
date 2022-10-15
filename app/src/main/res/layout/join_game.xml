@@ -16,29 +16,23 @@
             android:id="@+id/connectionStatusInfo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="10dp"
             android:text="Status:   Nicht verbunden"
-            android:textAppearance = "@style/Base.TextAppearance.AppCompat.Medium" />
-
-        <TextView
-            android:id="@+id/tvIP"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/connectionStatusInfo"
-            android:padding="10dp"
-            android:text="IP eingeben: "
-            android:textAppearance = "@style/Base.TextAppearance.AppCompat.Medium" />
+            android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium" />
 
         <EditText
             android:id="@+id/etIP"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/connectionStatusInfo"
-            android:layout_toRightOf="@+id/tvIP"
-            android:paddingHorizontal="30dp"
-            android:textAppearance = "@style/Base.TextAppearance.AppCompat.Medium"
-            android:hint="IP-Adresse"
-            android:inputType="text" />
+            android:hint="Host-IP-Adresse eingeben"
+            android:inputType="text"
+            android:labelFor="@id/etIP"
+            android:paddingHorizontal="10dp"
+            android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium" />
     </RelativeLayout>
 
     <Button
