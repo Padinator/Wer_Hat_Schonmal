@@ -45,7 +45,7 @@ public class EndScoreAdapter extends RecyclerView.Adapter<EndScoreAdapter.ViewHo
 
         // Create database connection
         db = Room.databaseBuilder(mContext, AppDatabase.class, "database").allowMainThreadQueries().build();
-        Game actualGame = db.gameDao().loadAllByGameIds(new int[] {mGameId}).get(0);
+        Game actualGame = db.gameDao().loadAllByGameIds(new int[]{mGameId}).get(0);
         int lastDrinkNumber = convertDrink(actualGame.actualDrinkOfTheGame);
 
         holder.player.setText(mPlayers.get(pos).name + "");
@@ -61,7 +61,7 @@ public class EndScoreAdapter extends RecyclerView.Adapter<EndScoreAdapter.ViewHo
 
         if (playerScores[0] + playerScores[1] + playerScores[2] + playerScores[3] + playerScores[4] == 0) {
             setDrink(holder, 0, lastDrinkNumber, 0);
-            for (int counterPos=1; counterPos<playerScores.length; counterPos++) {
+            for (int counterPos = 1; counterPos < playerScores.length; counterPos++) {
                 allRelativeLayouts[counterPos].setVisibility(View.INVISIBLE);
             }
         } else {

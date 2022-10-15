@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.text.Html;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -551,6 +552,13 @@ public class PlayGame extends AppCompatActivity {
 
                 } else { // New intent with end score, game is over
                     runOnUiThread(() -> { // Run last Intent on UI-Thread
+
+                        // Actualize game in database to "game is over"
+                        actualGame.gameIsOver = true;
+                        db = Room.databaseBuilder(PlayGame.this, AppDatabase.class, "database").allowMainThreadQueries().build();
+                        db.gameDao().updateGame(actualGame);
+                        db.close();
+
                         end.putExtra("GameId", gameId);
                         startActivity(end);
                         finish();
@@ -561,10 +569,9 @@ public class PlayGame extends AppCompatActivity {
 
         // calling the action bar
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.arrow_back);
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-
+        getSupportActionBar().setTitle((Html.fromHtml("<big><font color=\"#000000\">" + "Wer hat schonmal..." + "</font></big>")));
     }
 
     @Override
@@ -736,6 +743,7 @@ public class PlayGame extends AppCompatActivity {
                     // Set solution-possibility to visible
                     dropDownMenu.setVisibility(View.VISIBLE);
                     solution.setVisibility(View.VISIBLE);
+                    dropDownMenu.notifyAll();
                 } else { // Another player may guess
                     final int guessingPlayersNumber = guessingPlayer.getNumber();
                     Log.e("guessingPlayer ist", guessingPlayer.getNumber() + "");
@@ -743,6 +751,7 @@ public class PlayGame extends AppCompatActivity {
                     // Set solution-possibility of host to invisible
                     dropDownMenu.setVisibility(View.INVISIBLE);
                     solution.setVisibility(View.INVISIBLE);
+                    dropDownMenu.notifyAll();
 
                     // Inform guessing player to guess
                     ClientServerHandler.getServerEndPoint().sendMessageToClient(guessingPlayersNumber - 2, SocketEndPoint.YOUR_TURN);

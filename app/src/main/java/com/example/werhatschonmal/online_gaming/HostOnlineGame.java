@@ -1,11 +1,9 @@
 package com.example.werhatschonmal.online_gaming;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.Log;
@@ -14,7 +12,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -31,7 +29,6 @@ import com.example.werhatschonmal.server_client_communication.SocketEndPoint;
 import java.io.IOException;
 import java.util.LinkedList;
 
-@SuppressLint("SetTextI18n")
 public class HostOnlineGame extends AppCompatActivity {
     private ServerSocketEndPoint serverEndPoint;
     private SocketCommunicator.Receiver receiverAction;
@@ -44,7 +41,6 @@ public class HostOnlineGame extends AppCompatActivity {
     private int minStoryNumber, maxStoryNumber, maxPlayerNumber;
     private String gameName, drinkOfTheGame;
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -117,11 +113,8 @@ public class HostOnlineGame extends AppCompatActivity {
         //calling the actionbar
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.arrow_back);
-        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.rgb(34, 139, 34)));
         getSupportActionBar().setTitle((Html.fromHtml("<font color=\"#000000\">" + "Host" + "</font>")));
-
-
-
     }
 
     private String[] cutClientInfo(String clientInfo) {
@@ -148,7 +141,6 @@ public class HostOnlineGame extends AppCompatActivity {
         return s;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     private void onClick(View view) {
         if (serverEndPoint.sizeOfClients() < maxPlayerNumber - 1)
             Toast.makeText(getApplicationContext(), "Zu wenig Spieler verbunden!", Toast.LENGTH_SHORT).show();
@@ -234,6 +226,7 @@ public class HostOnlineGame extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
+
         if (serverEndPoint != null && serverEndPoint.sizeOfClients() > 0) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Spielererstellung")
@@ -256,6 +249,5 @@ public class HostOnlineGame extends AppCompatActivity {
             finish();
         }
     }
-
 }
 

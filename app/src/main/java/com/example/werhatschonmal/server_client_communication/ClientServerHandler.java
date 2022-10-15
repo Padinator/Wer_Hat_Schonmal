@@ -4,8 +4,6 @@ import android.annotation.SuppressLint;
 
 /**
  *
- * @author Patrick<br>
- *
  * Class for server and client communication. Package can be extracted and used separatly.
  * You can get and set the server and/or client end points with getter and setter.
  */
@@ -13,7 +11,8 @@ public class ClientServerHandler {
 
     /**
      *
-     * Data field for the end point (serverside). Default value: null
+     * <strong>Data field for the end point (serverside).</strong><br>
+     * Default value: null
      */
     @SuppressLint("StaticFieldLeak")
     private static ServerSocketEndPoint serverEndPoint;

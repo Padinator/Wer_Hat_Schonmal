@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,14 +27,14 @@ public class LoadGameAdapter extends RecyclerView.Adapter<LoadGameAdapter.ViewHo
     private final LayoutInflater mInflater;
     private final AppDatabase mDatabase;
     private final Context mContext;
-    private int countOfGames;
-
+    private int countOfGames, actualGameNumber;
 
     public LoadGameAdapter(Context context, AppDatabase database) {
         mInflater = LayoutInflater.from(context);
         mDatabase = database; // Database is never closed in LoadGameAdapter
         mContext = context;
         countOfGames = mDatabase.gameDao().getAll().size() - 1;
+        actualGameNumber = countOfGames;
     }
 
     @NonNull
@@ -60,26 +61,35 @@ public class LoadGameAdapter extends RecyclerView.Adapter<LoadGameAdapter.ViewHo
         ImageButton delete;
         TextView name;
 
-        @SuppressLint("NotifyDataSetChanged")
+        @SuppressLint({"NotifyDataSetChanged", "LongLogTag", "SetTextI18n"})
         ViewHolder(View itemView) {
             super(itemView);
             name = itemView.findViewById(R.id.name);
             load = itemView.findViewById(R.id.load);
             viewGame = itemView.findViewById(R.id.view_game);
             delete = itemView.findViewById(R.id.delete);
+            Log.e("GetAbsolutAdapterPosition", getAbsoluteAdapterPosition() + "");
+
+            // Set buttons, if a game is already over
+            Game actualGame = mDatabase.gameDao().getAll().get(actualGameNumber);
+
+            if (actualGame.gameIsOver || actualGame.onlineGame && !actualGame.serverSide) {
+                // Game is already over or edit view for online gaming showing (clientside)
+                load.setText("Ansehen");
+                viewGame.setVisibility(View.INVISIBLE);
+                viewGame.callOnClick();
+            }
+
+            // Set used variable
+            actualGameNumber--; // Count number of actual games, latest game is on top
 
             load.setOnClickListener(view -> {
                 Game game = mDatabase.gameDao().getAll().get(countOfGames - getAbsoluteAdapterPosition());
                 // "getAbsoluteAdapterPosition()" works only here
-
-                if (game.onlineGame && !game.serverSide) { // Edit view for online gaming showing (clientside)
-                    load.setText("Ansehen");
-                    viewGame.setVisibility(View.INVISIBLE);
-                }
-
-                if (game.onlineGame && !game.serverSide) // Online game, clientside
+                Log.e("Game is over", game.gameIsOver + "");
+                if (game.gameIsOver || game.onlineGame && !game.serverSide) // Game is already over or edit view for online gaming showing (clientside)
                     viewGame.callOnClick();
-                else { // Offline game or online game (serverside)
+                else { // Game is not over, offline game or online game (serverside)
                     AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
                     builder.setTitle("Spiel laden")
                             .setMessage("Soll das Spiel " + game.gameName + " geladen werden?")
@@ -117,7 +127,8 @@ public class LoadGameAdapter extends RecyclerView.Adapter<LoadGameAdapter.ViewHo
                             // Notify adapter
                             notifyDataSetChanged();
                         })
-                        .setNegativeButton("Abbrechen", (dialogInterface, i) -> {});
+                        .setNegativeButton("Abbrechen", (dialogInterface, i) -> {
+                        });
                 builder.create().show();
             });
 
@@ -126,7 +137,7 @@ public class LoadGameAdapter extends RecyclerView.Adapter<LoadGameAdapter.ViewHo
                 // "getAbsoluteAdapterPosition()" works only here
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
-                builder.setTitle("Spiel laden")
+                builder.setTitle("Spiel ist bereits vorbei")
                         .setMessage("Soll das Spiel " + game.gameName + " angesehen werden?")
                         .setPositiveButton("Ansehen", (dialog, which) -> {
                             Intent rules = new Intent(view.getContext().getApplicationContext(), EndScore.class);
@@ -137,7 +148,8 @@ public class LoadGameAdapter extends RecyclerView.Adapter<LoadGameAdapter.ViewHo
                             mContext.startActivity(rules);
                             ((Activity) mContext).finish();
                         })
-                        .setNegativeButton("Abbrechen", (dialogInterface, i) -> {});
+                        .setNegativeButton("Abbrechen", (dialogInterface, i) -> {
+                        });
                 builder.create().show();
             });
         }

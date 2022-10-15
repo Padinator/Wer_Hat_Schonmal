@@ -49,13 +49,12 @@ public class LoadGame extends AppCompatActivity {
         // Close database connection
         db.close();
 
-
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.arrow_back);
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.WHITE));
         getSupportActionBar().setTitle((Html.fromHtml("<font color=\"#000000\">" + "Spiel laden" + "</font>")));
         noStoriesSaved = findViewById(R.id.noStoriesSaved);
-        noStoriesSaved.setText("Anzahl der gespeicherten Stories: " + loadGameAdapter.getItemCount());
+        noStoriesSaved.setText("Anzahl der gespeicherten Spiele: " + loadGameAdapter.getItemCount());
 
 
     }

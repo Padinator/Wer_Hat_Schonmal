@@ -17,11 +17,12 @@ public interface GameDao {
     List<Game> loadAllByGameIds(int[] gameIds);
 
     @Query("SELECT * FROM Game WHERE gameName LIKE :gameName AND onlineGame LIKE :onlineGame AND "
-            + "serverSide LIKE :serverSide AND idOfFirstPlayer LIKE :idOfFirstPlayer AND "
-            + "countOfPlayers LIKE :countOfPlayers AND idOfFirstStory LIKE :idOfFirstStory AND "
-            + "countOfStories LIKE :countOfStories AND roundNumber LIKE :roundNumber AND "
-            + "actualDrinkOfTheGame LIKE :actualDrinkOfTheGame LIMIT 1")
-    Game findByName(String gameName, boolean onlineGame, boolean serverSide, int idOfFirstPlayer, int countOfPlayers, int idOfFirstStory,
+            + "serverSide LIKE :serverSide AND gameIsOver LIKE :gameIsOver AND "
+            + "idOfFirstPlayer LIKE :idOfFirstPlayer AND countOfPlayers LIKE :countOfPlayers AND "
+            + "idOfFirstStory LIKE :idOfFirstStory AND countOfStories LIKE :countOfStories AND "
+            + "roundNumber LIKE :roundNumber AND actualDrinkOfTheGame LIKE :actualDrinkOfTheGame LIMIT 1")
+    Game findByName(String gameName, boolean onlineGame, boolean serverSide, boolean gameIsOver,
+                    int idOfFirstPlayer, int countOfPlayers, int idOfFirstStory,
                     int countOfStories, int roundNumber, String actualDrinkOfTheGame);
 
     @Update

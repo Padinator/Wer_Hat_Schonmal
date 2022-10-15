@@ -18,6 +18,9 @@ public class Game {
     @ColumnInfo(name = "serverSide")
     public boolean serverSide;
 
+    @ColumnInfo(name = "gameIsOver")
+    public boolean gameIsOver = false;
+
     @ColumnInfo(name = "idOfFirstPlayer")
     public int idOfFirstPlayer;
 
