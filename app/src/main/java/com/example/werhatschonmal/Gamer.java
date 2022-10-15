@@ -85,12 +85,15 @@ public class Gamer { // Data entity is already named Player
         return check;
     }
 
+    public static Gamer copyPlayer(Gamer player) {
+        return new Gamer(player.number, player.name, player.listOfStories);
+    }
+
     public static Gamer[] copyPlayers(Gamer[] listOfPlayers) {
         Gamer[] newListOfPlayers = new Gamer[listOfPlayers.length];
 
-        for (int i = 0; i < listOfPlayers.length; i++) {
+        for (int i = 0; i < listOfPlayers.length; i++)
             newListOfPlayers[i] = new Gamer(listOfPlayers[i].number, listOfPlayers[i].name, listOfPlayers[i].listOfStories);
-        }
 
         return newListOfPlayers;
     }

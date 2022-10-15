@@ -41,6 +41,7 @@ public class HostOnlineGame extends AppCompatActivity {
     private int minStoryNumber, maxStoryNumber, maxPlayerNumber;
     private String gameName, drinkOfTheGame;
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,7 +77,7 @@ public class HostOnlineGame extends AppCompatActivity {
         receiverAction = new SocketCommunicator(null, null, null, null, null).new Receiver() {
 
 
-            @SuppressLint("NotifyDataSetChanged")
+            @SuppressLint({"NotifyDataSetChanged", "SetTextI18n"})
             @Override
             public void action() {
                 if (serverEndPoint.sizeOfClients() > 0) {
@@ -110,7 +111,7 @@ public class HostOnlineGame extends AppCompatActivity {
         // Set set OnClickListener for btnContinue
         continues.setOnClickListener(this::onClick);
 
-        //calling the actionbar
+        // Calling the actionbar
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.arrow_back);
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.rgb(34, 139, 34)));
@@ -209,7 +210,6 @@ public class HostOnlineGame extends AppCompatActivity {
             createPlayers.putExtra("PlayerNumber", maxPlayerNumber);     // Pass number of players
             createPlayers.putExtra("GameName", gameName);     // Pass the name of the game
             createPlayers.putExtra("DrinkOfTheGame", drinkOfTheGame);
-            //createPlayers.putExtra("PlayersIndex", 0);      // Host is always first player
 
             startActivity(createPlayers);
             finish();

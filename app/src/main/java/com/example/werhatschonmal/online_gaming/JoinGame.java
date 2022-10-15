@@ -81,7 +81,7 @@ public class JoinGame extends AppCompatActivity {
                         createPlayers.putExtra("ServerSide", false);
                         createPlayers.putExtra("MinStoryNumber", Integer.parseInt(lines[1]));     // Pass storyMinNumber
                         createPlayers.putExtra("MaxStoryNumber", Integer.parseInt(lines[2]));     // Pass storyMaxNumber
-                        createPlayers.putExtra("PlayerNumber", 1);     // Pass number of players
+                        createPlayers.putExtra("PlayerNumber", 1);     // Pass max number of players
                         createPlayers.putExtra("GameName", lines[3]);     // Pass the name of the game
                         createPlayers.putExtra("DrinkOfTheGame", lines[4]);
                         ClientServerHandler.getClientEndPoint().getClient().setPlayerNumber(Integer.parseInt(lines[5]) + 1);

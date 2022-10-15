@@ -35,6 +35,9 @@ public class LoadGame extends AppCompatActivity {
         LoadGameAdapter loadGameAdapter;
         AppDatabase db;
 
+        // TextView
+        noStoriesSaved = findViewById(R.id.noStoriesSaved);
+
         // Create database connection
         db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
 
@@ -46,6 +49,9 @@ public class LoadGame extends AppCompatActivity {
         loadGameAdapter = new LoadGameAdapter(this, db);
         recyclerView.setAdapter(loadGameAdapter);
 
+        if (loadGameAdapter.getItemCount() == 0)
+            noStoriesSaved.setText("Es sind keine Spiele gespeichert!");
+
         // Close database connection
         db.close();
 
@@ -53,18 +59,13 @@ public class LoadGame extends AppCompatActivity {
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.arrow_back);
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.WHITE));
         getSupportActionBar().setTitle((Html.fromHtml("<font color=\"#000000\">" + "Spiel laden" + "</font>")));
-        noStoriesSaved = findViewById(R.id.noStoriesSaved);
-        noStoriesSaved.setText("Anzahl der gespeicherten Spiele: " + loadGameAdapter.getItemCount());
-
-
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                onBackPressed();
-                return true;
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
