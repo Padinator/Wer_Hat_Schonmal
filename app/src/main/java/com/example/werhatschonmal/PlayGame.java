@@ -547,6 +547,10 @@ public class PlayGame extends AppCompatActivity {
                                 dropDownMenu.setVisibility(View.INVISIBLE);
                                 solution.setVisibility(View.INVISIBLE);
                             }
+                            // resets the autoCompleteText for every round
+                            autoCompleteText.setText(null);
+                            //autoCompleteText.setText("");     // or you can use this
+                            autoCompleteText.setFocusable(false);
                         });
                     }).start();
 
