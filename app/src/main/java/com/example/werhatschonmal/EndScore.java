@@ -4,11 +4,13 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.MenuItem;
 import android.widget.Button;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -20,12 +22,14 @@ import com.example.werhatschonmal.database.AppDatabase;
 import com.example.werhatschonmal.database.Game;
 import com.example.werhatschonmal.database.Player;
 
+import java.util.Comparator;
 import java.util.List;
 
 public class EndScore extends AppCompatActivity {
 
     private int gameId;
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,13 +56,14 @@ public class EndScore extends AppCompatActivity {
 
         // Create database connection
         db = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
-        Game game = db.gameDao().loadAllByGameIds(new int[] {gameId}).get(0);
+        Game game = db.gameDao().loadAllByGameIds(new int[]{gameId}).get(0);
 
-        // Used variables
+        // Set used variables
         idOfFirstPlayer = game.idOfFirstPlayer;
         countOfPlayers = game.countOfPlayers;
         playerIds = PlayGame.findSomethingOfActualGame(idOfFirstPlayer, countOfPlayers);
         players = db.playerDao().loadAllByPlayerIds(playerIds);
+        players.sort(Comparator.comparingInt(player -> -player.score));
 
         // RecyclerView
         recyclerView = findViewById(R.id.recyclerView);
