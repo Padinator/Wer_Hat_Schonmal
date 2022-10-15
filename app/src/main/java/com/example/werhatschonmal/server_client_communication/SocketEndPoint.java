@@ -22,31 +22,41 @@ public abstract class SocketEndPoint {
 
     /**
      *
-     * Data field activity for running messages on UI-Thread.
+     * <strong>
+     *     Data field activity for running messages on UI-Thread.<br>
+     * </strong>
      */
     protected Activity activity;
 
     /**
      *
-     * Data field context for making and showing Toasts.
+     * <strong>
+     *     Data field context for making and showing Toasts.<br>
+     * </strong>
      */
     protected Context context;
 
     /**
      *
-     * Data field serverIP contains the servers IP.
+     * <strong>
+     *     Data field serverIP contains the servers IP.<br>
+     * </strong>
      */
     protected String serverIP;
 
     /**
      *
-     * Data field connectionThread creates a connection to server/clients after starting.
+     * <strong>
+     *      Data field connectionThread creates a connection to server/clients after starting.<br>
+     * </strong>
      */
     protected Thread connectionThread;
 
     /**
      *
-     * Data field receiverAction for defining an action, when receiving a message.
+     * <strong>
+     *     Data field receiverAction for defining an action, when receiving a message.<br>
+     *  </strong>
      */
     protected SocketCommunicator.Receiver receiverAction;
 
@@ -200,7 +210,7 @@ public abstract class SocketEndPoint {
     /**
      *
      * @return Returns the IP-address (in WLAN) of the actual device as a String.
-     * @throws UnknownHostException
+     * @throws UnknownHostException If no address can be looked up.
      */
     protected String getLocalIpAddress() throws UnknownHostException {
         WifiManager wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
