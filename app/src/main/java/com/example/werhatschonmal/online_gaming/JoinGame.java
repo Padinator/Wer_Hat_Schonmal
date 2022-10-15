@@ -127,16 +127,15 @@ public class JoinGame extends AppCompatActivity {
         // calling the action bar
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.arrow_back);
-        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.rgb(0,191,255)));
         getSupportActionBar().setTitle((Html.fromHtml("<font color=\"#000000\">" + "Client" + "</font>")));
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                onBackPressed();
-                return true;
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -171,5 +170,4 @@ public class JoinGame extends AppCompatActivity {
             finish();
         }
     }
-
 }

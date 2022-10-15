@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_margin="16dp"
@@ -17,9 +18,7 @@
         android:layout_marginBottom="8dp"
         android:background="@drawable/textview_story_border"
         android:hint="Spielname"
-
-        android:padding="8dp"
-        android:text="qwe" />
+        android:padding="8dp" />
 
 
     <EditText
@@ -34,8 +33,7 @@
         android:background="@drawable/textview_story_border"
         android:hint="Spieleranzahl"
         android:inputType="numberDecimal"
-        android:padding="8dp"
-        android:text="3" />
+        android:padding="8dp" />
 
 
     <EditText
@@ -50,8 +48,7 @@
         android:background="@drawable/textview_story_border"
         android:hint="Minimale Story-Zahl"
         android:inputType="numberDecimal"
-        android:padding="8dp"
-        android:text="1" />
+        android:padding="8dp" />
 
 
     <EditText
@@ -66,8 +63,7 @@
         android:background="@drawable/textview_story_border"
         android:hint="Maximale Story-Zahl"
         android:inputType="numberDecimal"
-        android:padding="8dp"
-        android:text="2" />
+        android:padding="8dp" />
 
     <Switch
         android:id="@+id/playMode"
@@ -80,7 +76,8 @@
         android:layout_marginBottom="8dp"
 
         android:hint="Lokal oder Online"
-        android:padding="8dp" />
+        android:padding="8dp"
+        tools:ignore="UseSwitchCompatOrMaterialXml" />
 
     <Button
         android:id="@+id/anotherDrink"

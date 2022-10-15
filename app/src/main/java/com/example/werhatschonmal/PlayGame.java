@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.text.Html;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -568,10 +569,9 @@ public class PlayGame extends AppCompatActivity {
 
         // calling the action bar
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.arrow_back);
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-
+        getSupportActionBar().setTitle((Html.fromHtml("<big><font color=\"#000000\">" + "Wer hat schonmal..." + "</font></big>")));
     }
 
     @Override

@@ -74,9 +74,7 @@ public class EndScore extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.arrow_back);
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.WHITE));
-        getSupportActionBar().setTitle((Html.fromHtml("<font color=\"#000000\">" + "Endpunktestand" + "</font>")));
-
-
+        getSupportActionBar().setTitle((Html.fromHtml("<font color=\"#8ab6de\">" + "Endpunktestand" + "</font>")));
     }
 
     @Override

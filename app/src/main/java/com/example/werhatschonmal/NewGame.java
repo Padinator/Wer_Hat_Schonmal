@@ -149,7 +149,7 @@ public class NewGame extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.arrow_back);
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.WHITE));
-        getSupportActionBar().setTitle((Html.fromHtml("<font color=\"#000000\">" + "Neues Spiel" + "</font>")));
+        getSupportActionBar().setTitle((Html.fromHtml("<font color=\"#000000\">" + "Neues Spiel erstellen" + "</font>")));
     }
 
     @Override
