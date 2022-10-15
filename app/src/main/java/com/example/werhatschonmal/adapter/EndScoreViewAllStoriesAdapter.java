@@ -1,4 +1,4 @@
-package com.example.ichhabschonmal.adapter;
+package com.example.werhatschonmal.adapter;
 
 
 import android.annotation.SuppressLint;
@@ -22,7 +22,7 @@ import com.example.werhatschonmal.database.Story;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EndScoreViewAllStoriesAdapter extends  RecyclerView.Adapter<EndScoreViewAllStoriesAdapter.ViewHolder> {
+public class EndScoreViewAllStoriesAdapter extends RecyclerView.Adapter<EndScoreViewAllStoriesAdapter.ViewHolder> {
 
     private LayoutInflater mInflater;
     private List<Player> mPlayers;
@@ -32,7 +32,7 @@ public class EndScoreViewAllStoriesAdapter extends  RecyclerView.Adapter<EndScor
 
     private int storyCounter = 0;
 
-    public EndScoreViewAllStoriesAdapter(Context context, List<Player> players, List<Story> stories, Activity activity ) {
+    public EndScoreViewAllStoriesAdapter(Context context, List<Player> players, List<Story> stories, Activity activity) {
         mInflater = LayoutInflater.from(context);
         mPlayers = players;
         mStories = stories;
@@ -50,6 +50,7 @@ public class EndScoreViewAllStoriesAdapter extends  RecyclerView.Adapter<EndScor
         holder.playerName.setText("Spieler: " + mPlayers.get(pos).name + "");
         List<Story> actualStories = getActualStories(mPlayers.get(pos).playerId);
 
+
         adapter = new EndScoreViewAllStoriesAdapterListAdapter(mActivity, actualStories);
 
         holder.endScoreListView.getLayoutParams().height = actualStories.size() * 250 + 50;
@@ -58,7 +59,6 @@ public class EndScoreViewAllStoriesAdapter extends  RecyclerView.Adapter<EndScor
     }
 
     /**
-     *
      * @param playerId Input player-ID of a player to get his stories.
      * @return Return all stories of a player.
      */
@@ -80,6 +80,9 @@ public class EndScoreViewAllStoriesAdapter extends  RecyclerView.Adapter<EndScor
             super(activity, R.layout.view_your_stories_list_item, actualStories); // Giving actualStories is possible because of "extends ArrayAdapter<Story>"
             this.activity = activity;
             this.actualStories = actualStories;
+            for (Story story: actualStories)
+                Log.e("Story: ", story.content + " " + story.playerId);
+
         }
 
         @SuppressLint({"ClickableViewAccessibility", "SetTextI18n"})
@@ -88,7 +91,7 @@ public class EndScoreViewAllStoriesAdapter extends  RecyclerView.Adapter<EndScor
 
             // Definitions and initializations
             LayoutInflater inflater = activity.getLayoutInflater();
-            @SuppressLint({"ViewHolder", "InflateParams"}) View rowView= inflater.inflate(R.layout.end_score_view_all_stories_list_item, null, true);
+            @SuppressLint({"ViewHolder", "InflateParams"}) View rowView = inflater.inflate(R.layout.end_score_view_all_stories_list_item, null, true);
             Log.e("ViewAllStories", position + ", " + actualStories.get(position).storyId + ", " + actualStories.get(position).playerId + ", " + actualStories.get(position).content + ", " + actualStories.size() + actualStories.get(position).guessedStatus);
 
             // Definitions
@@ -128,13 +131,10 @@ public class EndScoreViewAllStoriesAdapter extends  RecyclerView.Adapter<EndScor
         TextView playerName;
         ListView endScoreListView;
 
-
-
         ViewHolder(View itemView) {
             super(itemView);
             playerName = itemView.findViewById(R.id.endScorePlayerName);
             endScoreListView = itemView.findViewById(R.id.endScoreListView);
         }
-
     }
 }

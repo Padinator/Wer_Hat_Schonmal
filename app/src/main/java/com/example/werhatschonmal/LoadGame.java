@@ -1,10 +1,13 @@
 package com.example.werhatschonmal;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.text.Html;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
@@ -16,7 +19,9 @@ import com.example.werhatschonmal.adapter.LoadGameAdapter;
 import com.example.werhatschonmal.database.AppDatabase;
 
 public class LoadGame extends AppCompatActivity {
+    TextView noStoriesSaved;
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,9 +51,13 @@ public class LoadGame extends AppCompatActivity {
 
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.arrow_back);
-        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+        getSupportActionBar().setTitle((Html.fromHtml("<font color=\"#000000\">" + "Spiel laden" + "</font>")));
+        noStoriesSaved = findViewById(R.id.noStoriesSaved);
+        noStoriesSaved.setText("Anzahl der gespeicherten Stories: " + loadGameAdapter.getItemCount());
+
+
     }
 
     @Override
