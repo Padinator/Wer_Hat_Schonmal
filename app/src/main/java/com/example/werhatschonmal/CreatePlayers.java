@@ -594,13 +594,13 @@ public class CreatePlayers extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {       // Catch back button
-
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Spielererstellung")
                 .setMessage("Wenn du zur\u00fcck gehst, werden die Daten nicht gespeichert!")
                 .setPositiveButton("Zur\u00fcck", (dialog, which) -> {
                     Intent mainActivity = new Intent(CreatePlayers.this, MainActivity.class);
 
+                    // Disconnect from online services
                     try {
                         if (onlineGame && serverSide) {
                             ClientServerHandler.getServerEndPoint().disconnectClientsFromServer(); // Disconnect all clients from serve, serverside
@@ -611,6 +611,7 @@ public class CreatePlayers extends AppCompatActivity {
                         e.printStackTrace();
                     }
 
+                    // Go to next intent
                     startActivity(mainActivity);
                     finish();
                 })

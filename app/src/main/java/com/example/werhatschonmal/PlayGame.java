@@ -32,6 +32,7 @@ import com.example.werhatschonmal.server_client_communication.SocketCommunicator
 import com.example.werhatschonmal.server_client_communication.SocketEndPoint;
 import com.google.android.material.textfield.TextInputLayout;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -561,6 +562,18 @@ public class PlayGame extends AppCompatActivity {
 
                         end.putExtra("GameId", gameId);
                         startActivity(end);
+
+                        // Disconnect from online services
+                        try {
+                            if (onlineGame && serverSide) { // Online but serverside
+                                ClientServerHandler.getServerEndPoint().disconnectClientsFromServer();
+                                ClientServerHandler.getServerEndPoint().disconnectServerSocket();
+                            } else if (onlineGame && !serverSide) // Online but clientside (serverside, default: false)
+                                ClientServerHandler.getClientEndPoint().disconnectClient();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
                         finish();
                     });
                 }
@@ -1136,6 +1149,19 @@ public class PlayGame extends AppCompatActivity {
                 .setPositiveButton("Verlassen & speichern", (dialog, which) -> {
                     // No safe, which player is currently guessing and which player has already guessed
                     Intent mainActivity = new Intent(PlayGame.this, MainActivity.class);
+
+                    // Disconnect from online services
+                    try {
+                        if (onlineGame && serverSide) {
+                            ClientServerHandler.getServerEndPoint().disconnectClientsFromServer(); // Disconnect all clients from serve, serverside
+                            ClientServerHandler.getServerEndPoint().disconnectServerSocket(); // Disconnect socket of server
+                        } else if (onlineGame)
+                            ClientServerHandler.getClientEndPoint().disconnectClient(); // Disconnect client from server, clientside
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    // Go to next intent
                     startActivity(mainActivity);
                     finish();
                 })

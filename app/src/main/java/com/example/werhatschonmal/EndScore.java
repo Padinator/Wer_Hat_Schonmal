@@ -96,7 +96,7 @@ public class EndScore extends AppCompatActivity {
     public void onBackPressed() {       // Catch back button
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Spiel beenden")
-                .setMessage("Das Spiel wird verlassen")
+                .setMessage("Das Spiel verlassen?")
                 .setPositiveButton("Verlassen", (dialog, which) -> {
                     Intent mainActivity = new Intent(EndScore.this, MainActivity.class);
                     startActivity(mainActivity);

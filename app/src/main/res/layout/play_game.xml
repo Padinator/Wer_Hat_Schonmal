@@ -70,7 +70,6 @@
                               Hier sollte eine Story drin stehen.
                               Hier sollte eine Story drin stehen."
                 android:textSize="23dp" />
-            android:spinnerMode="dropdown" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/menu"

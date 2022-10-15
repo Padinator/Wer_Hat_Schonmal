@@ -234,6 +234,7 @@ public class HostOnlineGame extends AppCompatActivity {
                         }
                     }
 
+                    // Go to next intent
                     startActivity(mainActivity);
                     finish();
                 })

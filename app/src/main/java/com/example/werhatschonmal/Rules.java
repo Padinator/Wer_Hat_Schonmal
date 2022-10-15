@@ -15,6 +15,9 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 
+import com.example.werhatschonmal.server_client_communication.ClientServerHandler;
+
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class Rules extends AppCompatActivity {
@@ -102,6 +105,19 @@ public class Rules extends AppCompatActivity {
                     .setMessage("Wenn du zur\u00fcck gehst, wird das Spiel gespeichert und beendet!")
                     .setPositiveButton("Zur\u00fcck", (dialog, which) -> {
                         Intent mainActivity = new Intent(Rules.this, MainActivity.class);
+
+                        // Disconnect from online services
+                        try {
+                            if (ClientServerHandler.getServerEndPoint() != null) {
+                                ClientServerHandler.getServerEndPoint().disconnectClientsFromServer(); // Disconnect all clients from serve, serverside
+                                ClientServerHandler.getServerEndPoint().disconnectServerSocket(); // Disconnect socket of server
+                            } else if (ClientServerHandler.getClientEndPoint() != null)
+                                ClientServerHandler.getClientEndPoint().disconnectClient(); // Disconnect client from server, clientside
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+                        // Go to next intent
                         startActivity(mainActivity);
                         finish();
                     })

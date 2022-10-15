@@ -155,7 +155,6 @@ public class JoinGame extends AppCompatActivity {
                     .setMessage("M\u00f6chtest du wirkklich zur\u00fcck gehen?")
                     .setPositiveButton("Zur\u00fcck", (dialog, which) -> {
                         Intent mainActivity = new Intent(JoinGame.this, MainActivity.class);
-
                         startActivity(mainActivity);
                         finish();
                     })
