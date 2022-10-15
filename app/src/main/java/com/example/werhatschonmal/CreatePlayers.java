@@ -594,6 +594,7 @@ public class CreatePlayers extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {       // Catch back button
+
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Spielererstellung")
                 .setMessage("Wenn du zur\u00fcck gehst, werden die Daten nicht gespeichert!")

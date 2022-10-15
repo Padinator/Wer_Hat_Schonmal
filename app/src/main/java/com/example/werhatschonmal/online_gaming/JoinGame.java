@@ -148,6 +148,7 @@ public class JoinGame extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
+
         if (clientEndPoint != null && clientEndPoint.isConnected()) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Spielererstellung")

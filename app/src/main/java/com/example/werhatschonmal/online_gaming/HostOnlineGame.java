@@ -217,37 +217,31 @@ public class HostOnlineGame extends AppCompatActivity {
     }
 
     @Override
-    public void onBackPressed() {       // Catch back button
-        if (serverEndPoint != null) {
-            try {
-                serverEndPoint.disconnectClientsFromServer(); // Disconnect all clients from serve, serverside
-                serverEndPoint.disconnectServerSocket(); // Disconnect socket of server
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+    public void onBackPressed() { // Catch back button
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Spielererstellung")
+                .setMessage("M\u00f6chtest du wirkklich zur\u00fcck gehen?")
+                .setPositiveButton("Zur\u00fcck", (dialog, which) -> {
+                    Intent mainActivity = new Intent(HostOnlineGame.this, MainActivity.class);
 
-        if (serverEndPoint != null && serverEndPoint.sizeOfClients() > 0) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Spielererstellung")
-                    .setMessage("M\u00f6chtest du wirkklich zur\u00fcck gehen?")
-                    .setPositiveButton("Zur\u00fcck", (dialog, which) -> {
-                        Intent mainActivity = new Intent(HostOnlineGame.this, MainActivity.class);
+                    // Disconnect all end points for clients and server endpoint
+                    if (serverEndPoint != null) {
+                        try {
+                            serverEndPoint.disconnectClientsFromServer(); // Disconnect all clients from serve, serverside
+                            serverEndPoint.disconnectServerSocket(); // Disconnect socket of server
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
 
-                        startActivity(mainActivity);
-                        finish();
-                    })
-                    .setNegativeButton("Abbrechen", (dialogInterface, i) -> {
+                    startActivity(mainActivity);
+                    finish();
+                })
+                .setNegativeButton("Abbrechen", (dialogInterface, i) -> {
 
-                    });
+                });
 
-            builder.create().show();
-        } else {
-            Intent mainActivity = new Intent(HostOnlineGame.this, MainActivity.class);
-
-            startActivity(mainActivity);
-            finish();
-        }
+        builder.create().show();
     }
 }
 
