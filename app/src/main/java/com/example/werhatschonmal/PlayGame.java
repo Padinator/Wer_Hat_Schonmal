@@ -79,6 +79,7 @@ public class PlayGame extends AppCompatActivity {
     private String selectedPlayer;
     private int selectedPlayerPosition;
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @SuppressLint({"SetTextI18n", "LongLogTag"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -662,10 +663,12 @@ public class PlayGame extends AppCompatActivity {
         return players;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     private void playGame() {
         playRound();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @SuppressLint("SetTextI18n")
     private void playRound() {
         runOnUiThread(() -> { //  Main-Thread = UI-Thread
