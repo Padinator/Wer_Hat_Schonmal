@@ -1034,6 +1034,8 @@ public class PlayGame extends AppCompatActivity {
 
             save.setOnClickListener(v -> {
                 newDrinkOfTheGame = drinks.get(i);
+                changeDrink(newDrinkOfTheGame);
+                setDrinkOfTheGame(newDrinkOfTheGame);
                 dialog.dismiss();
             });
 
