@@ -118,6 +118,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="32dp"
+        android:paddingVertical="20dp"
         android:backgroundTint="@color/orange_one"
         android:text="Weiter" />
 

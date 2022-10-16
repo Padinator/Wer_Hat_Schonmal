@@ -46,6 +46,7 @@ public class LoadGameAdapter extends RecyclerView.Adapter<LoadGameAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
+        Log.e("onBindViewHolder",countOfGames + ", " + position);
         holder.name.setText(mDatabase.gameDao().getAll().get(countOfGames - position).gameName);
     }
 
@@ -68,9 +69,9 @@ public class LoadGameAdapter extends RecyclerView.Adapter<LoadGameAdapter.ViewHo
             load = itemView.findViewById(R.id.load);
             viewGame = itemView.findViewById(R.id.view_game);
             delete = itemView.findViewById(R.id.delete);
-            Log.e("GetAbsolutAdapterPosition", getAbsoluteAdapterPosition() + "");
 
             // Set buttons, if a game is already over
+            Log.e("actualGameNumber", actualGameNumber + "");
             Game actualGame = mDatabase.gameDao().getAll().get(actualGameNumber);
 
             if (actualGame.gameIsOver || actualGame.onlineGame && !actualGame.serverSide) {

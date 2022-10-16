@@ -7,6 +7,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -209,7 +210,6 @@ public class HostOnlineGame extends AppCompatActivity {
             createPlayers.putExtra("PlayerNumber", maxPlayerNumber);     // Pass number of players
             createPlayers.putExtra("GameName", gameName);     // Pass the name of the game
             createPlayers.putExtra("DrinkOfTheGame", drinkOfTheGame);
-            //createPlayers.putExtra("PlayersIndex", 0);      // Host is always first player
 
             startActivity(createPlayers);
             finish();
@@ -217,37 +217,41 @@ public class HostOnlineGame extends AppCompatActivity {
     }
 
     @Override
-    public void onBackPressed() {       // Catch back button
-        if (serverEndPoint != null) {
-            try {
-                serverEndPoint.disconnectClientsFromServer(); // Disconnect all clients from serve, serverside
-                serverEndPoint.disconnectServerSocket(); // Disconnect socket of server
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+    public void onBackPressed() { // Catch back button
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Spielererstellung")
+                .setMessage("M\u00f6chtest du wirkklich zur\u00fcck gehen?")
+                .setPositiveButton("Zur\u00fcck", (dialog, which) -> {
+                    Intent mainActivity = new Intent(HostOnlineGame.this, MainActivity.class);
+
+                    // Disconnect all end points for clients and server endpoint
+                    if (serverEndPoint != null) {
+                        try {
+                            serverEndPoint.disconnectClientsFromServer(); // Disconnect all clients from serve, serverside
+                            serverEndPoint.disconnectServerSocket(); // Disconnect socket of server
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    // Go to next intent
+                    startActivity(mainActivity);
+                    finish();
+                })
+                .setNegativeButton("Abbrechen", (dialogInterface, i) -> {
+
+                });
+
+        builder.create().show();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
         }
-
-        if (serverEndPoint != null && serverEndPoint.sizeOfClients() > 0) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Spielererstellung")
-                    .setMessage("M\u00f6chtest du wirkklich zur\u00fcck gehen?")
-                    .setPositiveButton("Zur\u00fcck", (dialog, which) -> {
-                        Intent mainActivity = new Intent(HostOnlineGame.this, MainActivity.class);
-
-                        startActivity(mainActivity);
-                        finish();
-                    })
-                    .setNegativeButton("Abbrechen", (dialogInterface, i) -> {
-
-                    });
-
-            builder.create().show();
-        } else {
-            Intent mainActivity = new Intent(HostOnlineGame.this, MainActivity.class);
-
-            startActivity(mainActivity);
-            finish();
-        }
+        return super.onOptionsItemSelected(item);
     }
 }
 

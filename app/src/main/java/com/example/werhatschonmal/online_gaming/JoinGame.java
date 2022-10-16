@@ -81,7 +81,7 @@ public class JoinGame extends AppCompatActivity {
                         createPlayers.putExtra("ServerSide", false);
                         createPlayers.putExtra("MinStoryNumber", Integer.parseInt(lines[1]));     // Pass storyMinNumber
                         createPlayers.putExtra("MaxStoryNumber", Integer.parseInt(lines[2]));     // Pass storyMaxNumber
-                        createPlayers.putExtra("PlayerNumber", 1);     // Pass number of players
+                        createPlayers.putExtra("PlayerNumber", 1);     // Pass max number of players
                         createPlayers.putExtra("GameName", lines[3]);     // Pass the name of the game
                         createPlayers.putExtra("DrinkOfTheGame", lines[4]);
                         ClientServerHandler.getClientEndPoint().getClient().setPlayerNumber(Integer.parseInt(lines[5]) + 1);
@@ -148,13 +148,13 @@ public class JoinGame extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
+
         if (clientEndPoint != null && clientEndPoint.isConnected()) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Spielererstellung")
                     .setMessage("M\u00f6chtest du wirkklich zur\u00fcck gehen?")
                     .setPositiveButton("Zur\u00fcck", (dialog, which) -> {
                         Intent mainActivity = new Intent(JoinGame.this, MainActivity.class);
-
                         startActivity(mainActivity);
                         finish();
                     })

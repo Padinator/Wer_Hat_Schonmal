@@ -15,6 +15,9 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 
+import com.example.werhatschonmal.server_client_communication.ClientServerHandler;
+
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class Rules extends AppCompatActivity {
@@ -47,9 +50,9 @@ public class Rules extends AppCompatActivity {
         rules.add("2. Aufgeschriebene Stories m\u00fcssen tats\u00e4chlich passiert sein.");
         rules.add("3. Spieler sowie Stories werden zuf\u00e4llig ausgew\u00e4hlt.");
         rules.add("4. Jeder Spieler kommt irgendwann dran.");
-        rules.add("5. Gib keine direkten Tips, wenn du weißt, von wem die Story ist.");
+        rules.add("5. Gib keine direkten Tipps, wenn du weißt, von wem die Story ist.");
         rules.add("6. Wer falsch r\u00e4t, muss nat\u00fcrlich trinken.");
-        rules.add("7. Wird richtig geraten, dann muss der Storyschreiber einen trinken.");
+        rules.add("7. Wird richtig geraten, dann muss der Storybesitzer einen trinken.");
         rules.add("8. Eine Aulf\u00f6sung gibts am Ende.");
 
         // Adapter
@@ -80,7 +83,7 @@ public class Rules extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.arrow_back);
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.WHITE));
-        getSupportActionBar().setTitle((Html.fromHtml("<font color=\"#000000\">" + "Regeln" + "</font>")));
+        getSupportActionBar().setTitle((Html.fromHtml("<big><font color=\"#000000\">" + "Wer hat schonmal..." + "</font></big>")));
 
     }
 
@@ -102,6 +105,19 @@ public class Rules extends AppCompatActivity {
                     .setMessage("Wenn du zur\u00fcck gehst, wird das Spiel gespeichert und beendet!")
                     .setPositiveButton("Zur\u00fcck", (dialog, which) -> {
                         Intent mainActivity = new Intent(Rules.this, MainActivity.class);
+
+                        // Disconnect from online services
+                        try {
+                            if (ClientServerHandler.getServerEndPoint() != null) {
+                                ClientServerHandler.getServerEndPoint().disconnectClientsFromServer(); // Disconnect all clients from serve, serverside
+                                ClientServerHandler.getServerEndPoint().disconnectServerSocket(); // Disconnect socket of server
+                            } else if (ClientServerHandler.getClientEndPoint() != null)
+                                ClientServerHandler.getClientEndPoint().disconnectClient(); // Disconnect client from server, clientside
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+                        // Go to next intent
                         startActivity(mainActivity);
                         finish();
                     })

@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.Log;
@@ -17,6 +18,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.room.Room;
@@ -32,6 +34,7 @@ import com.example.werhatschonmal.server_client_communication.SocketCommunicator
 import com.example.werhatschonmal.server_client_communication.SocketEndPoint;
 import com.google.android.material.textfield.TextInputLayout;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -60,7 +63,7 @@ public class PlayGame extends AppCompatActivity {
             allPlayersGuessed = false, preconditionsSet = false, anotherRound = false,
             selectedPlayerSelected = false;
     // solutionPressed: before next round begins, Button solution may not been pressed
-    // allPlayersGuessed: true means that all players guessed one time
+    // allPlayersGuessed: true: all players guessed one time
     private int idOfFirstPlayer, countOfPlayers, idOfFirstStory, countOfStories, gameId, roundNumber;
     private int actualStoryNumberInList, actualStoryNumber;     // actualStoryNumber is a counter to set stories to used
 
@@ -76,6 +79,7 @@ public class PlayGame extends AppCompatActivity {
     private String selectedPlayer;
     private int selectedPlayerPosition;
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @SuppressLint({"SetTextI18n", "LongLogTag"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -422,9 +426,7 @@ public class PlayGame extends AppCompatActivity {
         }
 
         solution.setOnClickListener(view -> {
-
-            // The host (or in local game the one player/device) presses the solution-Button
-            if (!selectedPlayerSelected)
+            if (!selectedPlayerSelected) // No player is selected
                 Toast.makeText(PlayGame.this, "W\u00e4hle zuerst einen Spieler aus!", Toast.LENGTH_SHORT).show();
             else if (!solutionPressed) { // solution-Button may not been pressed
                 if (onlineGame && !serverSide) { // A client pressed solution-Button
@@ -519,8 +521,9 @@ public class PlayGame extends AppCompatActivity {
                     next.putExtra("GameId", gameId);
                     startActivity(next);
 
+                    // Start next round
                     new Thread(() -> {
-                        if (!onlineGame || serverSide) { // Start next round
+                        if (!onlineGame || serverSide) {
 
                             // Wait for closing next intent
                             try {
@@ -540,16 +543,20 @@ public class PlayGame extends AppCompatActivity {
                         solutionPressed = false;
                         selectedPlayerSelected = false;
 
+                        // Set TextViews
                         runOnUiThread(() -> {
-                            if (!onlineGame) // Set TextView
+                            if (!onlineGame) // Offline game
                                 solution.setText("Aufl\u00f6sen");
-                            else { // "Deactivate" temporary solution-possibility for all players
+                            else { // Online game: "deactivate" temporary solution-possibility for all players
                                 dropDownMenu.setVisibility(View.INVISIBLE);
                                 solution.setVisibility(View.INVISIBLE);
                             }
+                            // resets the autoCompleteText for every round
+                            autoCompleteText.setText(null);
+                            //autoCompleteText.setText("");     // or you can use this
+                            autoCompleteText.setFocusable(false);
                         });
                     }).start();
-
                 } else { // New intent with end score, game is over
                     runOnUiThread(() -> { // Run last Intent on UI-Thread
 
@@ -561,6 +568,18 @@ public class PlayGame extends AppCompatActivity {
 
                         end.putExtra("GameId", gameId);
                         startActivity(end);
+
+                        // Disconnect from online services
+                        try {
+                            if (onlineGame && serverSide) { // Online but serverside
+                                ClientServerHandler.getServerEndPoint().disconnectClientsFromServer();
+                                ClientServerHandler.getServerEndPoint().disconnectServerSocket();
+                            } else if (onlineGame && !serverSide) // Online but clientside (serverside, default: false)
+                                ClientServerHandler.getClientEndPoint().disconnectClient();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
                         finish();
                     });
                 }
@@ -572,15 +591,6 @@ public class PlayGame extends AppCompatActivity {
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.arrow_back);
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         getSupportActionBar().setTitle((Html.fromHtml("<big><font color=\"#000000\">" + "Wer hat schonmal..." + "</font></big>")));
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            onBackPressed();
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     @SuppressLint("LongLogTag")
@@ -657,10 +667,12 @@ public class PlayGame extends AppCompatActivity {
         return players;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     private void playGame() {
         playRound();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @SuppressLint("SetTextI18n")
     private void playRound() {
         runOnUiThread(() -> { //  Main-Thread = UI-Thread
@@ -669,15 +681,16 @@ public class PlayGame extends AppCompatActivity {
             StringBuilder messagePrecondition = new StringBuilder(SocketEndPoint.SET_PRE_CONDITIONS_OF_PLAYING_GAME
                     + SocketEndPoint.SEPARATOR + actualGame.gameName);
             String messageForAllClients = SocketEndPoint.GAME_STATUS_CHANGED + SocketEndPoint.SEPARATOR;
+            String chosenStory;
 
-            if (allPlayersGuessed || Gamer.isEmpty(editedPlayers)) { // Enter, if each player has guessed one time
+            if (Gamer.isEmpty(editedPlayers)) { // Enter, if each player has guessed one time
                 editedPlayers = Gamer.copyPlayers(players);
                 requestToChangeDrink(); // Request to change drink
             }
 
-            guessingPlayer = chooseRandomPlayerWhoGuesses(); // Choose randomly a player to guess someone's story
-            guessedPlayer = chooseRandomPlayerToBeGuessed(); // Choose another player to be guessed
-            String chosenStory = chooseRandomStory(); // Then choose randomly story of this player
+            guessedPlayer = chooseRandomPlayerToBeGuessed(); // Choose randomly a player to be guessed
+            guessingPlayer = chooseRandomPlayerWhoGuesses(); // Choose randomly a player to guess guessedPlayer's story
+            chosenStory = chooseRandomStory(); // Then choose randomly story of this player
 
             // Set TextViews
             round.setText("Runde Nr." + roundNumber);
@@ -802,78 +815,72 @@ public class PlayGame extends AppCompatActivity {
         });
     }
 
-    private Gamer chooseRandomPlayerWhoGuesses() {
-        int playerNumber, factor = 1;
+    private Gamer chooseRandomPlayerToBeGuessed() {
+        LinkedList<Gamer> storyPlayers = new LinkedList<>();
 
-        // factor is for calculating a number of a player in the range of the count of players
-        for (int tmp = editedPlayers.length; 0 < tmp; tmp /= 10) {
-            factor *= 10;
-        }
+        // Look for players, who could be guessed
+        for (Gamer gamer : players)
+            if (gamer.getCountOfStories() != 0)
+                storyPlayers.add(gamer);
 
-        // Choose randomly a player
-        do {
-            playerNumber = (int) (Math.random() * factor);
-            Log.e("endlosschleife", "Endlosschleife1");
-        } while (playerNumber <= 0 || playerNumber > editedPlayers.length || editedPlayers[playerNumber - 1] == null);       // If a player is null, he has already guessed
-
-        return editedPlayers[playerNumber - 1];
+        // Choose randomly a player, who has still stories
+        return storyPlayers.get((int) (Math.random() * storyPlayers.size()));
     }
 
-    private Gamer chooseRandomPlayerToBeGuessed() {
-        int playerNumber, factor = 1;
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private Gamer chooseRandomPlayerWhoGuesses() {
+        LinkedList<Gamer> unusedPlayers = new LinkedList<>();
 
-        // factor is for calculating a number of a player in the range of the count of players
-        for (int tmp = players.length; 0 < tmp; tmp /= 10) {
-            factor *= 10;
+        // Look for players, who has not guessed yet
+        for (Gamer gamer : editedPlayers)
+            if (gamer != null)
+                unusedPlayers.add(gamer);
+
+        // Remove player to be guessed from list of players, who can still guess
+        unusedPlayers.removeIf(gamer -> gamer.getNumber() == guessedPlayer.getNumber());
+
+        if (unusedPlayers.size() == 0) { // Player, who should be guessed, was the last player, who has not guessed in current round
+            editedPlayers[guessedPlayer.getNumber() - 1] = null; // Last player with stories can not guess
+            editedPlayers[guessedPlayer.getNumber() % editedPlayers.length] // Set another player to guess
+                    = Gamer.copyPlayer(players[guessedPlayer.getNumber() % editedPlayers.length]);
+            unusedPlayers.add(editedPlayers[guessedPlayer.getNumber() % editedPlayers.length]); // Set another player to guess
         }
 
-        // Choose randomly a player
-        do {
-            playerNumber = (int) (Math.random() * factor);
-            checkAll();
-            if (playerNumber > 0 && playerNumber <= players.length && playerNumber != guessingPlayer.getNumber())
-                Log.e("endlosschleife", "Endlosschleife2, Bedingung passt: " + "Spieler: " + playerNumber + ", " + players[playerNumber - 1].getCountOfStories());
-            else if (guessingPlayer.getNumber() == playerNumber)
-                Log.e("endlosschleife", "Endlosschleife2, playerNumber == chosenPlayer.getNumber(): " + "playerNumber: " + playerNumber + ", guessingPlayerNumber: " + guessingPlayer.getNumber() + ", Storyzahl: " + players[guessingPlayer.getNumber() - 1].getCountOfStories());
-            //else
-            //Log.e("endlosschleife", "Endlosschleife2, Bedingungen passen nicht, zufaellige Spielerauswahl will nicht mehr: " + playerNumber);
-        } while (playerNumber == guessingPlayer.getNumber() || playerNumber <= 0 || playerNumber > players.length
-                || players[playerNumber - 1].getCountOfStories() == 0);     // If a player has no stories, he can not be chosen to be guessed
-
-        return players[playerNumber - 1];
+        // Choose randomly a player, who has not guessed in the current round and is not the player
+        // who was chosen to be guessed
+        return unusedPlayers.get((int) (Math.random() * unusedPlayers.size()));
     }
 
     private String chooseRandomStory() {        // Choose randomly a story of otherPlayer
-        int storyNumber, factor = 1;            // storyNumber = storyNumber in Array listOfStories (see class Gamer), storyNumber is not an index
+        int storyIndex;            // storyNumber = storyNumber in Array listOfStories (see class Gamer), storyNumber is not an index
         int countOfStories = players[guessedPlayer.getNumber() - 1].getCountOfStories();      // Count of stories of otherPlayer
         int actualStoryNumber = 0;
         String story;
 
-        // factor is for calculating a number of a story in the range of the count of stories
-        for (int tmp = countOfStories; 0 < tmp; tmp /= 10) {
-            factor *= 10;
-        }
+        for (Story stories : listOfStories)
+            Log.e("All stories", stories.storyId + ", " + stories.content);
 
+        Log.e("chooseRandomStory", "countOfStories: " + countOfStories);
         Log.e("chooseRandomStory", "Ausgewaehlte SpielerId: " + playerIds[guessedPlayer.getNumber() - 1] + ", suchen dieses Spielers " + listOfStories.get(actualStoryNumber).playerId + ", actualStoryNumber: " + actualStoryNumber);
 
         // Set used variable
-        while (listOfStories.get(actualStoryNumber).playerId != playerIds[guessedPlayer.getNumber() - 1]) {       // Find the right player
+        while (listOfStories.get(actualStoryNumber).playerId != playerIds[guessedPlayer.getNumber() - 1]) { // Find the right player
             actualStoryNumber++;
             Log.e("endlosschleife", "Endlosschleife3: " + "Ausgewaehlter Spieler: " + playerIds[guessedPlayer.getNumber() - 1] + ", suchen dieses Spielers " + listOfStories.get(actualStoryNumber).playerId + ", actualStoryNumber: " + actualStoryNumber);
         }
 
-        // Choose randomly a story
+        // Choose randomly a story, which should be unused
         do {
-            storyNumber = (int) (Math.random() * factor);
-            if (storyNumber > 0 && storyNumber <= countOfStories)
-                Log.e("endlosschleife", "Endlosschleife4: " + actualStoryNumber + ", " + storyNumber + ", " + listOfStories.get(actualStoryNumber + storyNumber - 1).status);
+            storyIndex = (int) (Math.random() * countOfStories);
+            if (storyIndex >= 0 && storyIndex < countOfStories)
+                Log.e("endlosschleife", "Endlosschleife4: " + actualStoryNumber + ", " + storyIndex + ", " + listOfStories.get(actualStoryNumber + storyIndex).status);
             else
-                Log.e("endlosschleife", "Endlosschleife4: " + actualStoryNumber + ", " + storyNumber);
-        } while (storyNumber <= 0 || storyNumber > countOfStories || listOfStories.get(actualStoryNumber + storyNumber - 1).status);
+                Log.e("endlosschleife", "Endlosschleife4: " + actualStoryNumber + ", " + storyIndex);
+        } while (listOfStories.get(actualStoryNumber + storyIndex).status);
 
         // Save story in variable story
         try {
-            story = players[guessedPlayer.getNumber() - 1].getStory(storyNumber - 1);
+            story = players[guessedPlayer.getNumber() - 1].getStory(storyIndex);
         } catch (GamerException ex) {
             ex.printStackTrace();
             Log.e("ChooseRandomStory", Arrays.toString(ex.getStackTrace()) + ", Message: " + ex.getMessage());
@@ -881,14 +888,14 @@ public class PlayGame extends AppCompatActivity {
         }
 
         // Set used variable
-        actualStoryNumber += storyNumber - 1;       // Has now the value of the actual story in the List "players[otherPlayer.getNumber() - 1]"
+        actualStoryNumber += storyIndex; // Has now the value of the actual story in the List "players[otherPlayer.getNumber() - 1]"
 
-        if (actualStoryNumber >= 0 && actualStoryNumber < listOfStories.size()) {
+        if (actualStoryNumber >= 0 && actualStoryNumber < listOfStories.size())
             actualStoryNumberInList = actualStoryNumber;
-        } else
-            Toast.makeText(this, "Fehler, Story konnte nicht auf benutzt gesetzt werden!", Toast.LENGTH_SHORT).show();
+        else
+            Toast.makeText(this, "Fehler, Story konnte nicht auf \"benutzt\" gesetzt werden!", Toast.LENGTH_SHORT).show();
 
-        this.actualStoryNumber = storyNumber;
+        this.actualStoryNumber = storyIndex + 1;
 
         return story;
     }
@@ -1012,7 +1019,7 @@ public class PlayGame extends AppCompatActivity {
         }
 
         drink = "Das Getränk des Spiels ist: " + drink;
-        drinkOfTheGameTextView.setText(drink);
+        drinkOfTheGameTextView.setText(drink); // Set drink of the game
     }
 
     public void showDrinkSelection(List<String> drinks) {
@@ -1030,6 +1037,8 @@ public class PlayGame extends AppCompatActivity {
 
             save.setOnClickListener(v -> {
                 newDrinkOfTheGame = drinks.get(i);
+                changeDrink(newDrinkOfTheGame); // Update new drink in database
+                setDrinkOfTheGame(newDrinkOfTheGame); // Set drink of the game
                 dialog.dismiss();
             });
 
@@ -1041,73 +1050,19 @@ public class PlayGame extends AppCompatActivity {
         dialog.show();
     }
 
+    /**
+     * @return Return, if another round can be played (another round can be player: return true)
+     */
     @SuppressLint("LongLogTag")
-    private boolean checkRound() {      // Checks if at least one player has an unused story
-        boolean nextRound = false, proofCheckPlayer = false;        // nextRound = true: another round can be played
-        // proofCheckPlayer: proof, whether checkPlayer is different to the last
-        // remaining players in editedPlayers (case: storyPlayer = 1)
-        int storyPlayers = 0;      // storyPlayer = count of players with at least one story
-        Gamer checkPlayer = null;
+    private boolean checkRound() { // Checks if at least one player has an unused story
+        int storyPlayers = 0; // storyPlayer = count of players with at least one story
 
-        for (Gamer gamer : editedPlayers) {
-            if (gamer != null)
-                Log.e("checkRound: check editedPlayers", gamer.getName());
-        }
-
-        for (Gamer gamer : players) {      // Check ALL players
-            if (gamer.getCountOfStories() != 0) {
-                nextRound = true;
+        // Check All players for having a story -> find at least one
+        for (Gamer gamer : players)
+            if (gamer.getCountOfStories() != 0)
                 storyPlayers++;
 
-                if (storyPlayers == 1)
-                    checkPlayer = gamer;
-            }
-        }
-
-        if (checkPlayer != null)
-            Log.e("checkRound", "storyPlayer: " + storyPlayers + ", Spieler" + checkPlayer.getNumber() + ", " + checkPlayer.getName() + ", CountOfStories: " + checkPlayer.getCountOfStories());
-        else
-            Log.e("checkRound", "storyPlayer: " + storyPlayers);
-
-        if (storyPlayers == 1) {     // Check, if the last player with a story is not as the only one contained in editedPlayers
-            boolean checkEmptyArray = true;         // true: all fields of editedPlayers are null
-            int i = 0;
-
-            Log.e("checkRound", "EditedPlayers: " + editedPlayers.length);
-
-            for (Gamer editedPlayer : editedPlayers) {
-                if (editedPlayer != null) {
-                    checkEmptyArray = false;
-                    break;
-                }
-            }
-
-            if (checkEmptyArray) {          // Case: "checkEmptyArray == true"
-                editedPlayers = Gamer.copyPlayers(players);
-                allPlayersGuessed = true;
-            }
-
-            while (!proofCheckPlayer && i < editedPlayers.length) {       // nextRound have to be true, if this line is accessed
-                //Log.e("checkRound", editedPlayers[i] + ", " + editedPlayers[i].getNumber() + ", " + checkPlayer.getNumber());
-                if (editedPlayers[i] != null && editedPlayers[i].getNumber() == checkPlayer.getNumber())        // Searches checkPlayer in editedPlayers
-                    proofCheckPlayer = true;
-                else
-                    i++;
-                //Log.e("checkRound", "PlayerNumber: " + editedPlayers[i].getNumber() + ", i: " + i + ", proofCheckPlayer: " + proofCheckPlayer);
-            }
-
-            //Log.e("checkRound", editedPlayers[0].getNumber() + ", " + editedPlayers[1].getNumber() + ", " + editedPlayers[2].getNumber() + ", " + editedPlayers[i].getNumber());
-
-            //Log.e("checkRound", "proofCheckPlayer: " + proofCheckPlayer);
-
-            if (proofCheckPlayer/* && i != editedPlayers.length*/) {        // case: editedPlayers[i].getNumber() == checkPlayer.getNumber()
-                editedPlayers = Gamer.copyPlayers(players);
-                editedPlayers[i] = null;        // The player with the last story/stories can not guess
-                Log.e("checkRound", "Spieler: " + (i + 1));
-            }
-        }
-
-        return nextRound;
+        return storyPlayers > 0;
     }
 
     /**
@@ -1129,6 +1084,15 @@ public class PlayGame extends AppCompatActivity {
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     public void onBackPressed() {       // Catch back button
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Spiel beenden")
@@ -1136,6 +1100,19 @@ public class PlayGame extends AppCompatActivity {
                 .setPositiveButton("Verlassen & speichern", (dialog, which) -> {
                     // No safe, which player is currently guessing and which player has already guessed
                     Intent mainActivity = new Intent(PlayGame.this, MainActivity.class);
+
+                    // Disconnect from online services
+                    try {
+                        if (onlineGame && serverSide) {
+                            ClientServerHandler.getServerEndPoint().disconnectClientsFromServer(); // Disconnect all clients from serve, serverside
+                            ClientServerHandler.getServerEndPoint().disconnectServerSocket(); // Disconnect socket of server
+                        } else if (onlineGame)
+                            ClientServerHandler.getClientEndPoint().disconnectClient(); // Disconnect client from server, clientside
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    // Go to next intent
                     startActivity(mainActivity);
                     finish();
                 })
@@ -1144,29 +1121,5 @@ public class PlayGame extends AppCompatActivity {
                 });
 
         builder.create().show();
-    }
-
-
-    private void checkAll() {
-        for (int i = 0; i < listOfPlayers.size(); i++) {
-            Log.e("checkAllPlayers", "PlayerId: " + listOfPlayers.get(i).playerId + ", Spieler" +
-                    listOfPlayers.get(i).playerNumber + " " + listOfPlayers.get(i).name +
-                    ", Score: " + listOfPlayers.get(i).score + ":" + listOfPlayers.get(i).countOfBeers +
-                    ", GameId: " + listOfPlayers.get(i).gameId);
-        }
-
-        for (int i = 0; i < listOfStories.size(); i++) {
-            Log.e("checkAllStories", "PlayerId der Story: " + listOfStories.get(i).playerId + ", StoryId: " +
-                    listOfStories.get(i).storyId + ", Content: " + listOfStories.get(i).content +
-                    ", Story benutzt?: " + listOfStories.get(i).status + ", Rater: " +
-                    listOfStories.get(i).guessingPerson + ", Story erraten?:" +
-                    listOfStories.get(i).guessedStatus);
-        }
-    }
-
-    private void checkPlayers(Gamer[] players) {
-        for (Gamer gamer : players) {
-            Log.e("checkPlayers", "Spieler" + gamer.getNumber() + ", " + gamer.getName() + ", " + gamer.getCountOfStories());
-        }
     }
 }
