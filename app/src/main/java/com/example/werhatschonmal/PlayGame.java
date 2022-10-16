@@ -551,6 +551,10 @@ public class PlayGame extends AppCompatActivity {
                                 dropDownMenu.setVisibility(View.INVISIBLE);
                                 solution.setVisibility(View.INVISIBLE);
                             }
+                            // resets the autoCompleteText for every round
+                            autoCompleteText.setText(null);
+                            //autoCompleteText.setText("");     // or you can use this
+                            autoCompleteText.setFocusable(false);
                         });
                     }).start();
                 } else { // New intent with end score, game is over
@@ -1033,6 +1037,8 @@ public class PlayGame extends AppCompatActivity {
 
             save.setOnClickListener(v -> {
                 newDrinkOfTheGame = drinks.get(i);
+                changeDrink(newDrinkOfTheGame);
+                setDrinkOfTheGame(newDrinkOfTheGame);
                 dialog.dismiss();
             });
 
