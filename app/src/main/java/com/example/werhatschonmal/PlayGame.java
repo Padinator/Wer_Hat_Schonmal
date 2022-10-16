@@ -1019,7 +1019,7 @@ public class PlayGame extends AppCompatActivity {
         }
 
         drink = "Das Getränk des Spiels ist: " + drink;
-        drinkOfTheGameTextView.setText(drink);
+        drinkOfTheGameTextView.setText(drink); // Set drink of the game
     }
 
     public void showDrinkSelection(List<String> drinks) {
@@ -1037,8 +1037,8 @@ public class PlayGame extends AppCompatActivity {
 
             save.setOnClickListener(v -> {
                 newDrinkOfTheGame = drinks.get(i);
-                changeDrink(newDrinkOfTheGame);
-                setDrinkOfTheGame(newDrinkOfTheGame);
+                changeDrink(newDrinkOfTheGame); // Update new drink in database
+                setDrinkOfTheGame(newDrinkOfTheGame); // Set drink of the game
                 dialog.dismiss();
             });
 
@@ -1121,29 +1121,5 @@ public class PlayGame extends AppCompatActivity {
                 });
 
         builder.create().show();
-    }
-
-
-    private void checkAll() {
-        for (int i = 0; i < listOfPlayers.size(); i++) {
-            Log.e("checkAllPlayers", "PlayerId: " + listOfPlayers.get(i).playerId + ", Spieler" +
-                    listOfPlayers.get(i).playerNumber + " " + listOfPlayers.get(i).name +
-                    ", Score: " + listOfPlayers.get(i).score + ":" + listOfPlayers.get(i).countOfBeers +
-                    ", GameId: " + listOfPlayers.get(i).gameId);
-        }
-
-        for (int i = 0; i < listOfStories.size(); i++) {
-            Log.e("checkAllStories", "PlayerId der Story: " + listOfStories.get(i).playerId + ", StoryId: " +
-                    listOfStories.get(i).storyId + ", Content: " + listOfStories.get(i).content +
-                    ", Story benutzt?: " + listOfStories.get(i).status + ", Rater: " +
-                    listOfStories.get(i).guessingPerson + ", Story erraten?:" +
-                    listOfStories.get(i).guessedStatus);
-        }
-    }
-
-    private void checkPlayers(Gamer[] players) {
-        for (Gamer gamer : players) {
-            Log.e("checkPlayers", "Spieler" + gamer.getNumber() + ", " + gamer.getName() + ", " + gamer.getCountOfStories());
-        }
     }
 }

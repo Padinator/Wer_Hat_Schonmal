@@ -252,9 +252,9 @@ public class CreatePlayers extends AppCompatActivity {
             else if (writeStories.getText().toString().trim().isEmpty())
                 Toast.makeText(CreatePlayers.this, "Kein Text zum speichern!",
                         Toast.LENGTH_LONG).show();
-            else if (writeStories.getText().toString().length() < 25)
+            else if (writeStories.getText().toString().length() < 8)
                 Toast.makeText(CreatePlayers.this,
-                        "Eine Story muss aus mindestens 25 zeichen " + "bestehen.",
+                        "Eine Story muss aus mindestens 8 zeichen " + "bestehen.",
                         Toast.LENGTH_SHORT).show();
             else {          // Text field is okay
                 Objects.requireNonNull(mapOfGamers.get(actualPlayersIndex)).addStory(writeStories.getText().toString().trim());
