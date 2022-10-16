@@ -19,7 +19,6 @@ import com.example.werhatschonmal.adapter.LoadGameAdapter;
 import com.example.werhatschonmal.database.AppDatabase;
 
 public class LoadGame extends AppCompatActivity {
-    TextView noStoriesSaved;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -32,6 +31,7 @@ public class LoadGame extends AppCompatActivity {
 
         // Definitions
         RecyclerView recyclerView;
+        TextView noStoriesSaved;
         LoadGameAdapter loadGameAdapter;
         AppDatabase db;
 

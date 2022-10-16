@@ -50,9 +50,9 @@ public class Rules extends AppCompatActivity {
         rules.add("2. Aufgeschriebene Stories m\u00fcssen tats\u00e4chlich passiert sein.");
         rules.add("3. Spieler sowie Stories werden zuf\u00e4llig ausgew\u00e4hlt.");
         rules.add("4. Jeder Spieler kommt irgendwann dran.");
-        rules.add("5. Gib keine direkten Tips, wenn du weißt, von wem die Story ist.");
+        rules.add("5. Gib keine direkten Tipps, wenn du weißt, von wem die Story ist.");
         rules.add("6. Wer falsch r\u00e4t, muss nat\u00fcrlich trinken.");
-        rules.add("7. Wird richtig geraten, dann muss der Storyschreiber einen trinken.");
+        rules.add("7. Wird richtig geraten, dann muss der Storybesitzer einen trinken.");
         rules.add("8. Eine Aulf\u00f6sung gibts am Ende.");
 
         // Adapter

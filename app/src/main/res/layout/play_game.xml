@@ -101,6 +101,7 @@
                 android:layout_marginTop="80dp"
                 android:layout_marginRight="10dp"
                 android:layout_marginBottom="15dp"
+                android:paddingVertical="20dp"
                 android:backgroundTint="@color/orange_one"
                 android:text="Auflösen"
                 android:visibility="visible" />

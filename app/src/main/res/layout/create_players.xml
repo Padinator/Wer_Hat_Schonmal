@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/relLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -8,11 +9,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true">
+        android:layout_alignParentTop="true"
+        tools:ignore="UselessParent">
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content">
 
             <RelativeLayout
                 android:id="@id/player"
@@ -25,18 +27,18 @@
                     android:id="@+id/playerID"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="16dp"
-                    android:layout_marginRight="30dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="30dp"
                     android:padding="8dp"
                     android:text="Spieler Nr. 1"
-                    android:textSize="20dp" />
+                    android:textSize="20sp" />
 
                 <EditText
                     android:id="@+id/playerName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="30dp"
-                    android:layout_toRightOf="@+id/playerID"
+                    android:layout_marginEnd="30dp"
+                    android:layout_toEndOf="@+id/playerID"
                     android:background="@drawable/textview_story_border"
                     android:hint="Dein Name"
                     android:padding="8dp"
@@ -56,26 +58,26 @@
                 android:layout_marginBottom="16dp"
                 android:padding="6dp"
                 android:text="Schreibe auf, was du schon mal gemacht hast und die anderen müssen es erraten:"
-                android:textSize="20dp" />
+                android:textSize="20sp" />
 
             <TextView
                 android:id="@+id/storyNumber"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/explanation"
-                android:layout_marginLeft="16dp"
+                android:layout_marginStart="16dp"
                 android:padding="8dp"
                 android:text="Story 1:"
-                android:textSize="20dp" />
+                android:textSize="20sp" />
 
             <TextView
                 android:id="@+id/charsLeft"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/explanation"
-                android:layout_marginLeft="50dp"
-                android:layout_toRightOf="@+id/storyNumber"
-                android:textSize="20dp" />
+                android:layout_marginStart="50dp"
+                android:layout_toEndOf="@+id/storyNumber"
+                android:textSize="20sp" />
 
             <EditText
                 android:id="@+id/writeStories"
@@ -98,17 +100,17 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/writeStories"
                 android:layout_centerHorizontal="true"
-                android:layout_marginHorizontal="16dp">
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginVertical="30dp">
 
                 <Button
                     android:id="@+id/saveAndNextStory"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="10dp"
-                    android:layout_marginBottom="15dp"
-                    android:layout_toLeftOf="@+id/orientationOne"
+                    android:layout_toStartOf="@+id/orientationOne"
+                    android:layout_marginBottom="30dp"
                     android:backgroundTint="@color/normalGreen"
-                    android:padding="5dp"
+                    android:background="@drawable/button_rounded_edges"
                     android:text="Speichern"
                     android:textColor="@color/white" />
 
@@ -117,17 +119,16 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
+                    android:layout_marginHorizontal="20dp"
                     android:visibility="invisible" />
 
                 <Button
                     android:id="@+id/viewYourStories"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginBottom="15dp"
-                    android:layout_toRightOf="@+id/orientationOne"
+                    android:layout_toEndOf="@+id/orientationOne"
+                    android:background="@drawable/button_rounded_edges"
                     android:backgroundTint="@color/normalGreen"
-                    android:padding="5dp"
                     android:text="Alle ansehen"
                     android:textColor="@color/white" />
 
@@ -137,11 +138,9 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/saveAndNextStory"
                     android:layout_centerHorizontal="true"
-                    android:layout_marginRight="10dp"
-                    android:layout_marginBottom="15dp"
-                    android:layout_toLeftOf="@+id/orientationOne"
+                    android:layout_toStartOf="@+id/orientationOne"
                     android:backgroundTint="@color/normalBlue"
-                    android:padding="5dp"
+                    android:background="@drawable/button_rounded_edges"
                     android:text="Nächster"
                     android:textColor="@color/white" />
 
@@ -150,13 +149,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/saveAndNextStory"
-                    android:layout_marginLeft="10dp"
-                    android:layout_toRightOf="@+id/orientationOne"
+                    android:layout_toEndOf="@+id/orientationOne"
                     android:backgroundTint="@color/normalBlue"
-                    android:padding="5dp"
+                    android:background="@drawable/button_rounded_edges"
                     android:text="Regeln"
                     android:textColor="@color/white" />
-
 
             </RelativeLayout>
 
@@ -170,6 +167,7 @@
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="16dp"
+                android:paddingVertical="22dp"
                 android:backgroundTint="@color/orange_one"
                 android:text="Weiter" />
 
