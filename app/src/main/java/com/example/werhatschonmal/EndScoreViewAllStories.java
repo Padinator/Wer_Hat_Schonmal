@@ -5,9 +5,9 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Html;
+import android.util.Log;
 import android.view.MenuItem;
 
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -26,7 +26,6 @@ public class EndScoreViewAllStories extends AppCompatActivity {
 
     private int gameId;
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,7 +42,6 @@ public class EndScoreViewAllStories extends AppCompatActivity {
         List<Story> listOfStories;
         int[] playerIds, storyIds;
         int idOfFirstPlayer, countOfPlayers, idOfFirstStory, countOfStories;
-
         // Get from last intent
         gameId = getIntent().getExtras().getInt("GameId");
 
@@ -56,12 +54,20 @@ public class EndScoreViewAllStories extends AppCompatActivity {
         countOfPlayers = game.countOfPlayers;
         idOfFirstStory = game.idOfFirstStory;
         countOfStories = game.countOfStories;
+        Log.e("idOfFirstStory", "" + idOfFirstStory);
+        Log.e("countOfStories", "" + countOfStories);
         playerIds = PlayGame.findSomethingOfActualGame(idOfFirstPlayer, countOfPlayers);
         storyIds = PlayGame.findSomethingOfActualGame(idOfFirstStory, countOfStories);
 
         listOfPlayers = db.playerDao().loadAllByPlayerIds(playerIds);
         listOfStories = db.storyDao().loadAllByStoryIds(storyIds);
-        listOfStories.removeIf(story -> !story.status); // Remove unused stories
+
+        for (Story story: listOfStories)
+            Log.e("listofstories", story.content);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) { // Request version for sorting
+            listOfStories.removeIf(story -> !story.status); // Remove unused stories
+        }
 
         // recyclerView
         recyclerView = findViewById(R.id.recyclerView);
