@@ -10,7 +10,6 @@ import android.text.Html;
 import android.view.MenuItem;
 import android.widget.Button;
 
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -29,7 +28,6 @@ public class EndScore extends AppCompatActivity {
 
     private int gameId;
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,7 +61,10 @@ public class EndScore extends AppCompatActivity {
         countOfPlayers = game.countOfPlayers;
         playerIds = PlayGame.findSomethingOfActualGame(idOfFirstPlayer, countOfPlayers);
         players = db.playerDao().loadAllByPlayerIds(playerIds);
-        players.sort(Comparator.comparingInt(player -> -player.score));
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) { // Request version for sorting
+            players.sort(Comparator.comparingInt(player -> -player.score));
+        }
 
         // RecyclerView
         recyclerView = findViewById(R.id.recyclerView);

@@ -54,7 +54,7 @@ public class PlayGame extends AppCompatActivity {
     private List<Story> listOfStories;              // Contains lal stories of the actual game, listOfStories has access to the database
     private TextView player, story, round, drinkOfTheGameTextView;
     private Button solution, save, back;
-    private static Semaphore semPlayGame;
+    private static Semaphore semPlayGame = new Semaphore(0);
 
     // Variables for database and client-server-communication
     private AppDatabase db;
@@ -87,11 +87,6 @@ public class PlayGame extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.play_game);
 
-        // Calling the action bar
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.arrow_back);
-        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-
         // Set dark mode to none
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
 
@@ -113,7 +108,8 @@ public class PlayGame extends AppCompatActivity {
         dropDownMenu = findViewById(R.id.menu);
         autoCompleteText = findViewById(R.id.auto_complete);
 
-        if (!onlineGame) { // Set solution-possibility to visible
+        // Set solution-possibility to visible
+        if (!onlineGame) {
             dropDownMenu.setVisibility(View.VISIBLE);
             solution.setVisibility(View.VISIBLE);
         }
@@ -191,11 +187,6 @@ public class PlayGame extends AppCompatActivity {
                             // Set used variable
                             idOfFirstStory = -1;
 
-                            // Set Actionbar title
-                            int playerNumber = ClientServerHandler.getClientEndPoint().getClient().getPlayerNumber();
-                            String output = "Du bist Spieler " + playerNumber + ", " + listOfPlayers.get(playerNumber - 1);
-
-                            runOnUiThread(() -> getSupportActionBar().setTitle((Html.fromHtml("<big><font color=\"#000000\">" + output + "</font></big>"))));
                             break;
                         }
                         case (SocketEndPoint.GAME_STATUS_CHANGED): { // Set changed game status (general)
@@ -231,6 +222,7 @@ public class PlayGame extends AppCompatActivity {
                                 listOfStories = new LinkedList<>();
                                 idOfFirstStory = nextStory.storyId;
                                 actualGame.idOfFirstStory = idOfFirstStory;
+                                Log.e("idoffirststory", "" + idOfFirstStory);
                             }
 
                             // Update actual game in database
@@ -253,8 +245,8 @@ public class PlayGame extends AppCompatActivity {
 
                             // Set solution-possibility to invisible
                             runOnUiThread(() -> {
-                                dropDownMenu.setVisibility(View.VISIBLE);
-                                solution.setVisibility(View.VISIBLE);
+                                dropDownMenu.setVisibility(View.INVISIBLE);
+                                solution.setVisibility(View.INVISIBLE);
                             });
 
                             break;
@@ -276,7 +268,6 @@ public class PlayGame extends AppCompatActivity {
                                     selectedPlayerPosition = i;
                                     selectedPlayerSelected = true;
                                 });
-                                autoCompleteText.setVisibility(View.VISIBLE);
 
                                 // Set solution possibility to visible
                                 dropDownMenu.setVisibility(View.VISIBLE);
@@ -385,20 +376,52 @@ public class PlayGame extends AppCompatActivity {
 
             // Set used variables and views
             if (!onlineGame) { // Local game
-                // Set Actionbar title
-                getSupportActionBar().setTitle((Html.fromHtml("<big><font color=\"#000000\">" + "Wer hat schonmal..." + "</font></big>")));
-
                 dropDownMenu.setVisibility(View.VISIBLE);
                 solution.setVisibility(View.VISIBLE);
-                semPlayGame = new Semaphore(0);
-            } else { // Online game
+            } else { // Online game, serverside
+                // Receive results from guessing player
+                ClientServerHandler.getServerEndPoint().receiveMessages(
+                        new SocketCommunicator(null, null, null, null, null).new Receiver() {
 
-                // Set Actionbar title
-                getSupportActionBar().setTitle((Html.fromHtml("<big><font color=\"#000000\">" + "Du bist Spieler 1, " + listOfPlayers.get(0).name + "</font></big>")));
+                            @SuppressLint("LongLogTag")
+                            @Override
+                            public void action() {
+                                String receivedMessage = getMessage();
+                                String[] lines = receivedMessage.split(SocketEndPoint.SEPARATOR);
+                                receivedMessage = lines[0];
+                                Log.e("Host received from client", Arrays.toString(lines));
+                                Log.e("Host received from client", receivedMessage + ", " + (receivedMessage.equals(SocketEndPoint.VIEWED_ACTUAL_SCORE)));
+                                switch (receivedMessage) {
+                                    case (SocketEndPoint.PLAYER_CHOSEN): {
+                                        runOnUiThread(() -> {
+                                            //chooseAPlayer.setSelection(Integer.parseInt(lines[1]));/////////////////
+                                            //autoCompleteText.setText(autoCompleteText.getAdapter().getItem(Integer.parseInt(lines[1])).toString(), false);
+                                            //autoCompleteText.setListSelection(Integer.parseInt(lines[1]));
+                                            selectedPlayer = lines[1];
+                                            selectedPlayerSelected = true;
+                                            solution.callOnClick();
+                                            solution.setVisibility(View.VISIBLE);
+                                        });
 
-                semPlayGame = new Semaphore(countOfPlayers - 2);
+                                        break;
+                                    }
+                                    case (SocketEndPoint.VIEWED_ACTUAL_SCORE): { // Terminate waiting status "peu a peu"
+                                        releasePlayGame();
+                                        Log.e("Client released", "C1");
+                                        // Stop receiving from this client
+                                        //new Thread(() -> ClientServerHandler.getServerEndPoint().stopReceivingMessages(guessingPlayersNumber - 2)).start();
+
+                                        break;
+                                    }
+                                    default: {
+                                        Log.e("Server receives outside, PlayGame", Arrays.toString(lines));
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                );
             }
-
 
             // Case if a game is loaded, only use unused stories
             storyIds = findUnusedStories();
@@ -541,6 +564,24 @@ public class PlayGame extends AppCompatActivity {
                     next.putExtra("GameId", gameId);
                     startActivity(next);
 
+                    // Set used variable
+                    solutionPressed = false;
+                    selectedPlayerSelected = false;
+
+                    // Set TextViews
+                    runOnUiThread(() -> {
+                        if (!onlineGame) // Offline game
+                            solution.setText("Aufl\u00f6sen");
+                        else { // Online game: "deactivate" temporary solution-possibility for all players
+                            dropDownMenu.setVisibility(View.INVISIBLE);
+                            solution.setVisibility(View.INVISIBLE);
+                        }
+                        // resets the autoCompleteText for every round
+                        autoCompleteText.setText(null);
+                        //autoCompleteText.setText("");     // or you can use this
+                        autoCompleteText.setFocusable(false);
+                    });
+
                     // Start next round
                     new Thread(() -> {
                         if (!onlineGame || serverSide) {
@@ -549,8 +590,10 @@ public class PlayGame extends AppCompatActivity {
                             try {
                                 if (!onlineGame) // Local game
                                     waitForSth(1);
-                                else // Online game, serverside
+                                else { // Online game, serverside
+                                    Log.e("waitforsth", "" + countOfPlayers);
                                     waitForSth(countOfPlayers);
+                                }
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
@@ -558,24 +601,6 @@ public class PlayGame extends AppCompatActivity {
                             // Play another round
                             playRound();
                         }
-
-                        // Set used variable
-                        solutionPressed = false;
-                        selectedPlayerSelected = false;
-
-                        // Set TextViews
-                        runOnUiThread(() -> {
-                            if (!onlineGame) // Offline game
-                                solution.setText("Aufl\u00f6sen");
-                            else { // Online game: "deactivate" temporary solution-possibility for all players
-                                dropDownMenu.setVisibility(View.VISIBLE);
-                                solution.setVisibility(View.VISIBLE);
-                            }
-                            // resets the autoCompleteText for every round
-                            autoCompleteText.setText(null);
-                            //autoCompleteText.setText("");     // or you can use this
-                            autoCompleteText.setFocusable(false);
-                        });
                     }).start();
                 } else { // New intent with end score, game is over
                     runOnUiThread(() -> { // Run last Intent on UI-Thread
@@ -605,6 +630,12 @@ public class PlayGame extends AppCompatActivity {
                 }
             }
         });
+
+        // calling the action bar
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.arrow_back);
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        getSupportActionBar().setTitle((Html.fromHtml("<big><font color=\"#000000\">" + "Wer hat schonmal..." + "</font></big>")));
     }
 
     @SuppressLint("LongLogTag")
@@ -657,11 +688,11 @@ public class PlayGame extends AppCompatActivity {
         int oldPlayerId = idOfFirstPlayer;
         int storyCounter = 0;
 
-        Log.e("saveInNewDataStructure", "CountOfPlayers: " + countOfPlayers + ", IdOfFirstPlayer: " + idOfFirstPlayer);
+        //Log.e("saveInNewDataStructure", "CountOfPlayers: " + countOfPlayers + ", IdOfFirstPlayer: " + idOfFirstPlayer);
         for (int i = 0; i < countOfPlayers; i++) {
 
-            if (storyCounter < listOfStories.size())
-                Log.e("saveInNewDataStructure", "Spieler" + listOfPlayers.get(i).playerNumber + ", " + listOfPlayers.get(i).name + ", aktuell erste Story, dessen PlayerId: " + listOfStories.get(storyCounter).playerId);
+            //if (storyCounter < listOfStories.size())
+            //    Log.e("saveInNewDataStructure", "Spieler" + listOfPlayers.get(i).playerNumber + ", " + listOfPlayers.get(i).name + ", aktuell erste Story, dessen PlayerId: " + listOfStories.get(storyCounter).playerId);
             // Create a new player in the list
             players[i] = new Gamer(listOfPlayers.get(i).playerNumber);
             players[i].setName(listOfPlayers.get(i).name);
@@ -670,7 +701,7 @@ public class PlayGame extends AppCompatActivity {
             for (; storyCounter < countOfStories
                     && oldPlayerId == listOfStories.get(storyCounter).playerId; storyCounter++) {
                 players[i].addStory(listOfStories.get(storyCounter).content);
-                Log.e("saveInNewDataStructure", "StoryCounter: " + storyCounter + ", PlayerId: " + listOfStories.get(storyCounter).playerId + ", OldPlayerId: " + oldPlayerId + ", StoryId: " + listOfStories.get(storyCounter).storyId);
+                //Log.e("saveInNewDataStructure", "StoryCounter: " + storyCounter + ", PlayerId: " + listOfStories.get(storyCounter).playerId + ", OldPlayerId: " + oldPlayerId + ", StoryId: " + listOfStories.get(storyCounter).storyId);
             }
 
             // Set new id for oldStoryId
@@ -768,62 +799,24 @@ public class PlayGame extends AppCompatActivity {
                 if (guessingPlayer.getNumber() == 1) { // Host may guess
                     Log.e("guessingPlayer ist", guessingPlayer.getNumber() + ", ist 1");
                     // Set solution-possibility to visible
-                    dropDownMenu.setVisibility(View.VISIBLE);
-                    solution.setVisibility(View.VISIBLE);
-                    //dropDownMenu.notifyAll();
+                    runOnUiThread(() -> {
+                        dropDownMenu.setVisibility(View.VISIBLE);
+                        // dropDownMenu.notifyAll();
+                        solution.setVisibility(View.VISIBLE);
+                    });
                 } else { // Another player may guess
                     final int guessingPlayersNumber = guessingPlayer.getNumber();
                     Log.e("guessingPlayer ist", guessingPlayer.getNumber() + "");
 
                     // Set solution-possibility of host to invisible
-                    dropDownMenu.setVisibility(View.VISIBLE);
-                    solution.setVisibility(View.VISIBLE);
-                    //dropDownMenu.notifyAll();
+                    runOnUiThread(() -> {
+                        dropDownMenu.setVisibility(View.INVISIBLE);
+                        // dropDownMenu.notifyAll();
+                        solution.setVisibility(View.INVISIBLE);
+                    });
 
                     // Inform guessing player to guess
                     ClientServerHandler.getServerEndPoint().sendMessageToClient(guessingPlayersNumber - 2, SocketEndPoint.YOUR_TURN);
-
-                    // Receive results from guessing player
-                    ClientServerHandler.getServerEndPoint().receiveMessages(guessingPlayersNumber - 2,
-                            new SocketCommunicator(null, null, null, null, null).new Receiver() {
-
-                                @SuppressLint("LongLogTag")
-                                @Override
-                                public void action() {
-                                    String receivedMessage = getMessage();
-                                    String[] lines = receivedMessage.split(SocketEndPoint.SEPARATOR);
-                                    receivedMessage = lines[0];
-
-                                    switch (receivedMessage) {
-                                        case (SocketEndPoint.PLAYER_CHOSEN): {
-                                            runOnUiThread(() -> {
-                                                //chooseAPlayer.setSelection(Integer.parseInt(lines[1]));/////////////////
-                                                //autoCompleteText.setText(autoCompleteText.getAdapter().getItem(Integer.parseInt(lines[1])).toString(), false);
-                                                //autoCompleteText.setListSelection(Integer.parseInt(lines[1]));
-                                                selectedPlayer = lines[1];
-                                                selectedPlayerSelected = true;
-                                                solution.callOnClick();
-                                                solution.setVisibility(View.VISIBLE);
-                                            });
-
-                                            break;
-                                        }
-                                        case (SocketEndPoint.VIEWED_ACTUAL_SCORE): { // Terminate waiting status "peu a peu"
-                                            releasePlayGame();
-
-                                            // Stop receiving from this client
-                                            new Thread(() -> ClientServerHandler.getServerEndPoint().stopReceivingMessages(guessingPlayersNumber - 2)).start();
-
-                                            break;
-                                        }
-                                        default: {
-                                            Log.e("Server receives outside, PlayGame", Arrays.toString(lines));
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-                    );
                 }
             }
         });
@@ -874,22 +867,24 @@ public class PlayGame extends AppCompatActivity {
         for (Story stories : listOfStories)
             Log.e("All stories", stories.storyId + ", " + stories.content);
 
-        Log.e("chooseRandomStory", "countOfStories: " + countOfStories);
-        Log.e("chooseRandomStory", "Ausgewaehlte SpielerId: " + playerIds[guessedPlayer.getNumber() - 1] + ", suchen dieses Spielers " + listOfStories.get(actualStoryNumber).playerId + ", actualStoryNumber: " + actualStoryNumber);
+        //Log.e("chooseRandomStory", "countOfStories: " + countOfStories);
+        //Log.e("chooseRandomStory", "Ausgewaehlte SpielerId: " + playerIds[guessedPlayer.getNumber() - 1] + ", suchen dieses Spielers " + listOfStories.get(actualStoryNumber).playerId + ", actualStoryNumber: " + actualStoryNumber);
 
         // Set used variable
         while (listOfStories.get(actualStoryNumber).playerId != playerIds[guessedPlayer.getNumber() - 1]) { // Find the right player
             actualStoryNumber++;
-            Log.e("endlosschleife", "Endlosschleife3: " + "Ausgewaehlter Spieler: " + playerIds[guessedPlayer.getNumber() - 1] + ", suchen dieses Spielers " + listOfStories.get(actualStoryNumber).playerId + ", actualStoryNumber: " + actualStoryNumber);
+            //Log.e("endlosschleife", "Endlosschleife3: " + "Ausgewaehlter Spieler: " + playerIds[guessedPlayer.getNumber() - 1] + ", suchen dieses Spielers " + listOfStories.get(actualStoryNumber).playerId + ", actualStoryNumber: " + actualStoryNumber);
         }
 
         // Choose randomly a story, which should be unused
         do {
             storyIndex = (int) (Math.random() * countOfStories);
+            /*
             if (storyIndex >= 0 && storyIndex < countOfStories)
                 Log.e("endlosschleife", "Endlosschleife4: " + actualStoryNumber + ", " + storyIndex + ", " + listOfStories.get(actualStoryNumber + storyIndex).status);
             else
                 Log.e("endlosschleife", "Endlosschleife4: " + actualStoryNumber + ", " + storyIndex);
+            */
         } while (listOfStories.get(actualStoryNumber + storyIndex).status);
 
         // Save story in variable story
@@ -1091,6 +1086,7 @@ public class PlayGame extends AppCompatActivity {
      * Terminates waiting status of class PlayGame (release a semaphore).
      */
     public static void releasePlayGame() {
+        Log.e("Release", "1, available permits: " + semPlayGame.availablePermits());
         if (semPlayGame.availablePermits() >= 0)
             semPlayGame.release();
         else
