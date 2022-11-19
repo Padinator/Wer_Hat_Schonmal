@@ -20,6 +20,8 @@ import de.android.werhatschonmal.database.AppDatabase;
 
 public class LoadGame extends AppCompatActivity {
 
+    private AppDatabase db;
+
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +35,6 @@ public class LoadGame extends AppCompatActivity {
         RecyclerView recyclerView;
         TextView noStoriesSaved;
         LoadGameAdapter loadGameAdapter;
-        AppDatabase db;
 
         // TextView
         noStoriesSaved = findViewById(R.id.noStoriesSaved);
@@ -52,9 +53,6 @@ public class LoadGame extends AppCompatActivity {
         if (loadGameAdapter.getItemCount() == 0)
             noStoriesSaved.setText("Es sind keine Spiele gespeichert!");
 
-        // Close database connection
-        db.close();
-
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.arrow_back);
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.WHITE));
@@ -71,8 +69,13 @@ public class LoadGame extends AppCompatActivity {
     }
 
     @Override
-    public void onBackPressed() {       // Catch back button
+    public void onBackPressed() { // Catch back button
         Intent mainActivity = new Intent(LoadGame.this, MainActivity.class);
+
+        // Close database connection
+        db.close();
+
+        // Start next intent
         startActivity(mainActivity);
         finish();
     }

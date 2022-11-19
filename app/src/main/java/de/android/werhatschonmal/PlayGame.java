@@ -87,6 +87,11 @@ public class PlayGame extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.play_game);
 
+        // Calling the action bar
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.arrow_back);
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
         // Set dark mode to none
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
 
@@ -186,6 +191,11 @@ public class PlayGame extends AppCompatActivity {
                             // Set used variable
                             idOfFirstStory = -1;
 
+                            // Set Actionbar title
+                            int playerNumber = ClientServerHandler.getClientEndPoint().getClient().getPlayerNumber();
+                            String output = "Du bist Spieler " + playerNumber + ", " + listOfPlayers.get(playerNumber - 1);
+
+                            runOnUiThread(() -> getSupportActionBar().setTitle((Html.fromHtml("<big><font color=\"#000000\">" + output + "</font></big>"))));
                             break;
                         }
                         case (SocketEndPoint.GAME_STATUS_CHANGED): { // Set changed game status (general)
@@ -243,8 +253,8 @@ public class PlayGame extends AppCompatActivity {
 
                             // Set solution-possibility to invisible
                             runOnUiThread(() -> {
-                                dropDownMenu.setVisibility(View.INVISIBLE);
-                                solution.setVisibility(View.INVISIBLE);
+                                dropDownMenu.setVisibility(View.VISIBLE);
+                                solution.setVisibility(View.VISIBLE);
                             });
 
                             break;
@@ -375,11 +385,20 @@ public class PlayGame extends AppCompatActivity {
 
             // Set used variables and views
             if (!onlineGame) { // Local game
+                // Set Actionbar title
+                getSupportActionBar().setTitle((Html.fromHtml("<big><font color=\"#000000\">" + "Wer hat schonmal..." + "</font></big>")));
+
                 dropDownMenu.setVisibility(View.VISIBLE);
                 solution.setVisibility(View.VISIBLE);
                 semPlayGame = new Semaphore(0);
-            } else // Online game
+            } else { // Online game
+
+                // Set Actionbar title
+                getSupportActionBar().setTitle((Html.fromHtml("<big><font color=\"#000000\">" + "Du bist Spieler 1, " + listOfPlayers.get(0).name + "</font></big>")));
+
                 semPlayGame = new Semaphore(countOfPlayers - 2);
+            }
+
 
             // Case if a game is loaded, only use unused stories
             storyIds = findUnusedStories();
@@ -549,8 +568,8 @@ public class PlayGame extends AppCompatActivity {
                             if (!onlineGame) // Offline game
                                 solution.setText("Aufl\u00f6sen");
                             else { // Online game: "deactivate" temporary solution-possibility for all players
-                                dropDownMenu.setVisibility(View.INVISIBLE);
-                                solution.setVisibility(View.INVISIBLE);
+                                dropDownMenu.setVisibility(View.VISIBLE);
+                                solution.setVisibility(View.VISIBLE);
                             }
                             // resets the autoCompleteText for every round
                             autoCompleteText.setText(null);
@@ -586,12 +605,6 @@ public class PlayGame extends AppCompatActivity {
                 }
             }
         });
-
-        // calling the action bar
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.arrow_back);
-        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        getSupportActionBar().setTitle((Html.fromHtml("<big><font color=\"#000000\">" + "Wer hat schonmal..." + "</font></big>")));
     }
 
     @SuppressLint("LongLogTag")
@@ -757,15 +770,15 @@ public class PlayGame extends AppCompatActivity {
                     // Set solution-possibility to visible
                     dropDownMenu.setVisibility(View.VISIBLE);
                     solution.setVisibility(View.VISIBLE);
-                    dropDownMenu.notifyAll();
+                    //dropDownMenu.notifyAll();
                 } else { // Another player may guess
                     final int guessingPlayersNumber = guessingPlayer.getNumber();
                     Log.e("guessingPlayer ist", guessingPlayer.getNumber() + "");
 
                     // Set solution-possibility of host to invisible
-                    dropDownMenu.setVisibility(View.INVISIBLE);
-                    solution.setVisibility(View.INVISIBLE);
-                    dropDownMenu.notifyAll();
+                    dropDownMenu.setVisibility(View.VISIBLE);
+                    solution.setVisibility(View.VISIBLE);
+                    //dropDownMenu.notifyAll();
 
                     // Inform guessing player to guess
                     ClientServerHandler.getServerEndPoint().sendMessageToClient(guessingPlayersNumber - 2, SocketEndPoint.YOUR_TURN);
