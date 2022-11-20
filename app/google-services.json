@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:438608168925:android:54e862a501d7cf34f5d834",
         "android_client_info": {
-          "package_name": "com.example.ichhabschonmal"
+          "package_name": "de.android.ichhabschonmal"
         }
       },
       "oauth_client": [
@@ -17,10 +17,39 @@
           "client_id": "438608168925-mtpjiosv8i5h9tl39qc5m4s17utak8kk.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.ichhabschonmal",
+            "package_name": "de.android.ichhabschonmal",
             "certificate_hash": "55df1cfa52fc56ff89f847e541a2d67837810127"
           }
         },
+        {
+          "client_id": "438608168925-sa2ftijb7hblrdpnstngjan07apef8i9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCXzFoTtcV1_LEQh3NhRGLtQsAzMz8n2Mw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "438608168925-sa2ftijb7hblrdpnstngjan07apef8i9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:438608168925:android:199583de4278028df5d834",
+        "android_client_info": {
+          "package_name": "de.android.werhatschonmal"
+        }
+      },
+      "oauth_client": [
         {
           "client_id": "438608168925-sa2ftijb7hblrdpnstngjan07apef8i9.apps.googleusercontent.com",
           "client_type": 3
