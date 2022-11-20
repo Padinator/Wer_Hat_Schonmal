@@ -160,7 +160,7 @@ public class CreatePlayers extends AppCompatActivity {
 
                                 try {
                                     semRespondingClient.acquire();
-                                    respondingClients++;
+                                    respondingClients++; // Raise count of respondingClients to size of players
                                     tmp = respondingClients;
                                     semRespondingClient.release();
                                 } catch (InterruptedException e) {
