@@ -73,6 +73,14 @@ public class NewGame extends AppCompatActivity {
         // Close database connection
         db.close();
 
+        playMode.setOnClickListener(view -> {
+            if (!playMode.isChecked())
+                playMode.setText("Offline");
+            else
+                playMode.setText("Online");
+        });
+
+
         // Pop up window for drink selection
         chooseDrink.setOnClickListener(e -> showDrinkSelection(Gamer.drinks));
 
